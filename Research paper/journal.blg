@@ -1,16 +1,16 @@
 [0] Config.pm:307> INFO - This is Biber 2.19
 [0] Config.pm:310> INFO - Logfile is 'journal.blg'
-[126] biber-MSWIN64:340> INFO - === 
-[155] Biber.pm:419> INFO - Reading 'journal.bcf'
-[262] Biber.pm:979> INFO - Found 1 citekeys in bib section 0
-[277] Biber.pm:4419> INFO - Processing section 0
-[289] Biber.pm:4610> INFO - Looking for bibtex file 'reference.bib' for section 0
-[296] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[296] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
-[296] Biber.pm:4239> INFO - Sorting list 'nty/global//global/global' of type 'entry' with template 'nty' and locale 'en-US'
-[296] Biber.pm:4245> INFO - No sort tailoring available for locale 'en-US'
-[297] bbl.pm:660> INFO - Writing 'journal.bbl' with encoding 'UTF-8'
-[297] bbl.pm:763> INFO - Output to journal.bbl
-[297] Biber.pm:131> WARN - Data source 'reference.bib' is empty, ignoring
-[297] Biber.pm:131> WARN - I didn't find a database entry for 'ajao2020' (section 0)
-[297] Biber.pm:133> INFO - WARNINGS: 2
+[182] biber-MSWIN64:340> INFO - === 
+[250] Biber.pm:419> INFO - Reading 'journal.bcf'
+[352] Biber.pm:979> INFO - Found 1 citekeys in bib section 0
+[367] Biber.pm:4419> INFO - Processing section 0
+[391] Biber.pm:4610> INFO - Looking for bibtex file 'reference.bib' for section 0
+[397] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[397] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[397] Biber.pm:4239> INFO - Sorting list 'nty/global//global/global' of type 'entry' with template 'nty' and locale 'en-US'
+[397] Biber.pm:4245> INFO - No sort tailoring available for locale 'en-US'
+[398] bbl.pm:660> INFO - Writing 'journal.bbl' with encoding 'UTF-8'
+[398] bbl.pm:763> INFO - Output to journal.bbl
+[398] Biber.pm:131> WARN - Data source 'reference.bib' is empty, ignoring
+[398] Biber.pm:131> WARN - I didn't find a database entry for 'ajao2020' (section 0)
+[398] Biber.pm:133> INFO - WARNINGS: 2

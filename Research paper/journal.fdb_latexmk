@@ -1,12 +1,13 @@
 # Fdb version 4
-["biber journal"] 1701207970 "journal.bcf" "journal.bbl" "journal" 1701208086 0
+["biber journal"] 1701254698 "journal.bcf" "journal.bbl" "journal" 1701254706 0
   "./reference.bib" 1701127038 0 d41d8cd98f00b204e9800998ecf8427e ""
-  "journal.bcf" 1701208086 107952 84f264c44e1da7b2e05c84c84ac12654 "pdflatex"
+  "journal.bcf" 1701254705 107952 84f264c44e1da7b2e05c84c84ac12654 "pdflatex"
   (generated)
   "journal.bbl"
   "journal.blg"
   (rewritten before read)
-["pdflatex"] 1701208085 "c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/Research paper/journal.tex" "journal.pdf" "journal" 1701208086 0
+["pdflatex"] 1701254704 "c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/Research paper/journal.tex" "journal.pdf" "journal" 1701254706 0
+  "../Research paper/images/trend_analysis_improved.pdf" 1701254669 47790 60848952ccaa6d12d1cdc61719d1e808 ""
   "C:/Users/ajaoo/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1700855343 358856 fe366f6fcd0f6a891d830f994f031f69 ""
   "C:/Users/ajaoo/AppData/Local/MiKTeX/fonts/tfm/public/rsfs/rsfs10.tfm" 1694778591 688 37338d6ab346c2f1466b29e195316aa4 ""
   "C:/Users/ajaoo/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1684845992 23185515 8df6b0498e95ba1a9d42f08dd43f741e ""
@@ -129,12 +130,12 @@
   "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/tex/latex/refcount/refcount.sty" 1576433952 9878 9e94e8fa600d95f9c7731bb21dfb67a4 ""
   "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/tex/latex/rerunfilecheck/rerunfilecheck.sty" 1657797096 9714 ba3194bd52c8499b3f1e3eb91d409670 ""
   "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
-  "c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/Research paper/journal.tex" 1701208084 3364 f23dc98288d930f77a3be9c0e85374c8 ""
-  "journal.aux" 1701208086 1989 76e4a1fe8999cfe5d1d386a1080bfb69 "pdflatex"
-  "journal.bbl" 1701207972 486 ee04f40f768daeed26442158e95aba61 "biber journal"
-  "journal.out" 1701208086 652 a1ee9a8d54c413acbdee7ceed3a88e62 "pdflatex"
-  "journal.run.xml" 1701208086 2325 0fe41ba36f172b21a5121004ca96b68e "pdflatex"
-  "journal.tex" 1701208084 3364 f23dc98288d930f77a3be9c0e85374c8 ""
+  "c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/Research paper/journal.tex" 1701254704 3534 23eee1d4778116c98a420317e91c12a0 ""
+  "journal.aux" 1701254705 2093 c893c874b2c23c523079d52bd546939c "pdflatex"
+  "journal.bbl" 1701254703 486 ee04f40f768daeed26442158e95aba61 "biber journal"
+  "journal.out" 1701254705 720 e02d869fa309bb6258bfd170ab7c22ec "pdflatex"
+  "journal.run.xml" 1701254705 2325 0fe41ba36f172b21a5121004ca96b68e "pdflatex"
+  "journal.tex" 1701254704 3534 23eee1d4778116c98a420317e91c12a0 ""
   (generated)
   "journal.aux"
   "journal.bcf"
