@@ -2,14 +2,14 @@
 ["bibtex journal"] 0 "journal.aux" "journal.bbl" "journal" 0 -1
   "./reference.bib" 1700504359 0 d41d8cd98f00b204e9800998ecf8427e ""
   "c:/texlive/2023/texmf-dist/bibtex/bst/ieeetran/IEEEtran.bst" 1699279656 57748 7c8250ecf02814ce6ddc0cdbb63df1dd ""
-  "journal.aux" 1701368292 2131 29decac632660a0a83cc63a2dcbe0783 "pdflatex"
+  "journal.aux" 1701375202 2131 2e0feb33fb406d994c12409fb1de1dd1 "pdflatex"
   (generated)
   "journal.bbl"
   "journal.blg"
   (rewritten before read)
-["pdflatex"] 1701368291 "c:/Users/olarinoyem/Project/Multivate-forecasting/Research paper/journal.tex" "journal.pdf" "journal" 1701368293 2
+["pdflatex"] 1701375202 "c:/Users/olarinoyem/Project/Multivate-forecasting/Research paper/journal.tex" "journal.pdf" "journal" 1701375203 2
   "../Research paper/images/trend_analysis_improved.pdf" 1701368261 38733 8e4f013dba2ed25cb5fd3a2b4d707803 ""
-  "c:/Users/olarinoyem/Project/Multivate-forecasting/Research paper/journal.tex" 1701366036 5640 020e4bade75df5c7dd33c8ae45318d71 ""
+  "c:/Users/olarinoyem/Project/Multivate-forecasting/Research paper/journal.tex" 1701375186 5656 a54660c45d27d9aa53b1dbe4e8cdf586 ""
   "c:/texlive/2023/texmf-dist/fonts/enc/dvips/base/8r.enc" 1699278983 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "c:/texlive/2023/texmf-dist/fonts/map/fontname/texfonts.map" 1699279301 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "c:/texlive/2023/texmf-dist/fonts/tfm/adobe/symbol/psyr.tfm" 1699281420 1408 5937f58aa508ea2cea4901c07d10f5fe ""
@@ -121,10 +121,10 @@
   "c:/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1699282142 4753603 383a31e199d96e9d74a6cf2558b44381 ""
   "c:/texlive/2023/texmf-var/web2c/pdftex/pdflatex.fmt" 1699282205 8212869 abd5c876be700494ef82de869f433ffe ""
   "c:/texlive/2023/texmf.cnf" 1699282129 713 e69b156964470283e0530f5060668171 ""
-  "journal.aux" 1701368292 2131 29decac632660a0a83cc63a2dcbe0783 "pdflatex"
+  "journal.aux" 1701375202 2131 2e0feb33fb406d994c12409fb1de1dd1 "pdflatex"
   "journal.bbl" 1701363479 486 ee04f40f768daeed26442158e95aba61 "bibtex journal"
-  "journal.out" 1701368292 2475 1dcfdbde91c54f392ea366841f480722 "pdflatex"
-  "journal.tex" 1701366036 5640 020e4bade75df5c7dd33c8ae45318d71 ""
+  "journal.out" 1701375202 2475 1dcfdbde91c54f392ea366841f480722 "pdflatex"
+  "journal.tex" 1701375186 5656 a54660c45d27d9aa53b1dbe4e8cdf586 ""
   (generated)
   "journal.aux"
   "journal.log"
