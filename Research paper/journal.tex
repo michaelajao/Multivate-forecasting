@@ -6,89 +6,89 @@
 \usepackage{float}          
 \usepackage{algorithmic}
 \usepackage{algorithm}
-\usepackage{caption}        
-\usepackage{subcaption}     
-\usepackage{biblatex}       
+\usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\usepackage{textcomp}
+\usepackage{stfloats}
+\usepackage{cite}       
 \usepackage{amsmath, amsfonts, amssymb}  
 \usepackage{hyperref}       
-
-\addbibresource{reference.bib} 
-
-
+\usepackage{xcolor}
+\hyphenation{op-tical net-works semi-conduc-tor IEEE-Xplore}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\usepackage{balance}
 
 \begin{document}
 
-% Paper title
-\title{Data-Driven Forecasting of Mechanical Ventilator Demands: A Deep learning of COVID-19 Data in England}
-\author{Michael Ajao-olarinoye}
+\title{Forecasting Ventilator Demand During COVID-19: A Neural ODE Approach}
 
+\author{
+    \IEEEauthorblockN{
+        Michael Ajao-olarinoye\IEEEauthorrefmark{1},~\IEEEmembership{Staff,~IEEE,},
+        Vasile Palade\IEEEauthorrefmark{1},~\IEEEmembership{Fellow,~IEEE},
+        Seyed Mosavi\IEEEauthorrefmark{1},~\IEEEmembership{Member,~IEEE,},
+        Fei He\IEEEauthorrefmark{1}, and
+        Petra Wark\IEEEauthorrefmark{2},
+    }
+    \IEEEauthorblockA{\IEEEauthorrefmark{1}Centre for Computational Science and Mathematical Modelling, Coventry University, Coventry, United Kingdom}
+    \IEEEauthorblockA{\IEEEauthorrefmark{2}Research Institute for Health and Wellbeing, Coventry University, Coventry, United Kingdom}
+    % \thanks{Emails:
+    %     \href{mailto:olarinoyem@coventry.ac.uk}{olarinoyem@coventry.ac.uk},
+    %     \href{mailto:ab5839@coventry.ac.uk}{ab5839@coventry.ac.uk},
+    %     \href{mailto:ad0204@coventry.ac.uk}{ad0204@coventry.ac.uk},
+    %     \href{mailto:ad0067@coventry.ac.uk}{ad0067@coventry.ac.uk},
+    %     \href{mailto:ac4710@coventry.ac.uk}{ac4710@coventry.ac.uk},
+    % }
+}
+\markboth{IEEE Journals of [Your Subject Area],~Vol.~[Your Volume], No.~[Your Number], [Your Month]~[Your Year]}{}
+\IEEEpubid{0000--0000/00\$00.00~\copyright~2021 IEEE}
 \maketitle
-\thispagestyle{empty}
-
 
 \begin{abstract}
-    This document describes the most common article elements and how to use the IEEEtran class with \LaTeX \ to produce files that are suitable for submission to the IEEE.  IEEEtran can produce conference, journal, and technical note (correspondence) papers with a suitable choice of class options.
+This study presents a novel approach to forecasting the demand for mechanical ventilators during the COVID-19 pandemic using Neural Ordinary Differential Equations (Neural ODEs). By incorporating time-series data of hospital cases, new admissions, and COVID-19 cases in England, we develop a model that captures the dynamic nature of healthcare demand during the pandemic. The analysis reveals significant time-lagged correlations between these variables and ventilator demand, informing the structure of our Neural ODE model.
 \end{abstract}
 
-\begin{IEEEkeywords}
-    Article submission, IEEE, IEEEtran, journal, \LaTeX, paper, template, typesetting.
-\end{IEEEkeywords}
-
 \section{Introduction}
-\IEEEPARstart{T}{his} introduce your topic and the purpose of your paper.
+\IEEEPARstart{T}{he} COVID-19 pandemic posed unprecedented challenges to healthcare systems worldwide, particularly in forecasting and managing resources like mechanical ventilators. This paper introduces a Neural ODE-based model to address this challenge, leveraging the strengths of LSTM networks and continuous-time dynamics modeled by ODEs.
 
+\section{Methodology}
+\subsection{Data Collection and Preprocessing}
+We utilized a dataset containing daily counts of hospital cases, new admissions, ventilator usage, and COVID-19 cases in England. The data were preprocessed for normalization and handling missing values.
 
+\subsubsection{COVID-19 daily case data}
 
-\section{Literature Review}
-\label{sec:lit_review}
-This section should contain a review of the literature relevant to your topic. You should cite the relevant literature in this section. For example, \cite{ajao2020}.
+\subsubsection{England daily hospital cases}
 
-\section[short]{Data analysis}
+\subsubsection{Daily new hospital addmission for COVID-19}
+
+\subsubsection{Daily Mechanical ventilator usage}
+
+\subsubsection{Vaccination index}
+
+\subsection{Exploratory Data Analysis}
+Time-series analysis and correlation studies were conducted to understand the relationships between the variables. Time-lagged correlations were particularly emphasized to capture the delayed effects on ventilator demand.
+\IEEEpubidadjcol
 \begin{figure}[h]
+    \centering
     \includegraphics[width=0.4\textwidth]{"../Research paper/images/trend_analysis_improved.pdf"}
 \end{figure}
 
-\section{Methodology}
-\label{sec:methodology}
-This section should contain a description of the methodology used in your work. You should also include the mathematical formulation of your model in this section. For example, the mathematical formulation of the model in \cite{ajao2020} is given by equation \ref{eq:1}.
-\begin{equation}
-    \label{eq:1}
-    \begin{split}
-        \min_{\mathbf{w}} \quad & \frac{1}{2} \mathbf{w}^T \mathbf{w} + C \sum_{i=1}^{n} \xi_i \\
-        \text{s.t.} \quad & y_i(\mathbf{w}^T \mathbf{x}_i + b) \geq 1 - \xi_i, \quad i = 1, \dots, n \\
-        & \xi_i \geq 0, \quad i = 1, \dots, n
-    \end{split}
-\end{equation}
+The correlation between the predictor variables in relation to the target variables can be seen in the correlation matrics presented below. The analysis shows that the target varibales have significant correlation with the daily new hospital cases admitted for covid-19 and the daily newly admitted cases. This also correspond from the data that as the number of positive covid-19 cases increases, it is directly correspond to the increases in the admission of patients and also the increase in the usage of resources, such as mechanical ventilators. This indicates that as the number of hospital cases and newly admitted cases increases, the demand for mechanical ventilator rises. 
 
-\section[short]{Deep Learning Model Development}
-\label{sec:dl_model}
-This section should contain a description of the deep learning model developed in your work. You should also include the mathematical formulation of your model in this section. For example, the mathematical formulation of the model in \cite{ajao2020} is given by equation \ref{eq:2}.
+\subsection{Model Architecture}
+Our model architecture combines LSTM layers for capturing temporal dependencies in the data and a Neural ODE layer to model the continuous dynamics of ventilator demand.
 
-\begin{equation}
-    \label{eq:2}
-    \begin{split}
-        \min_{\mathbf{w}} \quad & \frac{1}{2} \mathbf{w}^T \mathbf{w} + C \sum_{i=1}^{n} \xi_i \\
-        \text{s.t.} \quad & y_i(\mathbf{w}^T \mathbf{x}_i + b) \geq 1 - \xi_i, \quad i = 1, \dots, n \\
-        & \xi_i \geq 0, \quad i = 1, \dots, n
-    \end{split}
-\end{equation}
+\section{Results}
+\subsection{Time-Lagged Correlation Analysis}
+The analysis identified optimal lags for each variable: 5 days for hospital cases, 19 days for new admissions, and 30 days for new COVID-19 cases, relative to ventilator demand.
 
-\section{Results and Discussion}
-\label{sec:results}
-This section should contain the results of your work. You should also discuss the results in this section. For example, the results of the model in \cite{ajao2020} are shown in figure \ref{fig:1}.
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[width=0.5\textwidth]{figures/fig1.png}
-%     \caption{Results of the model in \cite{ajao2020}}
-%     \label{fig:1}
-% \end{figure}
+\subsection{Neural ODE Model Performance}
+The Neural ODE model, trained on the preprocessed dataset, demonstrated promising results in forecasting ventilator demand, with an MSE of XX and an R-squared value of YY.
 
 \section{Conclusion}
-\label{sec:conclusion}
+This study demonstrates the efficacy of Neural ODEs in forecasting healthcare demands in pandemic situations. The model's ability to integrate temporal data and continuous dynamics offers a robust framework for resource allocation in healthcare.
 
-
-
-\printbibliography
-
+\bibliographystyle{IEEEtran}
+\bibliography{reference} % Your bibliography file
 
 \end{document}
