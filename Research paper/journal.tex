@@ -17,6 +17,8 @@
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \usepackage{balance}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning}
 
 \begin{document}
 
@@ -47,7 +49,7 @@
 \maketitle
 
 \begin{abstract}
-This study presents a novel approach to forecasting the demand for mechanical ventilators during the COVID-19 pandemic using Neural Ordinary Differential Equations (Neural ODEs). By incorporating time-series data of hospital cases, new admissions, and COVID-19 cases in England, we develop a model that captures the dynamic nature of healthcare demand during the pandemic. The analysis reveals significant time-lagged correlations between these variables and ventilator demand, informing the structure of our Neural ODE model.
+    This study presents a novel approach to forecasting the demand for mechanical ventilators during the COVID-19 pandemic using Neural Ordinary Differential Equations (Neural ODEs). By incorporating time-series data of hospital cases, new admissions, and COVID-19 cases in England, we develop a model that captures the dynamic nature of healthcare demand during the pandemic. The analysis reveals significant time-lagged correlations between these variables and ventilator demand, informing the structure of our Neural ODE model.
 \end{abstract}
 
 \section{Introduction}
@@ -75,10 +77,81 @@ Time-series analysis and correlation studies were conducted to understand the re
     \includegraphics[width=0.4\textwidth]{"../Research paper/images/trend_analysis_improved.pdf"}
 \end{figure}
 
-The correlation between the predictor variables in relation to the target variables can be seen in the correlation matrics presented below. The analysis shows that the target varibales have significant correlation with the daily new hospital cases admitted for covid-19 and the daily newly admitted cases. This also correspond from the data that as the number of positive covid-19 cases increases, it is directly correspond to the increases in the admission of patients and also the increase in the usage of resources, such as mechanical ventilators. This indicates that as the number of hospital cases and newly admitted cases increases, the demand for mechanical ventilator rises. 
+The correlation between the predictor variables in relation to the target variables can be seen in the correlation matrics presented below. The analysis shows that the target varibales have significant correlation with the daily new hospital cases admitted for covid-19 and the daily newly admitted cases. This also correspond from the data that as the number of positive covid-19 cases increases, it is directly correspond to the increases in the admission of patients and also the increase in the usage of resources, such as mechanical ventilators. This indicates that as the number of hospital cases and newly admitted cases increases, the demand for mechanical ventilator rises.
 
 \subsection{Model Architecture}
 Our model architecture combines LSTM layers for capturing temporal dependencies in the data and a Neural ODE layer to model the continuous dynamics of ventilator demand.
+
+
+
+% We develop a model that integrates neural networks with differential equations to predict healthcare resource utilization during a pandemic. The focus is on mechanical ventilators (\(V(t)\)), ICU admissions (\(I(t)\)), and hospital cases (\(H(t)\)).
+
+% \subsection*{States:}
+% \begin{itemize}
+%     \item \( V(t) \): Number of ventilators in use at time \( t \).
+%     \item \( H(t) \): Number of hospital cases at time \( t \).
+%     \item \( I(t) \): Number of ICU admissions at time \( t \).
+% \end{itemize}
+
+% \subsection*{Differential Equations:}
+% \begin{align*}
+%     \frac{dV}{dt} & = \alpha \cdot I(t) - \beta \cdot V(t)    \\
+%     \frac{dI}{dt} & = \delta \cdot H(t) - \epsilon \cdot I(t) \\
+%     \frac{dH}{dt} & = -\eta \cdot H(t) + \zeta \cdot I(t)
+% \end{align*}
+
+% \subsection*{Parameters:}
+% \(\alpha, \beta, \delta, \epsilon, \eta, \zeta\) - Parameters to be estimated from the data.
+
+% \begin{tikzpicture}[node distance=2cm, auto, thick]
+%     % Nodes
+%     \node (H) {Hospital Cases $H(t)$};
+%     \node [right=of H] (I) {ICU Cases $I(t)$};
+%     \node [below=of I] (V) {Ventilators $V(t)$};
+
+%     % Arrows
+%     \draw[-{Latex[length=3mm]}] (H) -- node {$\delta$} (I);
+%     \draw[-{Latex[length=3mm]}] (I) -- node {$\alpha$} (V);
+%     \draw[-{Latex[length=3mm]}, bend right] (H) to node [swap] {$\eta$} ++(2,-2);
+%     \draw[-{Latex[length=3mm]}, bend left] (I) to node {$\zeta$} (H);
+%     \draw[-{Latex[length=3mm]}] (V) -- node {$\beta$} ++(2,0);
+
+% \end{tikzpicture}
+
+% \begin{tikzpicture}[node distance=2cm, auto, thick]
+%     % Nodes
+%     \node (H) {Hospital Cases $H(t)$};
+%     \node [right=of H] (I) {ICU Cases $I(t)$};
+%     \node [below=of I] (V) {Ventilators $V(t)$};
+
+%     % Arrows
+%     \draw[-{Latex[length=3mm]}] (H) -- node {$\delta$} (I);
+%     \draw[-{Latex[length=3mm]}] (I) -- node {$\alpha$} (V);
+%     \draw[-{Latex[length=3mm]}, bend right] (H) to node [swap] {$\eta$} ++(2,-2);
+%     \draw[-{Latex[length=3mm]}, bend left] (I) to node {$\zeta$} (H);
+%     \draw[-{Latex[length=3mm]}] (V) -- node {$\beta$} ++(2,0);
+
+% \end{tikzpicture}
+
+% \begin{tikzpicture}[node distance=2cm, auto, thick]
+%     % Nodes
+%     \node (C) {COVID-19 Cases $C(t)$};
+%     \node [right=of C] (H) {Hospital Cases $H(t)$};
+%     \node [right=of H] (I) {ICU Cases $I(t)$};
+%     \node [below=of I] (V) {Ventilators $V(t)$};
+%     \node [right=of V] (R) {Recovered $R(t)$};
+
+%     % Arrows
+%     \draw[-{Latex[length=3mm]}] (C) -- node {$\zeta$} (H);
+%     \draw[-{Latex[length=3mm]}] (H) -- node {$\delta$} (I);
+%     \draw[-{Latex[length=3mm]}] (I) -- node {$\alpha$} (V);
+%     \draw[-{Latex[length=3mm]}] (V) -- node {$\theta$} (R);
+%     \draw[-{Latex[length=3mm]}, bend right] (H) to node [near start] {$\eta$} (R);
+%     \draw[-{Latex[length=3mm]}, bend left] (I) to node [near start] {$\epsilon$} (R);
+%     \draw[-{Latex[length=3mm]}] (R) -- node {$\iota$} ++(2,0);
+%     \draw[-{Latex[length=3mm]}] (V) -- node {$\beta$} ++(2,0);
+
+% \end{tikzpicture}
 
 \section{Results}
 \subsection{Time-Lagged Correlation Analysis}
