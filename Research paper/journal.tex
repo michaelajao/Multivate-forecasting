@@ -55,6 +55,8 @@
 \section{Introduction}
 \IEEEPARstart{T}{he} COVID-19 pandemic posed unprecedented challenges to healthcare systems worldwide, particularly in forecasting and managing resources like mechanical ventilators. This paper introduces a Neural ODE-based model to address this challenge, leveraging the strengths of LSTM networks and continuous-time dynamics modeled by ODEs.
 
+data-driven decisions for efficient hospital bed allocation during the pandemic.
+
 \section{Methodology}
 \subsection{Data Collection and Preprocessing}
 We utilized a dataset containing daily counts of hospital cases, new admissions, ventilator usage, and COVID-19 cases in England. The data were preprocessed for normalization and handling missing values.
@@ -76,6 +78,20 @@ Time-series analysis and correlation studies were conducted to understand the re
     \centering
     \includegraphics[width=0.4\textwidth]{"../Research paper/images/trend_analysis_improved.pdf"}
 \end{figure}
+
+\begin{table}[h]
+    \centering
+    \caption{Publicly available data used in the forecasts.}
+    \begin{tabular}{|l|l|l|l|}
+    \hline
+    \textbf{Data Description} & \textbf{Since} & \textbf{Geographical} & \textbf{Time} \\ \hline
+    Number of PCR tests & 2020-04-09 & Regional & Daily \\ \hline
+    Number of COVID-19 patients in the ICU & 2020-04-01 & Regional & Daily \\ \hline
+    Number of COVID-19 patients in the ICU by age group & 2020-04-01 & National & Daily \\ \hline
+    Number of new symptomatic cases & 2020-03-03 & Regional & Daily \\ \hline
+    \end{tabular}
+    \label{table:data_forecasts}
+    \end{table}
 
 The correlation between the predictor variables in relation to the target variables can be seen in the correlation matrics presented below. The analysis shows that the target varibales have significant correlation with the daily new hospital cases admitted for covid-19 and the daily newly admitted cases. This also correspond from the data that as the number of positive covid-19 cases increases, it is directly correspond to the increases in the admission of patients and also the increase in the usage of resources, such as mechanical ventilators. This indicates that as the number of hospital cases and newly admitted cases increases, the demand for mechanical ventilator rises.
 

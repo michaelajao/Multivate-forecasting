@@ -540,6 +540,7 @@ INPUT ..\Research paper\images\trend_analysis_improved.pdf
 INPUT ..\Research paper\images\trend_analysis_improved.pdf
 INPUT ..\Research paper\images\trend_analysis_improved.pdf
 INPUT ..\Research paper\images\trend_analysis_improved.pdf
+INPUT C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\fonts\tfm\adobe\times\ptmrc8t.tfm
 INPUT C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex\latex\psnfss\ts1ptm.fd
 INPUT C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex\latex\psnfss\ts1ptm.fd
 INPUT C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex\latex\psnfss\ts1ptm.fd
@@ -572,6 +573,10 @@ INPUT C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\fonts\vf\adobe\times\ptmr8t.v
 INPUT C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\fonts\vf\adobe\times\ptmri8t.vf
 INPUT C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\fonts\tfm\adobe\times\ptmri8r.tfm
 INPUT C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\fonts\vf\adobe\times\ptmr8t.vf
+INPUT C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\fonts\vf\adobe\times\ptmrc8t.vf
+INPUT C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\fonts\tfm\adobe\times\ptmr8r.tfm
+INPUT C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\fonts\vf\adobe\times\ptmb8t.vf
+INPUT C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\fonts\tfm\adobe\times\ptmb8r.tfm
 INPUT C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\fonts\vf\adobe\times\ptmr8c.vf
 INPUT .\journal.bbl
 INPUT journal.bbl

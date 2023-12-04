@@ -2,12 +2,12 @@
 ["bibtex journal"] 0 "journal.aux" "journal.bbl" "journal" 0 -1
   "./reference.bib" 1701127038 0 d41d8cd98f00b204e9800998ecf8427e ""
   "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/bibtex/bst/ieeetran/IEEEtran.bst" 1440618969 57748 7c8250ecf02814ce6ddc0cdbb63df1dd ""
-  "journal.aux" 1701551855 2616 620c7e72881986a1b26e899fa3ae37ab "pdflatex"
+  "journal.aux" 1701697707 2869 2cb41bf7212e830a5f3373e5400dc13b "pdflatex"
   (generated)
   "journal.bbl"
   "journal.blg"
   (rewritten before read)
-["pdflatex"] 1701551853 "c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/Research paper/journal.tex" "journal.pdf" "journal" 1701551856 2
+["pdflatex"] 1701697706 "c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/Research paper/journal.tex" "journal.pdf" "journal" 1701697708 2
   "../Research paper/images/trend_analysis_improved.pdf" 1701376625 38733 8e4f013dba2ed25cb5fd3a2b4d707803 ""
   "C:/Users/ajaoo/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1701420624 358856 fe366f6fcd0f6a891d830f994f031f69 ""
   "C:/Users/ajaoo/AppData/Local/MiKTeX/fonts/tfm/public/rsfs/rsfs10.tfm" 1694778591 688 37338d6ab346c2f1466b29e195316aa4 ""
@@ -181,11 +181,11 @@
   "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/tex/latex/subfig/subfig.sty" 1121281010 22049 9ef165ca6df8815c92e693146a376c92 ""
   "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1656233290 56148 51a9a8571c07b9921892ae11063ae853 ""
-  "c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/Research paper/journal.tex" 1701424940 8783 a5aedf9ff993a087da032f72c5c9decc ""
-  "journal.aux" 1701551855 2616 620c7e72881986a1b26e899fa3ae37ab "pdflatex"
-  "journal.bbl" 1701420626 901 628a2a8c68e066122d1514411e0b8455 "bibtex journal"
-  "journal.out" 1701551855 2570 f5b09f5fd509897c08dfbf20f34edc66 "pdflatex"
-  "journal.tex" 1701424940 8783 a5aedf9ff993a087da032f72c5c9decc ""
+  "c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/Research paper/journal.tex" 1701697703 9508 698f6a43b52bf8cc5a4b1dd9459c9898 ""
+  "journal.aux" 1701697707 2869 2cb41bf7212e830a5f3373e5400dc13b "pdflatex"
+  "journal.bbl" 1701697184 901 628a2a8c68e066122d1514411e0b8455 "bibtex journal"
+  "journal.out" 1701697707 2570 f5b09f5fd509897c08dfbf20f34edc66 "pdflatex"
+  "journal.tex" 1701697703 9508 698f6a43b52bf8cc5a4b1dd9459c9898 ""
   (generated)
   "journal.aux"
   "journal.log"
