@@ -45,7 +45,7 @@
     % }
 }
 \markboth{IEEE Journals of [Your Subject Area],~Vol.~[Your Volume], No.~[Your Number], [Your Month]~[Your Year]}{}
-\IEEEpubid{0000--0000/00\$00.00~\copyright~2021 IEEE}
+% \IEEEpubid{0000--0000/00\$00.00~\copyright~2021 IEEE}
 \maketitle
 
 \begin{abstract}
@@ -58,7 +58,7 @@
 data-driven decisions for efficient hospital bed allocation during the pandemic.
 
 \section{Methodology}
-\subsection{Data Collection and Preprocessing}
+\subsection{Data Collection}
 We utilized a dataset containing daily counts of hospital cases, new admissions, ventilator usage, and COVID-19 cases in England. The data were preprocessed for normalization and handling missing values.
 
 \subsubsection{COVID-19 daily case data}
@@ -66,10 +66,12 @@ We utilized a dataset containing daily counts of hospital cases, new admissions,
 \subsubsection{England daily hospital cases}
 
 \subsubsection{Daily new hospital addmission for COVID-19}
+This number of hospital admissions around England, this was collected as the combination of paients admitted in the last 24 hours and diagonosed in the last 24 hours. the data is also lagged
 
 \subsubsection{Daily Mechanical ventilator usage}
 
 \subsubsection{Vaccination index}
+
 
 \subsection{Exploratory Data Analysis}
 Time-series analysis and correlation studies were conducted to understand the relationships between the variables. Time-lagged correlations were particularly emphasized to capture the delayed effects on ventilator demand.
@@ -79,19 +81,21 @@ Time-series analysis and correlation studies were conducted to understand the re
     \includegraphics[width=0.4\textwidth]{"../Research paper/images/trend_analysis_improved.pdf"}
 \end{figure}
 
-\begin{table}[h]
-    \centering
-    \caption{Publicly available data used in the forecasts.}
-    \begin{tabular}{|l|l|l|l|}
-    \hline
-    \textbf{Data Description} & \textbf{Since} & \textbf{Geographical} & \textbf{Time} \\ \hline
-    Number of PCR tests & 2020-04-09 & Regional & Daily \\ \hline
-    Number of COVID-19 patients in the ICU & 2020-04-01 & Regional & Daily \\ \hline
-    Number of COVID-19 patients in the ICU by age group & 2020-04-01 & National & Daily \\ \hline
-    Number of new symptomatic cases & 2020-03-03 & Regional & Daily \\ \hline
-    \end{tabular}
-    \label{table:data_forecasts}
-    \end{table}
+The COVID-19 lockdown period from 2020 till 2021 where anounced at three different times, the first of which was 23 March 2020 and was gradually eased from may 2020. The second lockdown occured from 5 November to 2 December 2020 in England. the third was anounced from the 4 January 2021, lasted until march or april 2021. This lockdown required people to stay at home, except for essential reasons, and closed all non-essential shops and services.
+
+% \begin{table}[h]
+%     \centering
+%     \caption{Publicly available data used in the forecasts.}
+%     \begin{tabular}{|l|l|l|l|}
+%     \hline
+%     \textbf{Data Description} & \textbf{Since} & \textbf{Geographical} & \textbf{Time} \\ \hline
+%     Number of PCR tests & 2020-04-09 & Regional & Daily \\ \hline
+%     Number of COVID-19 patients in the ICU & 2020-04-01 & Regional & Daily \\ \hline
+%     Number of COVID-19 patients in the ICU by age group & 2020-04-01 & National & Daily \\ \hline
+%     Number of new symptomatic cases & 2020-03-03 & Regional & Daily \\ \hline
+%     \end{tabular}
+%     \label{table:data_forecasts}
+% \end{table}
 
 The correlation between the predictor variables in relation to the target variables can be seen in the correlation matrics presented below. The analysis shows that the target varibales have significant correlation with the daily new hospital cases admitted for covid-19 and the daily newly admitted cases. This also correspond from the data that as the number of positive covid-19 cases increases, it is directly correspond to the increases in the admission of patients and also the increase in the usage of resources, such as mechanical ventilators. This indicates that as the number of hospital cases and newly admitted cases increases, the demand for mechanical ventilator rises.
 
@@ -170,14 +174,14 @@ Our model architecture combines LSTM layers for capturing temporal dependencies 
 % \end{tikzpicture}
 
 \section{Results}
-\subsection{Time-Lagged Correlation Analysis}
-The analysis identified optimal lags for each variable: 5 days for hospital cases, 19 days for new admissions, and 30 days for new COVID-19 cases, relative to ventilator demand.
+% \subsection{Time-Lagged Correlation Analysis}
+% The analysis identified optimal lags for each variable: 5 days for hospital cases, 19 days for new admissions, and 30 days for new COVID-19 cases, relative to ventilator demand.
 
-\subsection{Neural ODE Model Performance}
-The Neural ODE model, trained on the preprocessed dataset, demonstrated promising results in forecasting ventilator demand, with an MSE of XX and an R-squared value of YY.
+% \subsection{Neural ODE Model Performance}
+% The Neural ODE model, trained on the preprocessed dataset, demonstrated promising results in forecasting ventilator demand, with an MSE of XX and an R-squared value of YY.
 
-\section{Conclusion}
-This study demonstrates the efficacy of Neural ODEs in forecasting healthcare demands in pandemic situations. The model's ability to integrate temporal data and continuous dynamics offers a robust framework for resource allocation in healthcare.
+% \section{Conclusion}
+% This study demonstrates the efficacy of Neural ODEs in forecasting healthcare demands in pandemic situations. The model's ability to integrate temporal data and continuous dynamics offers a robust framework for resource allocation in healthcare.
 
 \bibliographystyle{IEEEtran}
 \bibliography{reference} % Your bibliography file
