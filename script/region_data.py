@@ -5,16 +5,12 @@ import seaborn as sns
 from matplotlib.dates import DateFormatter
 path = '../data/hos_data/'
 
-filtered_data = pd.read_csv(path + 'filtered_data.csv')
-covid19_data = pd.read_csv(path + 'covid19_data_from_april_8.csv')
-
-filtered_data['date'] = pd.to_datetime(filtered_data['date'])
-covid19_data['date'] = pd.to_datetime(covid19_data['date'])
-
-filtered_data_names = filtered_data['areaName'].unique()
-covid19_names = covid19_data['region'].unique()
-# Map regions from covid19_data to match those in filtered_data
-region_mapping = {
+# Constants
+PATH = '../data/hos_data/'
+FILTERED_DATA_FILE = 'filtered_data.csv'
+COVID19_DATA_FILE = 'covid19_data_from_april_8.csv'
+DATE_COLUMN = 'date'
+REGION_MAPPING = {
     'North East England': 'North East and Yorkshire',
     'Yorkshire and the Humber': 'North East and Yorkshire',
     'East Midlands': 'Midlands',
@@ -26,14 +22,32 @@ region_mapping = {
     'North West England': 'North West'
 }
 
-# Apply mapping to covid19_data 'region' column
-covid19_data['mapped_region'] = covid19_data['region'].map(region_mapping)
+def load_and_prepare_data(path, filename, date_column):
+    """Load data from CSV file and prepare it."""
+    df = pd.read_csv(f"{path}{filename}")
+    df[date_column] = pd.to_datetime(df[date_column])
+    return df
 
+def map_regions_and_merge(df1, df2, mapping, merge_columns, drop_columns):
+    """Map regions in one dataframe to another and merge them."""
+    df2['mapped_region'] = df2['region'].map(mapping)
+    merged_df = pd.merge(df1, df2, how='inner', left_on=merge_columns, right_on=['date', 'mapped_region'])
+    merged_df.drop_duplicates(inplace=True)
+    merged_df.drop(columns=drop_columns, inplace=True, errors='ignore')
+    return merged_df
+# Load and prepare data
+filtered_data = load_and_prepare_data(PATH, FILTERED_DATA_FILE, DATE_COLUMN)
+covid19_data = load_and_prepare_data(PATH, COVID19_DATA_FILE, DATE_COLUMN)
+
+# Merge dataframes
+merge_columns = ['date', 'areaName']
+drop_columns = ['Unnamed: 0', 'mapped_region', 'areaType', 'areaCode', 'region']
+merged_data = map_regions_and_merge(filtered_data, covid19_data, REGION_MAPPING, merge_columns, drop_columns)
 
 # 1. Time Series Graph of New Confirmed Cases Over Time for Each NHS Region
 plt.figure(figsize=(14, 8))
-for region in merged_data_corrected['areaName'].unique():
-    region_data = merged_data_corrected[merged_data_corrected['areaName'] == region]
+for region in merged_data['areaName'].unique():
+    region_data = merged_data[merged_data['areaName'] == region]
     plt.plot(region_data['date'], region_data['new_confirmed'], label=region)
 
 plt.title('New Confirmed COVID-19 Cases Over Time by NHS Region')
@@ -45,7 +59,7 @@ plt.tight_layout()
 plt.show()
 
 # 2. Bar Chart Comparing Cumulative Confirmed Cases and Deaths Across NHS Regions
-cumulative_data = merged_data_corrected.groupby('areaName').agg({
+cumulative_data = merged_data.groupby('areaName').agg({
     'cumulative_confirmed': 'max',
     'cumulative_deceased': 'max'
 }).reset_index()
@@ -64,7 +78,7 @@ plt.show()
 
 # 3. Scatter Plot: New Confirmed Cases vs. New Admissions
 plt.figure(figsize=(10, 6))
-sns.scatterplot(data=merged_data_corrected, x='new_confirmed', y='newAdmissions', hue='areaName', style='areaName')
+sns.scatterplot(data=merged_data, x='new_confirmed', y='newAdmissions', hue='areaName', style='areaName')
 plt.title('New Confirmed Cases vs. New Admissions by NHS Region')
 plt.xlabel('New Confirmed Cases')
 plt.ylabel('New Admissions')
@@ -72,11 +86,9 @@ plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 plt.tight_layout()
 plt.show()
 
-
-
 # 4. Heat Map of New Confirmed Cases Over Time by Region
 # Pivot data for heat map
-pivot_cases_time_region = merged_data_corrected.pivot_table(index='date', columns='areaName', values='new_confirmed', aggfunc='sum').fillna(0)
+pivot_cases_time_region = merged_data.pivot_table(index='date', columns='areaName', values='new_confirmed', aggfunc='sum').fillna(0)
 
 plt.figure(figsize=(14, 10))
 sns.heatmap(pivot_cases_time_region, cmap='viridis')
@@ -88,7 +100,7 @@ plt.show()
 
 # 5. Box Plot for Hospital Cases by Region
 plt.figure(figsize=(14, 8))
-sns.boxplot(x='areaName', y='hospitalCases', data=merged_data_corrected)
+sns.boxplot(x='areaName', y='hospitalCases', data=merged_data)
 plt.title('Distribution of Hospital Cases by NHS Region')
 plt.xlabel('NHS Region')
 plt.ylabel('Hospital Cases')
@@ -97,7 +109,7 @@ plt.show()
 
 # 6. Correlation Heat Map
 # Select relevant metrics for correlation
-metrics_for_correlation = merged_data_corrected[['new_confirmed', 'new_deceased', 'hospitalCases', 'newAdmissions', 'cumulative_confirmed', 'cumulative_deceased']]
+metrics_for_correlation = merged_data[['new_confirmed', 'new_deceased', 'hospitalCases', 'newAdmissions', 'cumulative_confirmed', 'cumulative_deceased']]
 correlation_matrix = metrics_for_correlation.corr()
 
 plt.figure(figsize=(10, 8))
@@ -106,8 +118,4 @@ plt.title('Correlation Heat Map of COVID-19 Metrics')
 plt.show()
 
 
-# Perform the merge again using the new 'mapped_region' for alignment with 'areaName'
-merged_data_corrected = pd.merge(filtered_data, covid19_data, how='inner', left_on=['date', 'areaName'], right_on=['date', 'mapped_region'])
-merged_data_cleaned = merged_data_corrected.drop_duplicates()
-columns_to_drop = ['Unnamed: 0', 'mapped_region', 'areaType', 'areaCode', 'region', 'cumulative_confirmed', 'cumulative_deceased']
-merged_data_cleaned.drop(columns=columns_to_drop, inplace=True, errors='ignore')
+
