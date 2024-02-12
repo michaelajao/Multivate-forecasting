@@ -111,6 +111,12 @@ train_df, val_df, test_df = split_time_series_data(
 # Optionally, select a specific size for training (e.g., first 30 data points from the training set)
 train_df_selected = train_df.head(30)
 
+def min_max_normalize(series):
+    return (series - series.min()) / (series.max() - series.min())
+
+# Apply normalization to your DataFrame
+train_df_selected['cumulative_confirmed_normalized'] = min_max_normalize(train_df_selected['cumulative_confirmed'])
+train_df_selected['cumulative_deceased_normalized'] = min_max_normalize(train_df_selected['cumulative_deceased'])
 
 def df_to_tensors(df):
     """
@@ -130,12 +136,12 @@ def df_to_tensors(df):
         .to(device)
     )
     I_data_tensor = (
-        torch.tensor(df["cumulative_confirmed"].values, dtype=torch.float32)
+        torch.tensor(df["cumulative_confirmed_normalized"].values, dtype=torch.float32)
         .view(-1, 1)
         .to(device)
     )
     R_data_tensor = (
-        torch.tensor(df["cumulative_deceased"].values, dtype=torch.float32)
+        torch.tensor(df["cumulative_deceased_normalized"].values, dtype=torch.float32)
         .view(-1, 1)
         .to(device)
     )
@@ -213,8 +219,8 @@ def compute_loss(
     cumulative_infections,
     cumulative_deaths,
     N,
-    weight_physics=1.0,
-    weight_data=1.0,
+    weight_physics=10.0,
+    weight_data=10.0,
     weight_initial=1.0,
 ):
     sir, beta, gamma = model(t)
@@ -250,7 +256,6 @@ def compute_loss(
     total_loss = (
         weight_physics * loss_physics
         + weight_data * loss_data
-        + model.regularization()
     )
 
     return total_loss
@@ -323,7 +328,10 @@ def train_PINN(model, t_data, cumulative_infections_tensor, cumulative_deaths_te
     return model, history, final_predictions, final_beta, final_gamma
 
 
-N = train_df['population'].iloc[0]  # Assuming this retrieves the correct total population size
+N = train_df['population'].iloc[0]
+
+
+
 
 model_trained, history, final_predictions, final_beta, final_gamma = train_PINN(
     my_network,
@@ -334,3 +342,5 @@ model_trained, history, final_predictions, final_beta, final_gamma = train_PINN(
     num_epochs=200000,
     lr=0.001
 )
+
+
