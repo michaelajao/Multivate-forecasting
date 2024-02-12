@@ -5,6 +5,46 @@ import torch.optim as optim
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+# def preprocess_data(file_path):
+#     """
+#     Preprocess the data for SIRD model training.
+
+#     Parameters:
+#     - file_path: str, the path to the CSV file containing the data.
+
+#     Returns:
+#     - data: pd.DataFrame, the preprocessed data with normalized columns for SIRD model.
+#     """
+
+#     # Load the data
+#     data = pd.read_csv(file_path)
+
+#     # Convert 'date' to datetime if not already in that format
+#     if not pd.api.types.is_datetime64_any_dtype(data['date']):
+#         data['date'] = pd.to_datetime(data['date'])
+
+#     # Calculate the number of days since the start of the dataset
+#     data['day'] = (data['date'] - data['date'].min()).dt.days
+
+#     # # Normalize the cumulative confirmed, recovered, and deceased columns
+#     # data['normalized_confirmed'] = data['cumulative_confirmed'] / data['cumulative_confirmed'].max()
+#     # data['normalized_deceased'] = data['cumulative_deceased'] / data['cumulative_deceased'].max()
+
+#     # Assuming the 'recovered' cases need to be calculated as described previously
+#     recovery_period = 21  # The approximate recovery period
+#     data['recovered'] = data['cumulative_confirmed'].shift(recovery_period) - data['cumulative_deceased'].shift(recovery_period)
+#     # data['normalized_recovered'] = data['recovered'] / data['recovered'].max()
+
+#     # Assuming the 'active' cases need to be calculated as described previously
+#     data['active'] = data['cumulative_confirmed'] - data['cumulative_deceased'] - data['recovered']
+#     # data['normalized_active'] = data['active'] / data['active'].max()
+
+#     # Fill NaN values that may result from shifting with 0
+#     data = data.fillna(0)
+
+#     return data
+
 # Load and Preprocess Data
 def load_and_preprocess_data(filepath):
     df = pd.read_csv(filepath)
@@ -13,14 +53,28 @@ def load_and_preprocess_data(filepath):
     df['new_confirmed'] = df['new_confirmed'].rolling(window=7, min_periods=1).mean().fillna(0).astype(int)
     df['new_deceased'] = df['new_deceased'].rolling(window=7, min_periods=1).mean().fillna(0).astype(int)
     recovery_period = 14
-    df['R(t)'] = df['new_confirmed'].shift(recovery_period) - df['new_deceased'].shift(recovery_period)
-    df['I(t)'] = df['new_confirmed'] - df['R(t)'] - df['new_deceased'].fillna(0)
-    df['S(t)'] = df['population'] - df['new_confirmed'] - df['R(t)'] - df['new_deceased']
+    df['recovered'] = df['cumulative_confirmed'].shift(recovery_period) - df['cumulative_deceased'].shift(recovery_period)
+    df['active_cases'] = df['cumulative_confirmed'] - df['recovered'] - df['cumulative_deceased'].fillna(0)
+    df['S(t)'] = df['population'] - df['cumulative_confirmed'] - df['recovered'] - df['cumulative_deceased']
     df.fillna(0, inplace=True)
     return df
 
-df = load_and_preprocess_data("../data/region_daily_data/East Midlands.csv") 
+
+df = preprocess_data("../../data/region_daily_data/East Midlands.csv")
+
+plt.figure(figsize=(15, 10))
+plt.plot(df['day'], df['active'], label='Cumulative Confirmed')
+plt.show()
+
+
+
+df = load_and_preprocess_data("../../data/region_daily_data/East Midlands.csv") 
 data = df.head(30)
+
+plt.figure(figsize=(15, 10))
+plt.plot(df['days_since_start'], df['active_cases'], label='Cumulative Confirmed')
+plt.show()
+
 # Correct your file path
 # data = df[df["S(t)"] > 0].head(30)  # Select first 30 data points
 

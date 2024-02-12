@@ -3,6 +3,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.dates import DateFormatter
+import matplotlib.dates as mdates
+from matplotlib.backends.backend_pdf import PdfPages
+import matplotlib as mpl
+
+
+mpl.rcParams['figure.figsize'] = (10, 6)
+mpl.rcParams['figure.dpi'] = 300
+mpl.rcParams['axes.spines.top'] = False
+mpl.rcParams['axes.spines.right'] = False
+mpl.rcParams['axes.titlesize'] = 16
+# mpl.rcParams['axes.labelsize'] = 14
+# mpl.rcParams['xtick.labelsize'] = 12
+# mpl.rcParams['ytick.labelsize'] = 12
+# mpl.rcParams['legend.fontsize'] = 12
+
+
+
 path = '../data/hos_data/'
 
 # Constants
@@ -45,7 +62,7 @@ drop_columns = ['Unnamed: 0', 'mapped_region', 'areaType', 'areaCode', 'region']
 merged_data = map_regions_and_merge(filtered_data, covid19_data, REGION_MAPPING, merge_columns, drop_columns)
 
 # 1. Time Series Graph of New Confirmed Cases Over Time for Each NHS Region
-plt.figure(figsize=(14, 8))
+# plt.figure(figsize=(14, 8))
 for region in merged_data['areaName'].unique():
     region_data = merged_data[merged_data['areaName'] == region]
     plt.plot(region_data['date'], region_data['new_confirmed'], label=region)
@@ -58,23 +75,78 @@ plt.xticks(rotation=45)
 plt.tight_layout()
 plt.show()
 
-# 2. Bar Chart Comparing Cumulative Confirmed Cases and Deaths Across NHS Regions
-cumulative_data = merged_data.groupby('areaName').agg({
-    'cumulative_confirmed': 'max',
-    'cumulative_deceased': 'max'
-}).reset_index()
-
-plt.figure(figsize=(14, 8))
-x = range(len(cumulative_data))
-plt.bar(x, cumulative_data['cumulative_confirmed'], width=0.4, label='Cumulative Confirmed Cases', align='center')
-plt.bar(x, cumulative_data['cumulative_deceased'], width=0.4, label='Cumulative Deaths', align='edge')
-plt.xlabel('NHS Region')
-plt.ylabel('Counts')
-plt.title('Cumulative Confirmed Cases and Deaths by NHS Region')
-plt.xticks(x, cumulative_data['areaName'], rotation=45)
+# plt.figure(figsize=(15, 10))
+for region in merged_data['areaName'].unique():
+    region_data = merged_data[merged_data['areaName'] == region]
+    plt.plot(region_data['date'], region_data['cumulative_confirmed'], label=region)
+    
+plt.title('Cumulative Confirmed COVID-19 Cases Over Time by NHS Region')
+plt.xlabel('Date')
+plt.ylabel('Cumulative Confirmed Cases')
 plt.legend()
+plt.xticks(rotation=45)
 plt.tight_layout()
 plt.show()
+
+# data_image = merged_data[(merged_data['date'] >= '2020-01-01') & (merged_data['date'] <= '2021-12-31')]
+
+# # Prepare the figure and subplots with improved readability
+# fig, axs = plt.subplots(2, 1, figsize=(12, 8), sharex=True)
+# fig.subplots_adjust(hspace=0.5)
+
+# # Define plot details for new and cumulative confirmed cases
+# metrics = ['new_confirmed', 'cumulative_confirmed']
+# colors = ['orange', 'red']
+# titles = ['Daily New Confirmed COVID-19 Cases Over Time', 'Cumulative Confirmed COVID-19 Cases Over Time']
+
+# # Assuming 'data_image' already filtered as per your dataset
+# for ax, metric, color, title in zip(axs, metrics, colors, titles):
+#     # For each NHS region, plot the data
+#     for region in data_image['areaName'].unique():
+#         region_data = data_image[data_image['areaName'] == region]
+#         ax.plot(region_data['date'], region_data[metric], label=region, color=color, alpha=0.75)
+#     ax.set_title(title, fontsize=14)
+#     ax.set_ylabel('Count', fontsize=12)
+#     ax.tick_params(axis='x', labelrotation=45)
+#     ax.tick_params(axis='both', labelsize=10)
+#     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+#     ax.xaxis.set_major_locator(mdates.MonthLocator())
+
+# # Add a legend outside the last plot
+# handles, labels = axs[0].get_legend_handles_labels()
+# fig.legend(handles, labels, loc='upper center', ncol=3, fontsize='small')
+
+# # Set common x-label
+# axs[-1].set_xlabel('Date', fontsize=12)
+
+# # Improve overall layout and save to PDF
+# plt.tight_layout()
+
+# pdf_path_improved = '/mnt/data/trend_analysis_improved.pdf'  # Adjust path as needed
+# # with PdfPages(pdf_path_improved) as pdf:
+# #     pdf.savefig(fig, bbox_inches='tight')
+
+# # pdf_path_improved
+
+# # 2. Bar Chart Comparing Cumulative Confirmed Cases and Deaths Across NHS Regions
+# cumulative_data = merged_data.groupby('areaName').agg({
+#     'cumulative_confirmed': 'max',
+#     'cumulative_deceased': 'max'
+# }).reset_index()
+
+# plt.figure(figsize=(14, 8))
+# x = range(len(cumulative_data))
+# plt.bar(x, cumulative_data['cumulative_confirmed'], width=0.4, label='Cumulative Confirmed Cases', align='center')
+# plt.bar(x, cumulative_data['cumulative_deceased'], width=0.4, label='Cumulative Deaths', align='edge')
+# plt.xlabel('NHS Region')
+# plt.ylabel('Counts')
+# plt.title('Cumulative Confirmed Cases and Deaths by NHS Region')
+# plt.xticks(x, cumulative_data['areaName'], rotation=45)
+# plt.legend()
+# plt.tight_layout()
+# plt.show()
+
+
 
 # 3. Scatter Plot: New Confirmed Cases vs. New Admissions
 plt.figure(figsize=(10, 6))
