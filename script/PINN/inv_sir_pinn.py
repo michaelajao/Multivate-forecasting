@@ -178,16 +178,15 @@ class NeuralNet(nn.Module):
 
         self.init_xavier()
 
-    def forward(self, x, S0):
+    def forward(self, x):
         x = self.activation(self.input_layer(x))
         for layer in self.hidden_layers:
             x = self.activation(layer(x))
         sir = self.output_layer(x)
         beta = torch.sigmoid(self.beta(x))  # Ensuring beta is in (0, 1)
         gamma = torch.sigmoid(self.gamma(x))  # Ensuring gamma is in (0, 1)
-        R0 = self.beta / self.gamma
-        Rt = R0 * S0 / self.N
-        return sir, beta, gamma, R0, Rt
+
+        return sir, beta, gamma
 
     def init_xavier(self):
         torch.manual_seed(self.retrain_seed)
@@ -213,20 +212,23 @@ def compute_loss(
     t,
     cumulative_infections,
     cumulative_deaths,
-    S0,
-    I0,
-    R0,
     N,
     weight_physics=1.0,
     weight_data=1.0,
     weight_initial=1.0,
 ):
-    sir, beta, gamma, R0_pred, Rt_pred = model(t, S0)
+    sir, beta, gamma = model(t)
     S, I, R = sir[:, 0], sir[:, 1], sir[:, 2]
 
-    S_t = torch.autograd.grad(S.sum(), t, create_graph=True)[0]
-    I_t = torch.autograd.grad(I.sum(), t, create_graph=True)[0]
-    R_t = torch.autograd.grad(R.sum(), t, create_graph=True)[0]
+    S_t = torch.autograd.grad(
+        S, t, grad_outputs=torch.ones_like(S), retain_graph=True, create_graph=True
+    )[0]
+    I_t = torch.autograd.grad(
+        I, t, grad_outputs=torch.ones_like(I), retain_graph=True, create_graph=True
+    )[0]
+    R_t = torch.autograd.grad(
+        R, t, grad_outputs=torch.ones_like(R), retain_graph=True, create_graph=True
+    )[0]
 
     dSdt = -beta.squeeze() * S * I / N
     dIdt = beta.squeeze() * S * I / N - gamma.squeeze() * I
@@ -242,13 +244,12 @@ def compute_loss(
     )
     
         # Initial conditions loss
-    initial_conditions_loss = weight_initial * (torch.square(S[0] - S0) + torch.square(I[0] - I0) + torch.square(R[0] - R0))
+    # initial_conditions_loss = weight_initial * (torch.square(S[0] - S0) + torch.square(I[0] - I0) + torch.square(R[0] - R0))
 
     # Weighted total loss
     total_loss = (
         weight_physics * loss_physics
         + weight_data * loss_data
-        + initial_conditions_loss
         + model.regularization()
     )
 
@@ -278,7 +279,6 @@ class EarlyStopping:
             
 
 # Initialize the PINN model
-N = train_df['population'].iloc[0]
 
 my_network = NeuralNet(
     input_dimension=1,
@@ -287,10 +287,10 @@ my_network = NeuralNet(
     neurons=65,
     regularization_param=0.0001,
     regularization_exp=2,
-    retrain_seed=42,
+    retrain_seed=1462,
 ).to(device)
 
-def train_PINN(model, t_data, cumulative_infections_tensor, cumulative_deaths_tensor, num_epochs=5000, lr=0.01, N=1000000):
+def train_PINN(model, t_data, cumulative_infections_tensor, cumulative_deaths_tensor, N, num_epochs=5000, lr=0.01):
     optimizer = optim.Adam(model.parameters(), lr=lr)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20000, gamma=0.1)
     early_stopping = EarlyStopping(patience=500, verbose=True)
@@ -300,13 +300,14 @@ def train_PINN(model, t_data, cumulative_infections_tensor, cumulative_deaths_te
         optimizer.zero_grad()
         predictions, beta, gamma = model(t_data)
         loss = compute_loss(model, t_data, cumulative_infections_tensor, cumulative_deaths_tensor, N)
-        reg_loss = model.regularization()  # Calculate regularization loss if applicable
-        total_loss = loss + reg_loss  # Combine primary and regularization losses
+        reg_loss = model.regularization()
+        total_loss = loss + reg_loss
         total_loss.backward()
         optimizer.step()
         scheduler.step()
 
         history.append(total_loss.item())
+
         if (epoch + 1) % 100 == 0 or epoch == 0:
             print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {total_loss.item():.4f}, Learning rate: {scheduler.get_last_lr()[0]}")
 
@@ -315,5 +316,21 @@ def train_PINN(model, t_data, cumulative_infections_tensor, cumulative_deaths_te
             print("Early stopping triggered.")
             break
 
-    return model, history, predictions, beta, gamma
+    model.eval()
+    with torch.no_grad():
+        final_predictions, final_beta, final_gamma = model(t_data)
 
+    return model, history, final_predictions, final_beta, final_gamma
+
+
+N = train_df['population'].iloc[0]  # Assuming this retrieves the correct total population size
+
+model_trained, history, final_predictions, final_beta, final_gamma = train_PINN(
+    my_network,
+    t_data_tensor,
+    I_data_tensor,
+    R_data_tensor,
+    N=N,
+    num_epochs=200000,
+    lr=0.001
+)
