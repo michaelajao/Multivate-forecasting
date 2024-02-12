@@ -1,0 +1,9 @@
+rnn_type: LSTM
+input_size: 15
+hidden_size: 64
+num_layers: 20
+bidirectional: false
+learning_rate: 0.001
+optimizer_params: {}
+lr_scheduler: null
+lr_scheduler_params: {}

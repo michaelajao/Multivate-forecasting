@@ -5,75 +5,60 @@ import torch.optim as optim
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Set random seed for reproducibility
+np.random.seed(42)
+torch.manual_seed(42)
 
-# def preprocess_data(file_path):
-#     """
-#     Preprocess the data for SIRD model training.
+# Device configuration
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-#     Parameters:
-#     - file_path: str, the path to the CSV file containing the data.
-
-#     Returns:
-#     - data: pd.DataFrame, the preprocessed data with normalized columns for SIRD model.
-#     """
-
-#     # Load the data
-#     data = pd.read_csv(file_path)
-
-#     # Convert 'date' to datetime if not already in that format
-#     if not pd.api.types.is_datetime64_any_dtype(data['date']):
-#         data['date'] = pd.to_datetime(data['date'])
-
-#     # Calculate the number of days since the start of the dataset
-#     data['day'] = (data['date'] - data['date'].min()).dt.days
-
-#     # # Normalize the cumulative confirmed, recovered, and deceased columns
-#     # data['normalized_confirmed'] = data['cumulative_confirmed'] / data['cumulative_confirmed'].max()
-#     # data['normalized_deceased'] = data['cumulative_deceased'] / data['cumulative_deceased'].max()
-
-#     # Assuming the 'recovered' cases need to be calculated as described previously
-#     recovery_period = 21  # The approximate recovery period
-#     data['recovered'] = data['cumulative_confirmed'].shift(recovery_period) - data['cumulative_deceased'].shift(recovery_period)
-#     # data['normalized_recovered'] = data['recovered'] / data['recovered'].max()
-
-#     # Assuming the 'active' cases need to be calculated as described previously
-#     data['active'] = data['cumulative_confirmed'] - data['cumulative_deceased'] - data['recovered']
-#     # data['normalized_active'] = data['active'] / data['active'].max()
-
-#     # Fill NaN values that may result from shifting with 0
-#     data = data.fillna(0)
-
-#     return data
-
-# Load and Preprocess Data
 def load_and_preprocess_data(filepath):
-    df = pd.read_csv(filepath)
-    df['date'] = pd.to_datetime(df['date'])
-    df['days_since_start'] = (df['date'] - df['date'].min()).dt.days
-    df['new_confirmed'] = df['new_confirmed'].rolling(window=7, min_periods=1).mean().fillna(0).astype(int)
-    df['new_deceased'] = df['new_deceased'].rolling(window=7, min_periods=1).mean().fillna(0).astype(int)
-    recovery_period = 14
-    df['recovered'] = df['cumulative_confirmed'].shift(recovery_period) - df['cumulative_deceased'].shift(recovery_period)
-    df['active_cases'] = df['cumulative_confirmed'] - df['recovered'] - df['cumulative_deceased'].fillna(0)
-    df['S(t)'] = df['population'] - df['cumulative_confirmed'] - df['recovered'] - df['cumulative_deceased']
-    df.fillna(0, inplace=True)
-    return df
-
-
-df = preprocess_data("../../data/region_daily_data/East Midlands.csv")
-
-plt.figure(figsize=(15, 10))
-plt.plot(df['day'], df['active'], label='Cumulative Confirmed')
-plt.show()
+    try:
+        # Load data from a CSV file
+        df = pd.read_csv(filepath)
+        
+        # Ensure the 'date', 'cumulative_confirmed', and 'cumulative_deceased' columns exist
+        required_columns = ['date', 'cumulative_confirmed', 'cumulative_deceased', 'population']
+        if not all(column in df.columns for column in required_columns):
+            raise ValueError("Missing required columns in the dataset")
+        
+        # Convert 'date' column to datetime format
+        df['date'] = pd.to_datetime(df['date'])
+        
+        # Calculate the number of days since the start of the dataset
+        df['days_since_start'] = (df['date'] - df['date'].min()).dt.days
+        
+        # Smooth the 'cumulative_confirmed' and 'cumulative_deceased' with a 7-day rolling average
+        for col in ['cumulative_confirmed', 'cumulative_deceased']:
+            df[col] = df[col].rolling(window=7, min_periods=1).mean().fillna(0).astype(int)
+        
+        # Calculate recovered cases assuming a fixed recovery period
+        recovery_period = 21
+        df['recovered'] = df['cumulative_confirmed'].shift(recovery_period) - df['cumulative_deceased'].shift(recovery_period)
+        
+        # Calculate the number of active cases
+        df['active_cases'] = df['cumulative_confirmed'] - df['recovered'] - df['cumulative_deceased']
+        
+        # Calculate the susceptible population (S(t))
+        df['S(t)'] = df['population'] - df['active_cases'] - df['recovered'] - df['cumulative_deceased']
+        
+        # Fill any remaining missing values with 0
+        df.fillna(0, inplace=True)
+        
+        df = df[df['date'] >= '2020-04-01']
+        
+        return df
+    except FileNotFoundError:
+        print("File not found. Please check the filepath and try again.")
+    except pd.errors.EmptyDataError:
+        print("No data found. Please check the file content.")
+    except ValueError as e:
+        print(e)
 
 
 
 df = load_and_preprocess_data("../../data/region_daily_data/East Midlands.csv") 
 data = df.head(30)
-
-plt.figure(figsize=(15, 10))
-plt.plot(df['days_since_start'], df['active_cases'], label='Cumulative Confirmed')
-plt.show()
 
 # Correct your file path
 # data = df[df["S(t)"] > 0].head(30)  # Select first 30 data points
@@ -133,7 +118,7 @@ def sir_loss(model_output, SIR_tensor, t, model, beta, gamma, N, regularization_
     return loss
 
 # Training Loop
-def train(model, epochs, beta, gamma, N, regularization_factor=1e-):
+def train(model, epochs, beta, gamma, N, regularization_factor=1e-1):
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=100, gamma=0.22)
     
