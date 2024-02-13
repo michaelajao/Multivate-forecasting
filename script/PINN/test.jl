@@ -14,8 +14,8 @@ end
 data_path = "/share/home2/olarinoyem/Project/Multivate-forecasting/data/region_daily_data/East Midlands.csv"
 data = load_data(data_path)
 
-infected_data = data[!, "cumulative_confirmed"]
-death_data = data[!, "cumulative_deceased"]
+infected_data = data[!, "new_confirmed"]
+death_data = data[!, "new_deceased"]
 
 function rolling_mean(data, window_size)
     n = length(data)
@@ -27,7 +27,7 @@ rolling_infected = rolling_mean(infected_data, 7)
 rolling_death = rolling_mean(death_data, 7)
 
 # Prepare data
-data_length = min(60, nrow(data))
+data_length = min(10, nrow(data))
 infected_data = rolling_infected[1:data_length]
 death_data = rolling_death[1:data_length]
 population = data[1, "population"]
@@ -48,10 +48,10 @@ function create_NN(input_size, hidden_size, output_size)
     return nn, p, st
 end
 
-NN_β, p_β, st_β = create_NN(1, 50, 1)
-NN_γ, p_γ, st_γ = create_NN(1, 50, 1)
-NN_δ, p_δ, st_δ = create_NN(1, 50, 1)
-NN_α, p_α, st_α = create_NN(1, 50, 1)
+NN_β, p_β, st_β = create_NN(1, 10, 1)
+NN_γ, p_γ, st_γ = create_NN(1, 10, 1)
+NN_δ, p_δ, st_δ = create_NN(1, 10, 1)
+NN_α, p_α, st_α = create_NN(1, 10, 1)
 
 nn_params = ComponentArray(β=p_β, γ=p_γ, δ=p_δ, α=p_α)
 
@@ -117,10 +117,10 @@ end
 
 function loss_adjoint(θ)
     prediction, Rt_values = predict_adjoint(θ)
-    c = 1e-1
+    c = 1e-2
     loss = sum(abs2, log.(abs.(infected_data) .+ c) .- log.(abs.(prediction[3, :]) .+ c)) +
            sum(abs2, log.(abs.(death_data) .+ c) .- log.(abs.(prediction[5, :]) .+ c)) +
-        sum(abs2, Rt_values)
+        sum(abs2, Rt_values .- 4.0)
     return loss
 end
 
@@ -141,12 +141,18 @@ function calculate_mape(predicted, actual)
     return mape
 end
 
+function calculate_RMSE(predicted, actual)
+    rmse = sqrt(mean((predicted .- actual) .^ 2))
+    return rmse
+end
+
 #functions to evaluate model performance
 function evaluate_model(predicted, actual)
     mse = calculate_mse(predicted, actual)
     mae = calculate_mae(predicted, actual)
     mape = calculate_mape(predicted, actual)
-    return mse, mae, mape
+    rmse = calculate_RMSE(predicted, actual)
+    return mse, mae, mape, rmse
 end
 
 global losses = Float64[]
@@ -173,10 +179,20 @@ println("Training loss after $(length(losses)) iterations: $(losses[end])")
 
 # Evaluate model performance
 predicted_data, Rt_values = predict_adjoint(res.minimizer)
-mse, mae, mape = evaluate_model(predicted_data[3, :], infected_data)
-println("Mean Squared Error: $mse")
-println("Mean Absolute Error: $mae")
-println("Mean Absolute Percentage Error: $mape")
+mse, mae, mape, rmse = evaluate_model(predicted_data[3, :], infected_data)
+mse, mae, mape, rmse = evaluate_model(predicted_data[5, :], death_data)
+
+println("Mean Squared Error death_data: $mse")
+println("Mean Absolute Error death_data: $mae")
+println("Mean Absolute Percentage Error death_data: $mape")
+println("Root Mean Squared Error death_data: $rmse")
+
+
+println("Mean Squared Error infected: $mse")
+println("Mean Absolute Error infected: $mae")
+println("Mean Absolute Percentage Error infected: $mape")
+println("Root Mean Squared Error infected: $rmse")
+
 
 
 # # Visualization
@@ -201,30 +217,35 @@ println("Mean Absolute Percentage Error: $mape")
 
 function plot_training_loss(losses)
     plot(losses, label="Loss", xlabel="Iterations", ylabel="Loss", title="Training Loss", linewidth=2, legend=:topleft)
+    savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/training_loss1.pdf")
 end
 
 function plot_infection_data(t, infected_data, predicted_infected)
     p = bar(t, infected_data, label="I data", color=:red, alpha=0.5)
     plot!(p, t, predicted_infected, label="I prediction", color=:red, linewidth=2)
+    savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/plot_infection_data1.pdf")
     return p
 end
 
 function plot_death_data(t, death_data, predicted_death)
     p = bar(t, death_data, label="D data", color=:blue, alpha=0.5)
     plot!(p, t, predicted_death, label="D prediction", color=:blue, linewidth=2)
+    savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/plot_death_data2.pdf")
     return p
 end
 
 function plot_rt_values(t, Rt_values)
     plot(t, Rt_values, label="Rₜ", color=:black, ylabel="Rₜ", xlabel="Days", title="Effective Reproduction Number Rₜ Over Time", linewidth=2, legend=:topleft)
     hline!([1], linestyle=:dash, label="Threshold Rₜ=1")
+    savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/Rt_values1.pdf")
 end
 
 function plot_parameter_dynamics(t, β_values, γ_values, δ_values)
     p = plot(t, β_values, label="β (Transmission Rate)", color=:blue, legend=:topright, xlabel="Time (days)", ylabel="Parameter Value", title="Parameter Dynamics Over Time")
     plot!(p, t, γ_values, label="γ (Recovery Rate)", color=:green)
     plot!(p, t, δ_values, label="δ (Mortality Rate)", color=:red)
-    # plot!(p, t, α_values, label="α (Incubation Rate)", color=:orange)
+    plot!(p, t, α_values, label="α (Incubation Rate)", color=:orange)
+    savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/parameter_dynamics1.pdf")
     return p
 end
 
