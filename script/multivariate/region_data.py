@@ -20,10 +20,10 @@ mpl.rcParams['axes.titlesize'] = 16
 
 
 
-path = '../data/hos_data/'
+path = '../../data/hos_data/'
 
 # Constants
-PATH = '../data/hos_data/'
+PATH = '../../data/hos_data/'
 FILTERED_DATA_FILE = 'filtered_data.csv'
 COVID19_DATA_FILE = 'covid19_data_from_april_8.csv'
 DATE_COLUMN = 'date'
@@ -60,6 +60,8 @@ covid19_data = load_and_prepare_data(PATH, COVID19_DATA_FILE, DATE_COLUMN)
 merge_columns = ['date', 'areaName']
 drop_columns = ['Unnamed: 0', 'mapped_region', 'areaType', 'areaCode', 'region']
 merged_data = map_regions_and_merge(filtered_data, covid19_data, REGION_MAPPING, merge_columns, drop_columns)
+merged_data.to_csv('../../data/hos_data/merged_data.csv')
+merged_data.to_pickle('../../data/hos_data/merged_data.pkl')
 
 # 1. Time Series Graph of New Confirmed Cases Over Time for Each NHS Region
 # plt.figure(figsize=(14, 8))
