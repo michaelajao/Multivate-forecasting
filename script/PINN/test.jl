@@ -27,7 +27,7 @@ rolling_infected = rolling_mean(infected_data, 7)
 rolling_death = rolling_mean(death_data, 7)
 
 # Prepare data
-data_length = min(10, nrow(data))
+data_length = min(40, nrow(data))
 infected_data = rolling_infected[1:data_length]
 death_data = rolling_death[1:data_length]
 population = data[1, "population"]
@@ -43,7 +43,7 @@ function create_NN(input_size, hidden_size, output_size)
         Lux.Dense(input_size, hidden_size, Lux.tanh),
         Lux.Dense(hidden_size, hidden_size, Lux.tanh),
         Lux.Dense(hidden_size, hidden_size, Lux.tanh),
-        Lux.Dense(hidden_size, output_size, sigmoid))
+        Lux.Dense(hidden_size, output_size))
     p, st = Lux.setup(Random.default_rng(), nn)
     return nn, p, st
 end
@@ -120,7 +120,7 @@ function loss_adjoint(θ)
     c = 1e-2
     loss = sum(abs2, log.(abs.(infected_data) .+ c) .- log.(abs.(prediction[3, :]) .+ c)) +
            sum(abs2, log.(abs.(death_data) .+ c) .- log.(abs.(prediction[5, :]) .+ c)) +
-        sum(abs2, Rt_values .- 4.0)
+        sum(abs2, Rt_values .- 1.0)
     return loss
 end
 
@@ -171,11 +171,11 @@ end
 # Optimization
 optf = Optimization.OptimizationFunction((θ, _) -> loss_adjoint(θ), Optimization.AutoZygote())
 optprob = Optimization.OptimizationProblem(optf, nn_params)
-res = Optimization.solve(optprob, OptimizationOptimisers.ADAM(0.001), callback=callback, maxiters=20000)
+res = Optimization.solve(optprob, OptimizationOptimisers.ADAM(0.0001), callback=callback, maxiters=15000)
 println("Training loss after $(length(losses)) iterations: $(losses[end])")
-# optprob2 = remake(optprob, u0=res.minimizer)
-# res1 = Optimization.solve(optprob2, Optim.BFGS(initial_stepnorm=0.0001), callback=callback, maxiters=100)
-# println("Final training loss after $(length(losses)) iterations: $(losses[end])")
+optprob2 = remake(optprob, u0=res.minimizer)
+res1 = Optimization.solve(optprob2, Optim.BFGS(initial_stepnorm=0.0001), callback=callback, maxiters=100)
+println("Final training loss after $(length(losses)) iterations: $(losses[end])")
 
 # Evaluate model performance
 predicted_data, Rt_values = predict_adjoint(res.minimizer)
@@ -221,23 +221,24 @@ function plot_training_loss(losses)
 end
 
 function plot_infection_data(t, infected_data, predicted_infected)
-    p = bar(t, infected_data, label="I data", color=:red, alpha=0.5)
+    p = bar(t, infected_data, label="I data", title="Infection_data Plot", color=:red, alpha=0.5)
     plot!(p, t, predicted_infected, label="I prediction", color=:red, linewidth=2)
     savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/plot_infection_data1.pdf")
     return p
 end
 
 function plot_death_data(t, death_data, predicted_death)
-    p = bar(t, death_data, label="D data", color=:blue, alpha=0.5)
+    p = bar(t, death_data, label="D data", title="death_data prediction plot", color=:blue, alpha=0.5)
     plot!(p, t, predicted_death, label="D prediction", color=:blue, linewidth=2)
     savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/plot_death_data2.pdf")
     return p
 end
 
 function plot_rt_values(t, Rt_values)
-    plot(t, Rt_values, label="Rₜ", color=:black, ylabel="Rₜ", xlabel="Days", title="Effective Reproduction Number Rₜ Over Time", linewidth=2, legend=:topleft)
+    p =plot(t, Rt_values, label="Rₜ", color=:black, ylabel="Rₜ", xlabel="Days", title="Effective Reproduction Number Rₜ Over Time", linewidth=2, legend=:topleft)
     hline!([1], linestyle=:dash, label="Threshold Rₜ=1")
     savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/Rt_values1.pdf")
+    return p
 end
 
 function plot_parameter_dynamics(t, β_values, γ_values, δ_values)
@@ -257,4 +258,4 @@ pl_Rt = plot_rt_values(t, Rt_values)
 pl_parameters = plot_parameter_dynamics(t, β_values, γ_values, δ_values)
 
 final_plot = plot(pl_loss, pl_infected, pl_death, pl_Rt, pl_parameters, layout=(3, 2), size=(1000, 800))
-savefig(final_plot, "C:\\Users\\ajaoo\\Desktop\\Projects\\hospitalisation-PINN\reports\\figures\\SEIRD_UDE.png")
+# savefig(final_plot, "C:\\Users\\ajaoo\\Desktop\\Projects\\hospitalisation-PINN\reports\\figures\\SEIRD_UDE.png")
