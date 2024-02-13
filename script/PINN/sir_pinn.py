@@ -195,12 +195,6 @@ class NeuralNet(nn.Module):
 #     dSdt = -model.beta * S_pred * I_pred / N
 #     dIdt = model.beta * S_pred * I_pred / N - model.gamma * I_pred
 #     dRdt = model.gamma * I_pred
-
-#     loss = torch.mean((S_t - dSdt)**2) + torch.mean((I_t - dIdt)**2) + torch.mean((R_t - dRdt)**2)
-#     loss += torch.mean((model_output - SIR_tensor)**2)
-
-
-#     return loss
 def sir_loss(model_output, SIR_tensor, t, N, beta=0.25, gamma=0.15):
     S_pred, I_pred, R_pred = model_output[:, 0], model_output[:, 1], model_output[:, 2]
 
@@ -226,6 +220,12 @@ def sir_loss(model_output, SIR_tensor, t, N, beta=0.25, gamma=0.15):
     loss += torch.mean((model_output - SIR_tensor) ** 2)
 
     return loss
+#     loss = torch.mean((S_t - dSdt)**2) + torch.mean((I_t - dIdt)**2) + torch.mean((R_t - dRdt)**2)
+#     loss += torch.mean((model_output - SIR_tensor)**2)
+
+
+#     return loss
+
 
 
 # def train_PINN(model, t_data, SIR_tensor, num_epochs=5000, lr=0.01):

@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 import matplotlib.pyplot as plt
-
+from sklearn.preprocessing import StandardScaler
 # Set random seed for reproducibility
 np.random.seed(42)
 torch.manual_seed(42)
@@ -59,7 +59,8 @@ def load_and_preprocess_data(filepath):
 
 df = load_and_preprocess_data("../../data/region_daily_data/East Midlands.csv") 
 data = df.head(30)
-
+transformer = StandardScaler()
+data = transformer.fit_transform(data)
 # Correct your file path
 # data = df[df["S(t)"] > 0].head(30)  # Select first 30 data points
 
