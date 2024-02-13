@@ -120,7 +120,7 @@ function loss_adjoint(θ)
     c = 1e-2
     loss = sum(abs2, log.(abs.(infected_data) .+ c) .- log.(abs.(prediction[3, :]) .+ c)) +
            sum(abs2, log.(abs.(death_data) .+ c) .- log.(abs.(prediction[5, :]) .+ c)) +
-        sum(abs2, Rt_values .- 1.0)
+        sum(abs2, Rt_values)
     return loss
 end
 

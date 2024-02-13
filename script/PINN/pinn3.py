@@ -15,9 +15,10 @@ torch.manual_seed(42)
 # Set the default style
 mpl.style.use("fivethirtyeight")
 mpl.rcParams["lines.linewidth"] = 2
+mpl.rcParams['figure.dpi'] = 300
 mpl.rcParams["font.family"] = "serif"
-mpl.rcParams["text.usetex"] = True
-mpl.rcParams["text.latex.preamble"] = r"\usepackage{amsmath}"
+# mpl.rcParams["text.usetex"] = True
+# mpl.rcParams["text.latex.preamble"] = r"\usepackage{amsmath}"
 mpl.rcParams["axes.labelsize"] = 14
 mpl.rcParams["figure.figsize"] = [15, 8]
 mpl.rcParams["figure.autolayout"] = True
@@ -93,7 +94,7 @@ def load_and_preprocess_data(filepath):
         print(e)
 
 
-df = load_and_preprocess_data("../../data/region_daily_data/East Midlands.csv")
+df = load_and_preprocess_data("../../data/region_daily_data/East of England.csv")
 
 start_date = "2020-04-01"
 end_date = "2021-01-31"
@@ -287,8 +288,8 @@ def train_PINN(model, t_data, SIR_tensor, num_epochs=5000, lr=0.01):
 
 input_dimension = 1
 output_dimension = 3
-n_hidden_layers = 3
-neurons = 10
+n_hidden_layers = 6
+neurons = 50
 regularization_param = 0.0001  # Example regularization parameter
 regularization_exp = 2  # L2 regularization
 retrain_seed = 42
@@ -304,7 +305,7 @@ my_network = NeuralNet(
 ).to(device)
 
 # Train the model using the physics-informed loss
-model, history = train_PINN(my_network, t_data, SIR_tensor, num_epochs=100000, lr=0.01)
+model, history = train_PINN(my_network, t_data, SIR_tensor, num_epochs=100000, lr=0.001)
 
 # Plot training history
 plt.grid(True, which="both", ls=":")
@@ -351,7 +352,7 @@ plt.title("SIR Model Predictions vs. Actual Data")
 plt.legend()
 plt.grid(True)
 plt.show()
-plt.savefig("../../images/sir_model_predictions.pdf")
+plt.savefig("../../images/sir_model_predictions2.pdf")
 
 
 plt.plot(time_points, R_actual, "g", label="Recovered Actual", linewidth=2)
@@ -362,7 +363,7 @@ plt.title("SIR Model Predictions vs. Actual Data")
 plt.legend()
 plt.grid(True)
 plt.show()
-plt.savefig("../../images/sir_model_predictions.pdf")
+plt.savefig("../../images/sir_model_predictions2.pdf")
 
 # compute MAE, MSE, RMSE, and MAPE for predictions for infected and death cases
 
@@ -383,4 +384,4 @@ print(f"Deceased - MAE: {D_mae:.4f}, MSE: {D_mse:.4f}, RMSE: {D_rmse:.4f}, MAPE:
 
 
 # Save the model
-torch.save(model, "../../models/sir_model.pth")
+torch.save(model, "../../models/sir_model2.pth")

@@ -16,8 +16,6 @@ torch.manual_seed(42)
 mpl.style.use("fivethirtyeight")
 mpl.rcParams["lines.linewidth"] = 2
 mpl.rcParams["font.family"] = "serif"
-mpl.rcParams["text.usetex"] = True
-mpl.rcParams["text.latex.preamble"] = r"\usepackage{amsmath}"
 mpl.rcParams["axes.labelsize"] = 14
 mpl.rcParams["figure.figsize"] = [15, 8]
 mpl.rcParams["figure.autolayout"] = True
@@ -287,8 +285,8 @@ def train_PINN(model, t_data, SIR_tensor, num_epochs=5000, lr=0.01):
 
 input_dimension = 1
 output_dimension = 3
-n_hidden_layers = 3
-neurons = 10
+n_hidden_layers = 5
+neurons = 50
 regularization_param = 0.0001  # Example regularization parameter
 regularization_exp = 2  # L2 regularization
 retrain_seed = 42
