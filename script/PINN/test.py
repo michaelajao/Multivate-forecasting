@@ -20,6 +20,15 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def load_and_preprocess_data(filepath):
+    """
+    Loads and preprocesses the data from the given filepath.
+
+    Args:
+        filepath (str): The path to the data file.
+
+    Returns:
+        tuple: A tuple containing the preprocessed DataFrame and the scaler.
+    """
     df = pd.read_csv(filepath)
 
     # Check required columns
@@ -38,7 +47,7 @@ def load_and_preprocess_data(filepath):
 
     # Calculate rolling averages and discard the initial rows with insufficient data for rolling calculation
     for col in ["cumulative_confirmed", "cumulative_deceased"]:
-        df[col] = df[col].rolling(window=7, min_periods=7).mean()
+        df[col] = df[col].rolling(window=7, min_periods=7).mean().dropna()
 
     # Calculate other columns after dropping initial NaN values
     df = df.dropna().reset_index(drop=True)
@@ -56,7 +65,7 @@ def load_and_preprocess_data(filepath):
         - df["cumulative_deceased"]
     )
 
-    # Normalize the required fields
+    #Normalize the required fields
     scaler = StandardScaler()
     df[
         [
@@ -64,20 +73,10 @@ def load_and_preprocess_data(filepath):
             "cumulative_deceased",
             "recovered",
             "active_cases",
-            "S(t)",
         ]
     ] = scaler.fit_transform(
-        df[
-            [
-                "cumulative_confirmed",
-                "cumulative_deceased",
-                "recovered",
-                "active_cases",
-                "S(t)",
-            ]
-        ]
+        df[["cumulative_confirmed", "cumulative_deceased", "recovered", "active_cases"]]
     )
-
     return df, scaler
 
 
@@ -85,7 +84,7 @@ df, scaler = load_and_preprocess_data("../../data/region_daily_data/East Midland
 df = df[df["date"] >= "2020-04-01"].reset_index(drop=True)
 
 
-def split_time_series_data(df, train_size=0.7, val_size=0.15, test_size=0.15):
+def split_time_series_data(df, train_size=0.6, val_size=0.15, test_size=0.25):
     """
     Splits the DataFrame into training, validation, and test sets while maintaining the time series order.
 
@@ -132,10 +131,10 @@ def create_dataset(df):
         .to(device)
     )
 
-    # Susceptible population tensor
-    susceptible_tensor = (
-        torch.tensor(df["S(t)"].values, dtype=torch.float32).view(-1, 1).to(device)
-    )
+    # # Susceptible population tensor
+    # susceptible_tensor = (
+    #     torch.tensor(df["S(t)"].values, dtype=torch.float32).view(-1, 1).to(device)
+    # )
 
     # Recovered cases tensor
     recovered_tensor = (
@@ -143,22 +142,26 @@ def create_dataset(df):
     )
 
     # Combine susceptible, infected (confirmed), and recovered tensors into a single SIR tensor
-    SIR_tensor = torch.cat(
-        [susceptible_tensor, confirmed_tensor, recovered_tensor], dim=1
-    )
+    # SIR_tensor = torch.cat(
+    #     [confirmed_tensor, recovered_tensor], dim=1
+    # )
 
-    return t_tensor, SIR_tensor
+    return t_tensor, confirmed_tensor, recovered_tensor
 
 
 # Create datasets for training, validation, and testing
-t_train, SIR_train = create_dataset(train_df)
-t_val, SIR_val = create_dataset(val_df)
-t_test, SIR_test = create_dataset(test_df)
+t_train, I_train, R_train = create_dataset(train_df)
+t_val, I_val, R_val = create_dataset(val_df)
+t_test, I_test, R_test = create_dataset(test_df)
+
+# t_train, SIR_train = create_dataset(train_df)
+# t_val, SIR_val = create_dataset(val_df)
+# t_test, SIR_test = create_dataset(test_df)
 # train_df = train_df.head(30).copy()
 # Check the shape of the tensors
-print(f"Training set shapes - t_train: {t_train.shape}, SIR_train: {SIR_train.shape}")
-print(f"Validation set shapes - t_val: {t_val.shape}, SIR_val: {SIR_val.shape}")
-print(f"Testing set shapes - t_test: {t_test.shape}, SIR_test: {SIR_test.shape}")
+print(f"Training set shapes - t_train: {t_train.shape}")
+print(f"Validation set shapes - t_val: {t_val.shape}")
+print(f"Testing set shapes - t_test: {t_test.shape}")
 
 
 class NeuralNet(nn.Module):
@@ -216,7 +219,7 @@ class NeuralNet(nn.Module):
         return self.regularization_param * reg_loss
 
 
-def sir_loss(model_output, SIR_tensor, t, N, beta=0.25, gamma=0.15):
+def sir_loss(model_output, I, R, t, N, beta=0.25, gamma=0.15):
     S_pred, I_pred, R_pred = model_output[:, 0], model_output[:, 1], model_output[:, 2]
 
     S_t = torch.autograd.grad(
@@ -238,7 +241,11 @@ def sir_loss(model_output, SIR_tensor, t, N, beta=0.25, gamma=0.15):
         + torch.mean((I_t - dIdt) ** 2)
         + torch.mean((R_t - dRdt) ** 2)
     )
-    loss += torch.mean((model_output - SIR_tensor) ** 2)
+
+    loss += torch.mean((I_pred - I) ** 2)
+    loss += torch.mean((R_pred - R) ** 2)
+
+    # loss += torch.mean((model_output - SIR_tensor) ** 2)
 
     return loss
 
@@ -278,7 +285,7 @@ class EarlyStopping:
         self.val_loss_min = val_loss
 
 
-def train_PINN(model, t_data, SIR_tensor, num_epochs=5000, lr=0.01):
+def train_PINN(model, t_data, I_train, R_train, num_epochs=5000, lr=0.01):
     optimizer = optim.Adam(model.parameters(), lr=lr)
     # scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.1)  # Adjust gamma as needed
     early_stopping = EarlyStopping(patience=10)
@@ -287,18 +294,18 @@ def train_PINN(model, t_data, SIR_tensor, num_epochs=5000, lr=0.01):
     for epoch in range(num_epochs):
         optimizer.zero_grad()
         predictions = model(t_data)
-        loss = sir_loss(predictions, SIR_tensor, t_data, params["N"])
-        reg_loss = model.regularization()  # Un-comment and compute regularization loss
-        total_loss = loss + reg_loss  # Combine primary loss and regularization loss
-        total_loss.backward()
+        loss = sir_loss(predictions, I_train, R_train, t_data, params["N"])
+        # reg_loss = model.regularization()  # Un-comment and compute regularization loss
+        # total_loss = loss + reg_loss  # Combine primary loss and regularization loss
+        loss.backward()
         optimizer.step()
         # scheduler.step()
         # , LR: {scheduler.get_last_lr()[0]}'
         history.append(loss.item())
         if (epoch + 1) % 100 == 0:
-            print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {total_loss.item():.4f}")
+            print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {loss.item():.4f}")
 
-        if early_stopping(total_loss):
+        if early_stopping(loss):
             print("Early stopping")
             break
 
@@ -330,7 +337,7 @@ model = NeuralNet(
 
 
 # Train the model
-model, history = train_PINN(model, t_train, SIR_train, num_epochs=10000, lr=0.01)
+model, history = train_PINN(model, t_train, I_train, R_train, num_epochs=10000, lr=0.01)
 
 
 plt.plot(history, label="Training Loss")
@@ -368,53 +375,52 @@ plt.grid(True)
 plt.show()
 
 
-def evaluate_model(model, t_data, SIR_data, dataset_name="Validation"):
+def evaluate_model(model, t_data, I, R, dataset_name="Validation"):
     model.eval()  # Set the model to evaluation mode
     with torch.no_grad():  # No need to track gradients
         predictions = model(t_data)
         # Optionally calculate a simpler loss metric that doesn't involve gradients
         # For example, mean squared error (MSE) on the predictions vs actual SIR data
-        mse_loss = torch.mean((predictions - SIR_data) ** 2).item()
+        mse_loss = torch.mean((predictions - I) ** 2).item()
+        +torch.mean((predictions - R) ** 2).item()
+
     print(f"{dataset_name} MSE Loss: {mse_loss:.4f}")
     return predictions
 
 
 # Evaluate on validation set
-val_predictions = evaluate_model(model, t_val, SIR_val, "Validation")
+val_predictions = evaluate_model(model, t_val, I_val, R_val, "Validation")
 
 # Evaluate on test set
-test_predictions = evaluate_model(model, t_test, SIR_test, "Test")
+test_predictions = evaluate_model(model, t_test, I_test, R_test, "Test")
 
 
-def plot_predictions(
-    t_data, actual_data, predictions, title="Predictions vs Actual Data"
-):
-    plt.figure(figsize=(12, 6))
-    # Detach tensors and convert to numpy for plotting
-    t_data_np = t_data.detach().cpu().numpy()
-    actual_data_np = actual_data.detach().cpu().numpy()
-    predictions_np = predictions.detach().cpu().numpy()
-
+def plot_sir_predictions(t, I, R, predictions, title="SIR Model Predictions"):
+    plt.plot(t, I, label="Infected (Actual)", color="red", linestyle="--")
+    plt.plot(t, R, label="Recovered (Actual)", color="green", linestyle="--")
     plt.plot(
-        t_data_np, actual_data_np[:, 1], "r", label="Actual Confirmed Cases"
-    )  # Actual confirmed cases
+        t,
+        predictions[:, 1].cpu().detach().numpy(),
+        label="Infected (Predicted)",
+        color="red",
+    )
     plt.plot(
-        t_data_np, predictions_np[:, 1], "b--", label="Predicted Confirmed Cases"
-    )  # Predicted confirmed cases
-    plt.xlabel("Days")
-    plt.ylabel("Normalized Cases")
+        t,
+        predictions[:, 2].cpu().detach().numpy(),
+        label="Recovered (Predicted)",
+        color="green",
+    )
+    plt.xlabel("Days Since Start")
+    plt.ylabel("Proportion of Population")
     plt.title(title)
     plt.legend()
     plt.grid(True)
     plt.show()
 
 
-# Plot for validation set
-plot_predictions(
-    t_val, SIR_val, val_predictions, "Validation Set Predictions vs Actual Data"
+plot_sir_predictions(
+    t_val, I_val, R_val, val_predictions, title="SIR Model Validation Predictions"
 )
-
-# Plot for test set
-plot_predictions(
-    t_test, SIR_test, test_predictions, "Test Set Predictions vs Actual Data"
+plot_sir_predictions(
+    t_test, I_test, R_test, test_predictions, title="SIR Model Test Predictions"
 )
