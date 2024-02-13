@@ -316,12 +316,12 @@ def train_PINN(model, t_data, I_train, R_train, num_epochs=5000, lr=0.01):
 params = {
     "input_dimension": 1,
     "output_dimension": 3,
-    "n_hidden_layers": 3,
-    "neurons": 10,
+    "n_hidden_layers": 10,
+    "neurons": 32,
     "regularization_param": 0.001,
     "regularization_exp": 2,
     "retrain_seed": 42,
-    "N": df["population"].values[0],
+    "N":df["population"].iloc[0]
 }
 
 # Initialize the model
@@ -396,16 +396,16 @@ test_predictions = evaluate_model(model, t_test, I_test, R_test, "Test")
 
 
 def plot_sir_predictions(t, I, R, predictions, title="SIR Model Predictions"):
-    plt.plot(t, I, label="Infected (Actual)", color="red", linestyle="--")
-    plt.plot(t, R, label="Recovered (Actual)", color="green", linestyle="--")
+    plt.plot(t.detach().cpu().numpy(), I.cpu().detach().numpy(), label="Infected (Actual)", color="red", linestyle="--")
+    plt.plot(t.detach().cpu().numpy(), R.cpu().detach().numpy(), label="Recovered (Actual)", color="green", linestyle="--")
     plt.plot(
-        t,
+        t.detach().cpu().numpy(),
         predictions[:, 1].cpu().detach().numpy(),
         label="Infected (Predicted)",
         color="red",
     )
     plt.plot(
-        t,
+        t.detach().cpu().numpy(),
         predictions[:, 2].cpu().detach().numpy(),
         label="Recovered (Predicted)",
         color="green",
@@ -416,6 +416,7 @@ def plot_sir_predictions(t, I, R, predictions, title="SIR Model Predictions"):
     plt.legend()
     plt.grid(True)
     plt.show()
+
 
 
 plot_sir_predictions(
