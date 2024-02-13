@@ -127,7 +127,7 @@ def create_dataset(df):
 
     # Confirmed cases tensor
     confirmed_tensor = (
-        torch.tensor(df["cumulative_confirmed"].values, dtype=torch.float32)
+        torch.tensor(df["active_cases"].values, dtype=torch.float32)
         .view(-1, 1)
         .to(device)
     )
