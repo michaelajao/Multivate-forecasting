@@ -117,10 +117,10 @@ end
 
 function loss_adjoint(θ)
     prediction, Rt_values = predict_adjoint(θ)
-    c = 1e-2
+    c = 1e-1
     loss = sum(abs2, log.(abs.(infected_data) .+ c) .- log.(abs.(prediction[3, :]) .+ c)) +
            sum(abs2, log.(abs.(death_data) .+ c) .- log.(abs.(prediction[5, :]) .+ c)) +
-        sum(abs2, Rt_values)
+        sum(abs2, Rt_values .- 2.0)
     return loss
 end
 
@@ -178,7 +178,7 @@ res1 = Optimization.solve(optprob2, Optim.BFGS(initial_stepnorm=0.0001), callbac
 println("Final training loss after $(length(losses)) iterations: $(losses[end])")
 
 # Evaluate model performance
-predicted_data, Rt_values = predict_adjoint(res.minimizer)
+predicted_data, Rt_values = predict_adjoint(res1.minimizer)
 mse, mae, mape, rmse = evaluate_model(predicted_data[3, :], infected_data)
 mse, mae, mape, rmse = evaluate_model(predicted_data[5, :], death_data)
 

@@ -94,7 +94,7 @@ def load_and_preprocess_data(filepath):
         print(e)
 
 
-df = load_and_preprocess_data("../../data/region_daily_data/East of England.csv")
+df = load_and_preprocess_data("../../data/region_daily_data/London Region.csv")
 
 start_date = "2020-04-01"
 end_date = "2021-01-31"
@@ -288,7 +288,7 @@ def train_PINN(model, t_data, SIR_tensor, num_epochs=5000, lr=0.01):
 
 input_dimension = 1
 output_dimension = 3
-n_hidden_layers = 6
+n_hidden_layers = 5
 neurons = 50
 regularization_param = 0.0001  # Example regularization parameter
 regularization_exp = 2  # L2 regularization
@@ -352,7 +352,7 @@ plt.title("SIR Model Predictions vs. Actual Data")
 plt.legend()
 plt.grid(True)
 plt.show()
-plt.savefig("../../images/sir_model_predictions2.pdf")
+plt.savefig("../../images/sir_model_predictions3.pdf")
 
 
 plt.plot(time_points, R_actual, "g", label="Recovered Actual", linewidth=2)
@@ -363,7 +363,7 @@ plt.title("SIR Model Predictions vs. Actual Data")
 plt.legend()
 plt.grid(True)
 plt.show()
-plt.savefig("../../images/sir_model_predictions2.pdf")
+plt.savefig("../../images/sir_model_predictions3.pdf")
 
 # compute MAE, MSE, RMSE, and MAPE for predictions for infected and death cases
 
@@ -384,4 +384,4 @@ print(f"Deceased - MAE: {D_mae:.4f}, MSE: {D_mse:.4f}, RMSE: {D_rmse:.4f}, MAPE:
 
 
 # Save the model
-torch.save(model, "../../models/sir_model2.pth")
+torch.save(model, "../../models/sir_model3.pth")
