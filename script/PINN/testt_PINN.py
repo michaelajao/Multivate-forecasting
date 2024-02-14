@@ -123,6 +123,10 @@ class SIRInverseNet(nn.Module):
             nn.ReLU(),
             nn.Linear(50, 50),
             nn.ReLU(),
+            nn.Linear(50, 50),
+            nn.ReLU(),
+            nn.Linear(50, 50),
+            nn.ReLU(),
             nn.Linear(50, 2)  # Still outputting only I and R predictions
         )
         self.beta = nn.Parameter(torch.rand(1, device=device, requires_grad=True))
@@ -137,7 +141,7 @@ class SIRInverseNet(nn.Module):
 
 inverse_model = SIRInverseNet().to(device)
 
-def inverse_loss(S_pred, I_pred, R_pred, S_tensor, I_tensor, R_tensor, t, N, model):
+def inverse_loss(S_pred, I_pred, R_pred, S_tensor, I_tensor, R_tensor, t, N, model, initial_conditions_weight=1.0):
     # Compute the derivatives of S, I, and R
     S_t = torch.autograd.grad(S_pred, t, grad_outputs=torch.ones_like(S_pred), create_graph=True)[0]
     I_t = torch.autograd.grad(I_pred, t, grad_outputs=torch.ones_like(I_pred), create_graph=True)[0]
@@ -153,10 +157,17 @@ def inverse_loss(S_pred, I_pred, R_pred, S_tensor, I_tensor, R_tensor, t, N, mod
     
     # Loss based on the differences between the predicted and observed values
     loss += torch.mean((S_pred - S_tensor) ** 2) + torch.mean((I_pred - I_tensor) ** 2) + torch.mean((R_pred - R_tensor) ** 2)
-    
-    return loss
 
-def inverse_train(model, t_tensor, S_tensor, I_tensor, R_tensor, epochs, lr, N):
+    # Penalize deviations from the initial conditions
+    initial_conditions_loss = initial_conditions_weight * (
+        (S_pred[0] - S_tensor[0]) ** 2 +
+        (I_pred[0] - I_tensor[0]) ** 2 +
+        (R_pred[0] - R_tensor[0]) ** 2
+    )
+
+    return loss + initial_conditions_loss
+
+def inverse_train(model, t_tensor, S_tensor, I_tensor, R_tensor, epochs, lr, N, initial_conditions_weight=1.0):
     optimizer = optim.Adam(model.parameters(), lr=lr)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=1000, gamma=0.1)
 
@@ -167,7 +178,7 @@ def inverse_train(model, t_tensor, S_tensor, I_tensor, R_tensor, epochs, lr, N):
         model.train()
         optimizer.zero_grad()
         S_pred, I_pred, R_pred = model(t_tensor)
-        loss = inverse_loss(S_pred, I_pred, R_pred, S_tensor, I_tensor, R_tensor, t_tensor, N, model)
+        loss = inverse_loss(S_pred, I_pred, R_pred, S_tensor, I_tensor, R_tensor, t_tensor, N, model, initial_conditions_weight)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         optimizer.step()
@@ -193,7 +204,7 @@ S_tensor = torch.tensor(observed_S, dtype=torch.float32, device=device).view(-1,
 I_tensor = torch.tensor(observed_I, dtype=torch.float32, device=device).view(-1, 1)
 R_tensor = torch.tensor(observed_R, dtype=torch.float32, device=device).view(-1, 1)
 
-beta_vals, gamma_vals = inverse_train(inverse_model, t_tensor, S_tensor, I_tensor, R_tensor, epochs=10000, lr=0.01, N=N)
+beta_vals, gamma_vals = inverse_train(inverse_model, t_tensor, S_tensor, I_tensor, R_tensor, epochs=50000, lr=0.001, N=N)
 
 
 inverse_model.eval()
