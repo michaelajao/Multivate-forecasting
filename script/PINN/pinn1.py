@@ -16,14 +16,16 @@ torch.manual_seed(42)
 mpl.style.use("fivethirtyeight")
 mpl.rcParams["lines.linewidth"] = 2
 mpl.rcParams["font.family"] = "serif"
+mpl.rcParams["axes.titlesize"] = 20
 mpl.rcParams["axes.labelsize"] = 14
 mpl.rcParams["figure.figsize"] = [15, 8]
 mpl.rcParams["figure.autolayout"] = True
 mpl.rcParams["axes.spines.top"] = False
 mpl.rcParams["axes.spines.right"] = False
 mpl.rcParams["axes.grid"] = True
+# mpl.rcParams["xtick.labelsize"] = 12
+# mpl.rcParams["ytick.labelsize"] = 12
 mpl.rcParams["grid.color"] = "0.75"
-mpl.rcParams["font.size"] = 14
 mpl.rcParams["legend.fontsize"] = "medium"
 
 
@@ -80,8 +82,6 @@ def load_and_preprocess_data(filepath):
         # Fill any remaining missing values with 0
         df.fillna(0, inplace=True)
 
-        df = df[df["date"] >= "2020-04-01"]
-
         return df
     except FileNotFoundError:
         print("File not found. Please check the filepath and try again.")
@@ -101,13 +101,7 @@ training_data = df.loc[mask]
 transformer = MinMaxScaler()
 
 # Select the columns to scale
-columns_to_scale = [
-    "cumulative_confirmed",
-    "cumulative_deceased",
-    "recovered",
-    "active_cases",
-    "S(t)",
-]
+columns_to_scale = ["S(t)", "cumulative_confirmed", "cumulative_deceased"]
 
 # Fit the scaler to the training data
 transformer.fit(training_data[columns_to_scale])
@@ -129,12 +123,12 @@ t_data = (
     .to(device)
 )
 I_data = (
-    torch.tensor(training_data["active_cases"].values, dtype=torch.float32)
+    torch.tensor(training_data["cumulative_confirmed"].values, dtype=torch.float32)
     .view(-1, 1)
     .to(device)
 )
 R_data = (
-    torch.tensor(training_data["recovered"].values, dtype=torch.float32)
+    torch.tensor(training_data["cumulative_deceased"].values, dtype=torch.float32)
     .view(-1, 1)
     .to(device)
 )
@@ -268,7 +262,7 @@ def train_PINN(model, t_data, SIR_tensor, num_epochs=5000, lr=0.01):
         optimizer.step()
         scheduler.step(loss.item())
         # scheduler.step()  # Update the learning rate according to the scheduler
-# LR: {scheduler.get_last_lr()[0]}"
+        # LR: {scheduler.get_last_lr()[0]}"
         history.append(loss.item())  # Log the total loss, including regularization
         if (epoch + 1) % 100 == 0 or epoch == 0:
             print(
@@ -287,7 +281,7 @@ input_dimension = 1
 output_dimension = 3
 n_hidden_layers = 5
 neurons = 50
-regularization_param = 0.0001  # Example regularization parameter
+regularization_param = 0.001  # Example regularization parameter
 regularization_exp = 2  # L2 regularization
 retrain_seed = 42
 
@@ -302,7 +296,7 @@ my_network = NeuralNet(
 ).to(device)
 
 # Train the model using the physics-informed loss
-model, history = train_PINN(my_network, t_data, SIR_tensor, num_epochs=100000, lr=0.01)
+model, history = train_PINN(my_network, t_data, SIR_tensor, num_epochs=100000, lr=0.001)
 
 # Plot training history
 plt.grid(True, which="both", ls=":")
@@ -318,7 +312,6 @@ model.eval()
 # Generate predictions for the same inputs used during training
 with torch.no_grad():
     predictions = model(t_data)
-
 # Extract the predicted S, I, R values
 S_pred, I_pred, R_pred = (
     predictions[:, 0].cpu().numpy(),
@@ -364,6 +357,7 @@ plt.savefig("../../images/sir_model_predictions.pdf")
 
 # compute MAE, MSE, RMSE, and MAPE for predictions for infected and death cases
 
+
 def compute_metrics(actual, predicted):
     epsilon = 1e-1  # Small constant to prevent division by zero
     mae = mean_absolute_error(actual, predicted)
@@ -372,13 +366,149 @@ def compute_metrics(actual, predicted):
     mape = np.mean(np.abs((actual - predicted) / (actual + epsilon))) * 100
     return mae, mse, rmse, mape
 
+
 # Assuming I_actual, I_pred, D_actual, D_pred are defined
 I_mae, I_mse, I_rmse, I_mape = compute_metrics(I_actual, I_pred)
 D_mae, D_mse, D_rmse, D_mape = compute_metrics(R_actual, R_pred)
 
-print(f"Infected - MAE: {I_mae:.4f}, MSE: {I_mse:.4f}, RMSE: {I_rmse:.4f}, MAPE: {I_mape:.2f}%")
-print(f"Deceased - MAE: {D_mae:.4f}, MSE: {D_mse:.4f}, RMSE: {D_rmse:.4f}, MAPE: {D_mape:.2f}%")
+print(
+    f"Infected - MAE: {I_mae:.4f}, MSE: {I_mse:.4f}, RMSE: {I_rmse:.4f}, MAPE: {I_mape:.2f}%"
+)
+print(
+    f"Deceased - MAE: {D_mae:.4f}, MSE: {D_mse:.4f}, RMSE: {D_rmse:.4f}, MAPE: {D_mape:.2f}%"
+)
 
+model.state_dict()
 
 # Save the model
 torch.save(model, "../../models/sir_model.pth")
+
+full_predicted_data = np.zeros((len(S_pred), transformer.n_features_in_))
+full_actual_data = np.zeros((len(S_actual), transformer.n_features_in_))
+
+# Fill in the placeholders with the predicted and actual data
+# The order of columns in 'columns_to_scale' is ['recovered', 'active_cases', 'S(t)']
+full_predicted_data[:, columns_to_scale.index("S(t)")] = S_pred
+full_predicted_data[:, columns_to_scale.index("cumulative_confirmed")] = I_pred
+full_predicted_data[:, columns_to_scale.index("cumulative_deceased")] = R_pred
+
+full_actual_data[:, columns_to_scale.index("S(t)")] = S_actual
+full_actual_data[:, columns_to_scale.index("cumulative_confirmed")] = I_actual
+full_actual_data[:, columns_to_scale.index("cumulative_deceased")] = R_actual
+
+# Apply inverse transformation
+inverse_predicted_data = transformer.inverse_transform(full_predicted_data)
+inverse_actual_data = transformer.inverse_transform(full_actual_data)
+
+# Separate the inversely transformed S, I, R values for predicted and actual data
+S_pred_transformed = inverse_predicted_data[:, columns_to_scale.index("S(t)")]
+I_pred_transformed = inverse_predicted_data[
+    :, columns_to_scale.index("cumulative_confirmed")
+]
+R_pred_transformed = inverse_predicted_data[
+    :, columns_to_scale.index("cumulative_deceased")
+]
+
+S_actual_transformed = inverse_actual_data[:, columns_to_scale.index("S(t)")]
+I_actual_transformed = inverse_actual_data[
+    :, columns_to_scale.index("cumulative_confirmed")
+]
+R_actual_transformed = inverse_actual_data[
+    :, columns_to_scale.index("cumulative_deceased")
+]
+
+
+# Plot for Susceptible (S)
+plt.figure(figsize=(15, 8))
+plt.plot(
+    time_points, S_actual_transformed, "b", label="Susceptible Actual", linewidth=2
+)
+plt.plot(
+    time_points, S_pred_transformed, "b--", label="Susceptible Predicted", linewidth=2
+)
+plt.xlabel("Days since: 2020-04-01")
+plt.ylabel("Population")
+plt.title("Susceptible: Actual vs Predicted")
+plt.legend()
+plt.grid(True)
+plt.show()
+plt.savefig("../../images/sir_model_susceptible_predictions.pdf")
+
+# Plot for Infected (I)
+plt.figure(figsize=(15, 8))
+plt.plot(time_points, I_actual_transformed, "r", label="Infected Actual", linewidth=2)
+plt.plot(
+    time_points, I_pred_transformed, "r--", label="Infected Predicted", linewidth=2
+)
+plt.xlabel("Days since: 2020-04-01")
+plt.ylabel("Population")
+plt.title("Infected: Actual vs Predicted")
+plt.legend()
+plt.grid(True)
+plt.show()
+plt.savefig("../../images/sir_model_infected_predictions.pdf")
+
+# Plot for Recovered (R)
+plt.figure(figsize=(15, 8))
+plt.plot(time_points, R_actual_transformed, "g", label="Recovered Actual", linewidth=2)
+plt.plot(
+    time_points, R_pred_transformed, "g--", label="Recovered Predicted", linewidth=2
+)
+plt.xlabel("Days since: 2020-04-01")
+plt.ylabel("Population")
+plt.title("Recovered: Actual vs Predicted")
+plt.legend()
+plt.grid(True)
+plt.show()
+plt.savefig("../../images/sir_model_recovered_predictions.pdf")
+
+I_mae, I_mse, I_rmse, I_mape = compute_metrics(I_actual_transformed, I_pred_transformed)
+D_mae, D_mse, D_rmse, D_mape = compute_metrics(R_actual_transformed, R_pred_transformed)
+
+print(
+    f"Infected - MAE: {I_mae:.4f}, MSE: {I_mse:.4f}, RMSE: {I_rmse:.4f}, MAPE: {I_mape:.2f}%"
+)
+print(
+    f"Recovered - MAE: {D_mae:.4f}, MSE: {D_mse:.4f}, RMSE: {D_rmse:.4f}, MAPE: {D_mape:.2f}%"
+)
+# Predictions for 3, 5, 7 and 14 days ahead
+# future_days = [3, 5, 7, 14]
+# future_predictions = []
+
+# for days in future_days:
+#     future_t = torch.tensor([len(training_data) + days], dtype=torch.float32).view(-1, 1).to(device)
+#     with torch.no_grad():
+#         future_prediction = model(future_t)
+#         future_predictions.append(future_prediction.cpu().numpy().flatten())
+
+# # Apply inverse transformation
+# future_predictions = transformer.inverse_transform(future_predictions)
+
+# # Print the future predictions
+# for i, days in enumerate(future_days):
+#     print(f"Predictions for {days} days ahead: {future_predictions[i]}")
+#     print()
+
+# # visualise the training data and the future predictions for the next 14 days
+# plt.figure(figsize=(15, 8))
+# plt.plot(time_points, I_actual_transformed, 'r', label='Infected Actual', linewidth=2)
+# plt.plot(time_points, I_pred_transformed, 'r--', label='Infected Predicted', linewidth=2)
+
+# # Plot the future predictions
+# for i, days in enumerate(future_days):
+#     plt.plot(len(training_data) + days, future_predictions[i][1], 'bo', label=f'Infected Prediction {days} days ahead')
+
+# plt.xlabel("Days since: 2020-04-01")
+# plt.ylabel("Population")
+# plt.title("Infected: Actual vs Predicted")
+# plt.legend()
+# plt.show()
+
+
+# # Save the future predictions to a CSV file
+# future_predictions_df = pd.DataFrame(future_predictions, columns=columns_to_scale)
+# future_predictions_df["days_ahead"] = future_days
+# future_predictions_df.to_csv("../../data/future_predictions.csv", index=False)
+# print("Future predictions saved to 'future_predictions.csv'")
+
+# Save the model

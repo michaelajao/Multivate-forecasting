@@ -1,14 +1,17 @@
-using CSV, DataFrames, Lux, ComponentArrays, DifferentialEquations, Optimization, OptimizationOptimJL
-using OptimizationOptimisers, Plots, DiffEqFlux, Statistics, Random
+using CSV, DataFrames, Lux, ComponentArrays, DifferentialEquations
+using Optimization, OptimizationOptimJL, OptimizationOptimisers
+using Plots, DiffEqFlux, Statistics, Random, CUDA, LuxCUDA
+
 
 
 pwd()
 Random.seed!(1234)
 # Load data
 function load_data(path)
-    data = CSV.read(path, DataFrame)
+    data = CSV.File(path) |> DataFrame
     return data
 end
+
 
 
 data_path = "/share/home2/olarinoyem/Project/Multivate-forecasting/data/region_daily_data/East Midlands.csv"
@@ -38,22 +41,28 @@ tspan = (1, data_length)
 t = range(tspan[1], tspan[2], length=data_length)
 p0 = [0.2, 0.07]
 # Neural network for β, γ, δ
-function create_NN(input_size, hidden_size, output_size)
+
+
+function create_NN_gpu(input_size, hidden_size, output_size)
     nn = Lux.Chain(
-        Lux.Dense(input_size, hidden_size, Lux.tanh),
-        Lux.Dense(hidden_size, hidden_size, Lux.tanh),
-        Lux.Dense(hidden_size, hidden_size, Lux.tanh),
-        Lux.Dense(hidden_size, output_size))
-    p, st = Lux.setup(Random.default_rng(), nn)
-    return nn, p, st
+        Lux.Dense(input_size, hidden_size, Lux.tanh_fast),
+        Lux.Dense(hidden_size, hidden_size, Lux.tanh_fast),
+        Lux.Dense(hidden_size, output_size, Lux.sigmoid_fast)
+    )
+    # Explicitly transfer the neural network's parameters and state to GPU
+    p, st = Lux.setup(CUDA.default_rng(), nn)
+    p_gpu = CUDA.cu(p)
+    st_gpu = CUDA.cu(st)
+    return nn, p_gpu, st_gpu
 end
 
-NN_β, p_β, st_β = create_NN(1, 10, 1)
-NN_γ, p_γ, st_γ = create_NN(1, 10, 1)
-NN_δ, p_δ, st_δ = create_NN(1, 10, 1)
-NN_α, p_α, st_α = create_NN(1, 10, 1)
+# Create neural networks on the GPU
+NN_β, p_β, st_β = create_NN_gpu(1, 50, 1)
+NN_γ, p_γ, st_γ = create_NN_gpu(1, 50, 1)
+NN_δ, p_δ, st_δ = create_NN_gpu(1, 50, 1)
+NN_α, p_α, st_α = create_NN_gpu(1, 50, 1)
 
-nn_params = ComponentArray(β=p_β, γ=p_γ, δ=p_δ, α=p_α)
+nn_params = ComponentArray(β=CUDA.cu(p_β), γ=CUDA.cu(p_γ), δ=CUDA.cu(p_δ), α=CUDA.cu(p_α))
 
 # SEIRD model with neural network
 function seird_model!(du, u, p, t)
@@ -74,55 +83,42 @@ end
 
 prob_pred = ODEProblem(seird_model!, u0, tspan, nn_params)
 
-# Loss function
 function predict_adjoint(θ)
-    sol = solve(prob_pred, Tsit5(), p=θ, saveat=t, sensealg=InterpolatingAdjoint(autojacvec=ReverseDiffVJP(true)))
+    # Make sure initial conditions and time span are suitable for GPU
+    prob_gpu = remake(prob_pred; u0=cu(u0), p=cu(θ))
 
-    # Extracting time-varying parameters β, γ, and δ for each time point
-    β_values = [abs(NN_β([Float32(ti)], θ.β, st_β)[1][1]) for ti in t]
-    γ_values = [abs(NN_γ([Float32(ti)], θ.γ, st_γ)[1][1]) for ti in t]
-    δ_values = [abs(NN_δ([Float32(ti)], θ.δ, st_δ)[1][1]) for ti in t]
-    α_values = [abs(NN_α([Float32(ti)], θ.α, st_α)[1][1]) for ti in t]
+    sol = solve(prob_gpu, Tsit5(), saveat=t, sensealg=InterpolatingAdjoint(autojacvec=ReverseDiffVJP(true)))
 
-    # Calculating R_t for each time point based on β, γ, and δ
+    # Extract and process neural network parameters on GPU
+    β_values = cu([abs(NN_β([Float32(ti)], θ.β, st_β)[1][1]) for ti in t])
+    γ_values = cu([abs(NN_γ([Float32(ti)], θ.γ, st_γ)[1][1]) for ti in t])
+    δ_values = cu([abs(NN_δ([Float32(ti)], θ.δ, st_δ)[1][1]) for ti in t])
+    α_values = cu([abs(NN_α([Float32(ti)], θ.α, st_α)[1][1]) for ti in t])
+
     Rt_values = β_values ./ (γ_values .+ δ_values)
 
-    return Array(sol), Rt_values
+    return cu(Array(sol)), Rt_values
 end
-# function predict_adjoint(θ)
-#     sol = solve(prob_pred, Tsit5(), p=θ, saveat=t, sensealg=InterpolatingAdjoint(autojacvec=ReverseDiffVJP(true)))
-#     return Array(sol) # Just return the solution array
-# end
-
-
-# function loss_adjoint(θ)
-#     prediction = predict_adjoint(θ) # Get model predictions
-
-#     # Compute mean squared logarithmic error for infected and deceased
-#     c = 1e-1
-#     infected_loss = sum(abs2, log.(abs.(infected_data) .+ c) - log.(abs.(prediction[3, :]) .+ c))
-#     death_loss = sum(abs2, log.(abs.(death_data) .+ c) - log.(abs.(prediction[5, :]) .+ c))
-
-#     # Compute Rt for each time point and penalize deviations from 1.0
-#     β_values = [abs(NN_β([Float32(ti)], θ.β, st_β)[1][1]) for ti in t]
-#     γ_values = [abs(NN_γ([Float32(ti)], θ.γ, st_γ)[1][1]) for ti in t]
-#     δ_values = [abs(NN_δ([Float32(ti)], θ.δ, st_δ)[1][1]) for ti in t]
-#     Rt_values = β_values ./ (γ_values .+ δ_values)
-#     Rt_loss = sum(abs2, Rt_values .- 4.0)
-
-#     # Combine losses
-#     total_loss = infected_loss + death_loss + Rt_loss
-#     return total_loss
-# end
 
 function loss_adjoint(θ)
-    prediction, Rt_values = predict_adjoint(θ)
+    predicted, Rt_values = predict_adjoint(θ)
+    
+    # Ensure actual data is on GPU
+    infected_data_gpu = cu(infected_data)
+    death_data_gpu = cu(death_data)
+
+    # Logarithmic loss for infected and deceased data
     c = 1e-1
-    loss = sum(abs2, log.(abs.(infected_data) .+ c) .- log.(abs.(prediction[3, :]) .+ c)) +
-           sum(abs2, log.(abs.(death_data) .+ c) .- log.(abs.(prediction[5, :]) .+ c)) +
-        sum(abs2, Rt_values .- 2.0)
-    return loss
+    infected_loss = sum(abs2.(log.(abs.(infected_data_gpu) .+ c) .- log.(abs.(predicted[3, :]) .+ c)))
+    death_loss = sum(abs2.(log.(abs.(death_data_gpu) .+ c) .- log.(abs.(predicted[5, :]) .+ c)))
+
+    # Rt loss, assuming Rt_values and a target Rt are on the GPU
+    Rt_loss = sum(abs2.(Rt_values .- 1.0))
+
+    total_loss = infected_loss + death_loss + Rt_loss
+    return total_loss
 end
+
 
 function calculate_mse(predicted, actual)
     mse = mean((predicted .- actual) .^ 2)
@@ -137,7 +133,7 @@ end
 
 #function to calculate Mean absolute percentage error
 function calculate_mape(predicted, actual)
-    mape = mean(abs.((predicted .- actual) ./ actual)) * 100
+    mape = mean(abs.((predicted .- actual) ./ actual .+ c)) * 100
     return mape
 end
 
@@ -241,13 +237,41 @@ function plot_rt_values(t, Rt_values)
     return p
 end
 
-function plot_parameter_dynamics(t, β_values, γ_values, δ_values)
+# function plot_parameter_dynamics(t, β_values, γ_values, δ_values)
+#     p = plot(t, β_values, label="β (Transmission Rate)", color=:blue, legend=:topright, xlabel="Time (days)", ylabel="Parameter Value", title="Parameter Dynamics Over Time")
+#     plot!(p, t, γ_values, label="γ (Recovery Rate)", color=:green)
+#     plot!(p, t, δ_values, label="δ (Mortality Rate)", color=:red)
+#     plot!(p, t, α_values, label="α (Incubation Rate)", color=:orange)
+#     savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/parameter_dynamics1.pdf")
+#     return p
+# end
+
+function plot_beta(t, β_values)
     p = plot(t, β_values, label="β (Transmission Rate)", color=:blue, legend=:topright, xlabel="Time (days)", ylabel="Parameter Value", title="Parameter Dynamics Over Time")
-    plot!(p, t, γ_values, label="γ (Recovery Rate)", color=:green)
-    plot!(p, t, δ_values, label="δ (Mortality Rate)", color=:red)
-    plot!(p, t, α_values, label="α (Incubation Rate)", color=:orange)
-    savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/parameter_dynamics1.pdf")
+    savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/beta_parameter_dynamics1.pdf")
     return p
+    
+end
+
+function plot_gamma(t, γ_values)
+    p = plot(t, γ_values, label="γ (Recovery Rate)", color=:green, legend=:topright, xlabel="Time (days)", ylabel="Parameter Value", title="Parameter Dynamics Over Time")
+    savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/gamma_parameter_dynamics1.pdf")
+    return p
+    
+end
+
+function plot_rho(t, δ_values)
+    p = plot(t, δ_values, label="δ (Mortality Rate)", color=:red, legend=:topright, xlabel="Time (days)", ylabel="Parameter Value", title="Parameter Dynamics Over Time")
+    savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/rho_parameter_dynamics1.pdf")
+    return p
+    
+end
+
+function plot_alpha(t, α_values)
+    p = plot(t, α_values, label="α (Incubation Rate)", color=:orange, legend=:topright, xlabel="Time (days)", ylabel="Parameter Value", title="Parameter Dynamics Over Time")
+    savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/alpha_parameter_dynamics1.pdf")
+    return p
+    
 end
 
 pl_loss = plot_training_loss(losses)
@@ -255,7 +279,14 @@ pl_infected = plot_infection_data(t, infected_data, predicted_data[3, :])
 pl_death = plot_death_data(t, death_data, predicted_data[5, :])
 pl_Rt = plot_rt_values(t, Rt_values)
 
-pl_parameters = plot_parameter_dynamics(t, β_values, γ_values, δ_values)
+pl_beta = plot_beta(t, β_values)
+pl_gamma = plot_gamma(t, γ_values)
+pl_rho = plot_rho(t, δ_values)
+pl_alpha = plot_alpha(t, α_values)
 
-final_plot = plot(pl_loss, pl_infected, pl_death, pl_Rt, pl_parameters, layout=(3, 2), size=(1000, 800))
+final_plot = plot(pl_loss, pl_infected, pl_death, pl_Rt, pl_beta, pl_gamma, pl_rho, pl_alpha, layout=(4, 2), size=(1000, 800))
+
+# pl_parameters = plot_parameter_dynamics(t, β_values, γ_values, δ_values)
+
+# final_plot = plot(pl_loss, pl_infected, pl_death, pl_Rt, pl_parameters, layout=(3, 2), size=(1000, 800))
 # savefig(final_plot, "C:\\Users\\ajaoo\\Desktop\\Projects\\hospitalisation-PINN\reports\\figures\\SEIRD_UDE.png")
