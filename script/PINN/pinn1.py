@@ -1,10 +1,10 @@
-import pandas as pd
+import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
@@ -13,21 +13,22 @@ np.random.seed(42)
 torch.manual_seed(42)
 
 # Set the default style
-mpl.style.use("fivethirtyeight")
-mpl.rcParams["lines.linewidth"] = 2
-mpl.rcParams["font.family"] = "serif"
-mpl.rcParams["axes.titlesize"] = 20
-mpl.rcParams["axes.labelsize"] = 14
-mpl.rcParams["figure.figsize"] = [15, 8]
-mpl.rcParams["figure.autolayout"] = True
-mpl.rcParams["axes.spines.top"] = False
-mpl.rcParams["axes.spines.right"] = False
-mpl.rcParams["axes.grid"] = True
-# mpl.rcParams["xtick.labelsize"] = 12
-# mpl.rcParams["ytick.labelsize"] = 12
-mpl.rcParams["grid.color"] = "0.75"
-mpl.rcParams["legend.fontsize"] = "medium"
-
+plt.style.use("fivethirtyeight")
+plt.rcParams.update(
+    {
+        "lines.linewidth": 2,
+        "font.family": "serif",
+        "axes.titlesize": 20,
+        "axes.labelsize": 14,
+        "figure.figsize": [15, 8],
+        "figure.autolayout": True,
+        "axes.spines.top": False,
+        "axes.spines.right": False,
+        "axes.grid": True,
+        "grid.color": "0.75",
+        "legend.fontsize": "medium",
+    }
+)
 
 # Device configuration
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -44,6 +45,8 @@ def load_and_preprocess_data(filepath):
             "cumulative_confirmed",
             "cumulative_deceased",
             "population",
+            "new_confirmed",
+            "new_deceased",
         ]
         if not all(column in df.columns for column in required_columns):
             raise ValueError("Missing required columns in the dataset")
@@ -55,7 +58,12 @@ def load_and_preprocess_data(filepath):
         df["days_since_start"] = (df["date"] - df["date"].min()).dt.days
 
         # Smooth the 'cumulative_confirmed' and 'cumulative_deceased' with a 7-day rolling average
-        for col in ["cumulative_confirmed", "cumulative_deceased"]:
+        for col in [
+            "new_confirmed",
+            "new_deceased",
+            "cumulative_confirmed",
+            "cumulative_deceased",
+        ]:
             df[col] = (
                 df[col].rolling(window=7, min_periods=1).mean().fillna(0).astype(int)
             )
@@ -91,7 +99,16 @@ def load_and_preprocess_data(filepath):
         print(e)
 
 
-df = load_and_preprocess_data("../../data/region_daily_data/East Midlands.csv")
+def get_region_name_from_filepath(filepath):
+    # Assuming the region's name is part of the filename like 'East Midlands.csv'
+    # This will extract 'East Midlands' from the full path
+    base = os.path.basename(filepath)
+    return os.path.splitext(base)[0]
+
+
+path = "../../data/region_daily_data/East of England.csv"
+region_name = get_region_name_from_filepath(path)
+df = load_and_preprocess_data(f"../../data/region_daily_data/{region_name}.csv")
 
 start_date = "2020-04-01"
 end_date = "2021-01-31"
@@ -101,7 +118,7 @@ training_data = df.loc[mask]
 transformer = MinMaxScaler()
 
 # Select the columns to scale
-columns_to_scale = ["S(t)", "cumulative_confirmed", "cumulative_deceased"]
+columns_to_scale = ["S(t)", "active_cases", "recovered"]
 
 # Fit the scaler to the training data
 transformer.fit(training_data[columns_to_scale])
@@ -123,12 +140,12 @@ t_data = (
     .to(device)
 )
 I_data = (
-    torch.tensor(training_data["cumulative_confirmed"].values, dtype=torch.float32)
+    torch.tensor(training_data["active_cases"].values, dtype=torch.float32)
     .view(-1, 1)
     .to(device)
 )
 R_data = (
-    torch.tensor(training_data["cumulative_deceased"].values, dtype=torch.float32)
+    torch.tensor(training_data["recovered"].values, dtype=torch.float32)
     .view(-1, 1)
     .to(device)
 )
@@ -303,6 +320,8 @@ plt.grid(True, which="both", ls=":")
 plt.plot(np.arange(1, len(history) + 1), np.log10(history), label="Train Loss")
 plt.xlabel("Epoch")
 plt.ylabel("Log10(Loss)")
+plt.title(f"Training History {region_name}")
+plt.savefig(f"../../images/Training_History_{region_name}.pdf")
 plt.legend()
 plt.show()
 
@@ -331,29 +350,25 @@ time_points = t_data.cpu().detach().numpy()
 
 # Plotting the actual vs. predicted data
 
-# plt.plot(time_points, S_actual, 'b', label='Susceptible Actual', linewidth=2)
-# plt.plot(time_points, S_pred, 'b--', label='Susceptible Predicted', linewidth=2)
-
 plt.plot(time_points, I_actual, "r", label="Infected Actual", linewidth=2)
 plt.plot(time_points, I_pred, "r--", label="Infected Predicted", linewidth=2)
 plt.xlabel("Days since: 2020-04-01")
 plt.ylabel("Population")
-plt.title("SIR Model Predictions vs. Actual Data")
+plt.title(f"SIR Model Predictions vs. Actual Data {region_name}")
 plt.legend()
-plt.grid(True)
+# plt.savefig(f"../../images/sir_model_predictions_{region_name}.pdf")
 plt.show()
-plt.savefig("../../images/sir_model_predictions.pdf")
 
 
 plt.plot(time_points, R_actual, "g", label="Recovered Actual", linewidth=2)
 plt.plot(time_points, R_pred, "g--", label="Recovered Predicted", linewidth=2)
 plt.xlabel("Days since: 2020-04-01")
 plt.ylabel("Population")
-plt.title("SIR Model Predictions vs. Actual Data")
+plt.title(f"SIR Model Predictions vs. Actual Data {region_name}")
 plt.legend()
-plt.grid(True)
+# plt.savefig(f"../../images/sir_model_predictions_{region_name}.pdf")
 plt.show()
-plt.savefig("../../images/sir_model_predictions.pdf")
+
 
 # compute MAE, MSE, RMSE, and MAPE for predictions for infected and death cases
 
@@ -389,12 +404,12 @@ full_actual_data = np.zeros((len(S_actual), transformer.n_features_in_))
 # Fill in the placeholders with the predicted and actual data
 # The order of columns in 'columns_to_scale' is ['recovered', 'active_cases', 'S(t)']
 full_predicted_data[:, columns_to_scale.index("S(t)")] = S_pred
-full_predicted_data[:, columns_to_scale.index("cumulative_confirmed")] = I_pred
-full_predicted_data[:, columns_to_scale.index("cumulative_deceased")] = R_pred
+full_predicted_data[:, columns_to_scale.index("active_cases")] = I_pred
+full_predicted_data[:, columns_to_scale.index("recovered")] = R_pred
 
 full_actual_data[:, columns_to_scale.index("S(t)")] = S_actual
-full_actual_data[:, columns_to_scale.index("cumulative_confirmed")] = I_actual
-full_actual_data[:, columns_to_scale.index("cumulative_deceased")] = R_actual
+full_actual_data[:, columns_to_scale.index("active_cases")] = I_actual
+full_actual_data[:, columns_to_scale.index("recovered")] = R_actual
 
 # Apply inverse transformation
 inverse_predicted_data = transformer.inverse_transform(full_predicted_data)
@@ -402,24 +417,16 @@ inverse_actual_data = transformer.inverse_transform(full_actual_data)
 
 # Separate the inversely transformed S, I, R values for predicted and actual data
 S_pred_transformed = inverse_predicted_data[:, columns_to_scale.index("S(t)")]
-I_pred_transformed = inverse_predicted_data[
-    :, columns_to_scale.index("cumulative_confirmed")
-]
-R_pred_transformed = inverse_predicted_data[
-    :, columns_to_scale.index("cumulative_deceased")
-]
+I_pred_transformed = inverse_predicted_data[:, columns_to_scale.index("active_cases")]
+R_pred_transformed = inverse_predicted_data[:, columns_to_scale.index("recovered")]
 
 S_actual_transformed = inverse_actual_data[:, columns_to_scale.index("S(t)")]
-I_actual_transformed = inverse_actual_data[
-    :, columns_to_scale.index("cumulative_confirmed")
-]
-R_actual_transformed = inverse_actual_data[
-    :, columns_to_scale.index("cumulative_deceased")
-]
+I_actual_transformed = inverse_actual_data[:, columns_to_scale.index("active_cases")]
+R_actual_transformed = inverse_actual_data[:, columns_to_scale.index("recovered")]
 
 
 # Plot for Susceptible (S)
-plt.figure(figsize=(15, 8))
+
 plt.plot(
     time_points, S_actual_transformed, "b", label="Susceptible Actual", linewidth=2
 )
@@ -428,39 +435,39 @@ plt.plot(
 )
 plt.xlabel("Days since: 2020-04-01")
 plt.ylabel("Population")
-plt.title("Susceptible: Actual vs Predicted")
+plt.title(f"Susceptible: Predictions vs Actual Data {region_name}")
 plt.legend()
-plt.grid(True)
+plt.savefig(f"../../images/S_predictions_{region_name}.pdf")
 plt.show()
-plt.savefig("../../images/sir_model_susceptible_predictions.pdf")
+
 
 # Plot for Infected (I)
-plt.figure(figsize=(15, 8))
+
 plt.plot(time_points, I_actual_transformed, "r", label="Infected Actual", linewidth=2)
 plt.plot(
     time_points, I_pred_transformed, "r--", label="Infected Predicted", linewidth=2
 )
 plt.xlabel("Days since: 2020-04-01")
 plt.ylabel("Population")
-plt.title("Infected: Actual vs Predicted")
+plt.title(f"Infected: Predictions vs Actual Data {region_name}")
 plt.legend()
-plt.grid(True)
+plt.savefig(f"../../images/I_predictions_{region_name}.pdf")
 plt.show()
-plt.savefig("../../images/sir_model_infected_predictions.pdf")
+
 
 # Plot for Recovered (R)
-plt.figure(figsize=(15, 8))
+
 plt.plot(time_points, R_actual_transformed, "g", label="Recovered Actual", linewidth=2)
 plt.plot(
     time_points, R_pred_transformed, "g--", label="Recovered Predicted", linewidth=2
 )
 plt.xlabel("Days since: 2020-04-01")
 plt.ylabel("Population")
-plt.title("Recovered: Actual vs Predicted")
+plt.title(f"Recovered: Predictions vs Actual Data {region_name}")
 plt.legend()
-plt.grid(True)
+plt.savefig(f"../../images/R_predictions_{region_name}.pdf")
 plt.show()
-plt.savefig("../../images/sir_model_recovered_predictions.pdf")
+
 
 I_mae, I_mse, I_rmse, I_mape = compute_metrics(I_actual_transformed, I_pred_transformed)
 D_mae, D_mse, D_rmse, D_mape = compute_metrics(R_actual_transformed, R_pred_transformed)
