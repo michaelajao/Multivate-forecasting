@@ -147,6 +147,7 @@ end
 
 #function to calculate Mean absolute percentage error
 function calculate_mape(predicted, actual)
+    c = 1e-1
     mape = mean(abs.((predicted .- actual) ./ actual .+ c)) * 100
     return mape
 end
@@ -199,6 +200,9 @@ fig = with_theme(theme_web()) do
     return fig
 end
 
+# save images
+save("/share/home2/olarinoyem/Project/Multivate-forecasting/images/ude/east_midlands_training_loss.pdf", fig)
+
 # Optimization
 # optf = Optimization.OptimizationFunction((θ, _) -> loss_adjoint(θ), Optimization.AutoZygote())
 # optprob = Optimization.OptimizationProblem(optf, nn_params)
@@ -211,18 +215,16 @@ end
 # Evaluate model performance
 predicted_data, Rt_values = predict_adjoint(res1.minimizer)
 mse, mae, mape, rmse = evaluate_model(predicted_data[3, :], infected_data)
-mse, mae, mape, rmse = evaluate_model(predicted_data[5, :], death_data)
-
-println("Mean Squared Error death_data: $mse")
-println("Mean Absolute Error death_data: $mae")
-println("Mean Absolute Percentage Error death_data: $mape")
-println("Root Mean Squared Error death_data: $rmse")
-
-
 println("Mean Squared Error infected: $mse")
 println("Mean Absolute Error infected: $mae")
 println("Mean Absolute Percentage Error infected: $mape")
 println("Root Mean Squared Error infected: $rmse")
+
+mse, mae, mape, rmse = evaluate_model(predicted_data[5, :], death_data)
+println("Mean Squared Error death_data: $mse")
+println("Mean Absolute Error death_data: $mae")
+println("Mean Absolute Percentage Error death_data: $mape")
+println("Root Mean Squared Error death_data: $rmse")
 
 
 #Extract predicted compartments
