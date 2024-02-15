@@ -17,7 +17,7 @@ end
 # # Get the device determined by Lux
 # device = gpu_device()
 
-region_name = "South West England"
+region_name = "West Midlands"
 
 data_path = "/share/home2/olarinoyem/Project/Multivate-forecasting/data/region_daily_data/$(region_name).csv"
 
