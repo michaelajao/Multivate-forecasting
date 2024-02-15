@@ -222,3 +222,51 @@ weekly_data = merged_data.groupby(['region', pd.Grouper(key='date', freq='W')]).
 
 
 region = weekly_data['region'].unique()
+
+
+for area in region:
+    area_data = weekly_data[weekly_data['region'] == area]
+    plt.plot(area_data['date'], area_data['covidOccupiedMVBeds'], label=f"{area} - ICU Beds")
+    
+for start, end in lockdown_periods:
+    plt.axvspan(start, end, color="purple", alpha=0.3, label='Lockdown Periods' if start == '2020-03-23' else "")
+
+plt.title('Weekly Trends of ICU Bed Occupancy Across Selected Regions')
+plt.xlabel('Date')
+plt.ylabel('Average ICU Beds Occupied')
+plt.legend()
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.savefig('../../images/weekly_icu_beds_occupancy.pdf')
+plt.show()
+
+
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score
+
+cluster_data = merged_data.groupby(['region', 'date']).agg({
+    'new_confirmed': 'mean',
+    'new_deceased': 'mean',
+    'hospitalCases': 'mean',
+    'newAdmissions': 'mean',
+    'covidOccupiedMVBeds': 'mean'
+}).reset_index()
+
+scaler = StandardScaler()
+cluster_features = scaler.fit_transform(cluster_data[['new_confirmed', 'new_deceased', 'hospitalCases', 'newAdmissions', 'covidOccupiedMVBeds']])
+
+silhouette_scores = []
+for k in range(2, 21):
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    kmeans.fit(cluster_features)
+    score = silhouette_score(cluster_features, kmeans.labels_)
+    silhouette_scores.append(score)
+    
+    
+plt.plot(range(2, 21), silhouette_scores, marker='o')
+plt.title('Silhouette Score for Different Number of Clusters')
+plt.xlabel('Number of Clusters')
+plt.ylabel('Silhouette Score')
+plt.show()
+
