@@ -292,12 +292,83 @@ $\alpha$ & Mortality rate \\
 \bottomrule
 \end{tabular}
 
-\begin{figure}
+\begin{figure*}[ht]
     \centering
-    \includegraphics{images/forecast_multivarate_GRU.png}
-    \caption{Caption}
-    \label{fig:enter-label}
-\end{figure}
+    \includegraphics[width=0.8\textwidth]{"images/weekly_icu_beds_occupancy.pdf"}
+    \caption{weekly ICU bed occupancy across NHS regions.}
+    \label{fig:ICU_beds_occupancy}
+\end{figure*}
+
+
+\begin{figure*}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{"images/new_confirmed_per_100k.pdf"}
+    \caption{new confirmed COVID-19 cases per 100k people overtime by NHS regions.}
+    \label{fig:new_confirmed_per_100k}
+\end{figure*}
+
+\begin{figure*}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/pinn/I_predictions_East Midlands.pdf}
+    \caption{Predicted number of infectious individuals in the East Midlands region.}
+    \label{fig:I_predictions_East_Midlands}
+\end{figure*}
+
+\begin{figure*}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/pinn/R_predictions_East Midlands.pdf}
+    \caption{Predicted number of recovered individuals in the East Midlands region.}
+    \label{fig:R_predictions_East_Midlands}
+\end{figure*}
+
+\begin{figure*}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/pinn/Training_History_East Midlands.pdf}
+    \caption{Training history of the PINN model for the East Midlands region.}
+    \label{fig:Training_History_East_Midlands}
+\end{figure*}
+
+\begin{figure*}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/pinn/I_predictions_East of England.pdf}
+    \caption{Predicted number of infectious individuals in the East of England region.}
+    \label{fig:I_predictions_East_of_England}
+\end{figure*}
+
+\begin{figure*}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/pinn/R_predictions_East of England.pdf}
+    \caption{Predicted number of recovered individuals in the East of England region.}
+    \label{fig:R_predictions_East_of_England}
+\end{figure*}
+
+\begin{figure*}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/pinn/Training_History_East of England.pdf}
+    \caption{Training history of the PINN model for the East of England region.}
+    \label{fig:Training_History_East_of_England}
+\end{figure*}
+
+\begin{figure*}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/pinn/I_predictions_London Region.pdf}
+    \caption{Predicted number of infectious individuals in the London region.}
+    \label{fig:I_predictions_London}
+\end{figure*}
+
+\begin{figure*}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/pinn/R_predictions_London Region.pdf}
+    \caption{Predicted number of recovered individuals in the London region.}
+    \label{fig:R_predictions_London}
+\end{figure*}
+
+\begin{figure*}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/pinn/Training_History_London Region.pdf}
+    \caption{Training history of the PINN model for the London region.}
+    \label{fig:Training_History_London}
+\end{figure*}
 
 
 \bibliographystyle{alphaurl}
