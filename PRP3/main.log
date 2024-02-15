@@ -1,90 +1,91 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.5) (preloaded format=pdflatex 2023.5.23)  15 FEB 2024 13:53
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.11.6)  15 FEB 2024 19:51
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex
-(c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex
-LaTeX2e <2022-11-01> patch level 1
-L3 programming layer <2023-05-15> (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
-Document Class: article 2022/07/02 v1.4n Standard LaTeX document class
-(C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/base\size12.clo
-File: size12.clo 2022/07/02 v1.4n Standard LaTeX file (size option)
+**c:/Users/olarinoyem/Project/Multivate-forecasting/PRP3/main.tex
+(c:/Users/olarinoyem/Project/Multivate-forecasting/PRP3/main.tex
+LaTeX2e <2023-11-01>
+L3 programming layer <2023-11-01>
+(c:/texlive/2023/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(c:/texlive/2023/texmf-dist/tex/latex/base/size12.clo
+File: size12.clo 2023/05/17 v1.4n Standard LaTeX file (size option)
 )
-\c@part=\count185
-\c@section=\count186
-\c@subsection=\count187
-\c@subsubsection=\count188
-\c@paragraph=\count189
-\c@subparagraph=\count190
-\c@figure=\count191
-\c@table=\count192
+\c@part=\count186
+\c@section=\count187
+\c@subsection=\count188
+\c@subsubsection=\count189
+\c@paragraph=\count190
+\c@subparagraph=\count191
+\c@figure=\count192
+\c@table=\count193
 \abovecaptionskip=\skip48
 \belowcaptionskip=\skip49
 \bibindent=\dimen140
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/base\inputenc.sty
+) (c:/texlive/2023/texmf-dist/tex/latex/base/inputenc.sty
 Package: inputenc 2021/02/14 v1.3d Input encoding file
-\inpenc@prehook=\toks16
-\inpenc@posthook=\toks17
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/algorithms\algorithm.sty
+\inpenc@prehook=\toks17
+\inpenc@posthook=\toks18
+) (c:/texlive/2023/texmf-dist/tex/latex/algorithms/algorithm.sty
 Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating environment
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/float\float.sty
+ (c:/texlive/2023/texmf-dist/tex/latex/float/float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count193
-\float@exts=\toks18
+\c@float@type=\count194
+\float@exts=\toks19
 \float@box=\box51
-\@float@everytoks=\toks19
+\@float@everytoks=\toks20
 \@floatcapt=\box52
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/base\ifthen.sty
+) (c:/texlive/2023/texmf-dist/tex/latex/base/ifthen.sty
 Package: ifthen 2022/04/13 v1.1d Standard LaTeX ifthen package (DPC)
 )
-\@float@every@algorithm=\toks20
-\c@algorithm=\count194
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/algorithmicx\algpseudocode.sty
+\@float@every@algorithm=\toks21
+\c@algorithm=\count195
+) (c:/texlive/2023/texmf-dist/tex/latex/algorithmicx/algpseudocode.sty
 Package: algpseudocode 
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/algorithmicx\algorithmicx.sty
+ (c:/texlive/2023/texmf-dist/tex/latex/algorithmicx/algorithmicx.sty
 Package: algorithmicx 2005/04/27 v1.2 Algorithmicx
 
 Document Style algorithmicx 1.2 - a greatly improved `algorithmic' style
-\c@ALG@line=\count195
-\c@ALG@rem=\count196
-\c@ALG@nested=\count197
+\c@ALG@line=\count196
+\c@ALG@rem=\count197
+\c@ALG@nested=\count198
 \ALG@tlm=\skip50
 \ALG@thistlm=\skip51
-\c@ALG@Lnr=\count198
-\c@ALG@blocknr=\count199
-\c@ALG@storecount=\count266
-\c@ALG@tmpcounter=\count267
+\c@ALG@Lnr=\count199
+\c@ALG@blocknr=\count266
+\c@ALG@storecount=\count267
+\c@ALG@tmpcounter=\count268
 \ALG@tmplength=\skip52
 )
 Document Style - pseudocode environments for use with the `algorithmicx' style
-) (sigsam.sty
+) (./sigsam.sty
 Package: sigsam 
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/base\latexsym.sty
+ (c:/texlive/2023/texmf-dist/tex/latex/base/latexsym.sty
 Package: latexsym 1998/08/17 v2.2e Standard LaTeX package (lasy symbols)
 \symlasy=\mathgroup4
 LaTeX Font Info:    Overwriting symbol font `lasy' in version `bold'
 (Font)                  U/lasy/m/n --> U/lasy/b/n on input line 52.
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amssymb.sty
+) (c:/texlive/2023/texmf-dist/tex/latex/amsfonts/amssymb.sty
 Package: amssymb 2013/01/14 v3.01 AMS font symbols
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amsfonts.sty
+ (c:/texlive/2023/texmf-dist/tex/latex/amsfonts/amsfonts.sty
 Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
-\@emptytoks=\toks21
+\@emptytoks=\toks22
 \symAMSa=\mathgroup5
 \symAMSb=\mathgroup6
 LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
 LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
-)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty
+)) (c:/texlive/2023/texmf-dist/tex/latex/url/url.sty
 \Urlmuskip=\muskip16
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/caption\caption.sty
-Package: caption 2023/03/12 v3.6j Customizing captions (AR)
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/caption\caption3.sty
-Package: caption3 2023/03/12 v2.4 caption3 kernel (AR)
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty
+) (c:/texlive/2023/texmf-dist/tex/latex/caption/caption.sty
+Package: caption 2023/08/05 v3.6o Customizing captions (AR)
+ (c:/texlive/2023/texmf-dist/tex/latex/caption/caption3.sty
+Package: caption3 2023/07/31 v2.4d caption3 kernel (AR)
+ (c:/texlive/2023/texmf-dist/tex/latex/graphics/keyval.sty
 Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
-\KV@toks@=\toks22
+\KV@toks@=\toks23
 )
 \caption@tempdima=\dimen141
 \captionmargin=\dimen142
@@ -96,10 +97,10 @@ Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
 \caption@hangindent=\dimen148
 Package caption Info: Standard document class detected.
 )
-\c@caption@flags=\count268
-\c@continuedfloat=\count269
+\c@caption@flags=\count269
+\c@continuedfloat=\count270
 Package caption Info: float package is loaded.
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/fancyhdr\fancyhdr.sty
+) (c:/texlive/2023/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
 Package: fancyhdr 2022/11/09 v4.1 Extensive control of page headers and footers
 \f@nch@headwidth=\skip53
 \f@nch@O@elh=\skip54
@@ -110,31 +111,31 @@ Package: fancyhdr 2022/11/09 v4.1 Extensive control of page headers and footers
 \f@nch@O@erf=\skip59
 \f@nch@O@olf=\skip60
 \f@nch@O@orf=\skip61
-)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsmath.sty
-Package: amsmath 2022/04/08 v2.17n AMS math features
+)) (c:/texlive/2023/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2023/05/13 v2.17o AMS math features
 \@mathmargin=\skip62
 
 For additional information on amsmath, use the `?' option.
-(C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amstext.sty
+(c:/texlive/2023/texmf-dist/tex/latex/amsmath/amstext.sty
 Package: amstext 2021/08/26 v2.01 AMS text
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsgen.sty
+ (c:/texlive/2023/texmf-dist/tex/latex/amsmath/amsgen.sty
 File: amsgen.sty 1999/11/30 v2.0 generic functions
-\@emptytoks=\toks23
+\@emptytoks=\toks24
 \ex@=\dimen149
-)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsbsy.sty
+)) (c:/texlive/2023/texmf-dist/tex/latex/amsmath/amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d Bold Symbols
 \pmbraise@=\dimen150
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsopn.sty
+) (c:/texlive/2023/texmf-dist/tex/latex/amsmath/amsopn.sty
 Package: amsopn 2022/04/08 v2.04 operator names
 )
-\inf@bad=\count270
+\inf@bad=\count271
 LaTeX Info: Redefining \frac on input line 234.
-\uproot@=\count271
-\leftroot@=\count272
+\uproot@=\count272
+\leftroot@=\count273
 LaTeX Info: Redefining \overline on input line 399.
 LaTeX Info: Redefining \colon on input line 410.
-\classnum@=\count273
-\DOTSCASE@=\count274
+\classnum@=\count274
+\DOTSCASE@=\count275
 LaTeX Info: Redefining \ldots on input line 496.
 LaTeX Info: Redefining \dots on input line 499.
 LaTeX Info: Redefining \cdots on input line 620.
@@ -147,38 +148,38 @@ LaTeX Info: Redefining \Bigg on input line 725.
 \big@size=\dimen151
 LaTeX Font Info:    Redeclaring font encoding OML on input line 743.
 LaTeX Font Info:    Redeclaring font encoding OMS on input line 744.
-\macc@depth=\count275
+\macc@depth=\count276
 LaTeX Info: Redefining \bmod on input line 905.
 LaTeX Info: Redefining \pmod on input line 910.
 LaTeX Info: Redefining \smash on input line 940.
 LaTeX Info: Redefining \relbar on input line 970.
 LaTeX Info: Redefining \Relbar on input line 971.
-\c@MaxMatrixCols=\count276
+\c@MaxMatrixCols=\count277
 \dotsspace@=\muskip17
-\c@parentequation=\count277
-\dspbrk@lvl=\count278
-\tag@help=\toks24
-\row@=\count279
-\column@=\count280
-\maxfields@=\count281
-\andhelp@=\toks25
+\c@parentequation=\count278
+\dspbrk@lvl=\count279
+\tag@help=\toks25
+\row@=\count280
+\column@=\count281
+\maxfields@=\count282
+\andhelp@=\toks26
 \eqnshift@=\dimen152
 \alignsep@=\dimen153
 \tagshift@=\dimen154
 \tagwidth@=\dimen155
 \totwidth@=\dimen156
 \lineht@=\dimen157
-\@envbody=\toks26
+\@envbody=\toks27
 \multlinegap=\skip63
 \multlinetaggap=\skip64
-\mathdisplay@stack=\toks27
+\mathdisplay@stack=\toks28
 LaTeX Info: Redefining \[ on input line 2953.
 LaTeX Info: Redefining \] on input line 2954.
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/cite\cite.sty
+) (c:/texlive/2023/texmf-dist/tex/latex/cite/cite.sty
 LaTeX Info: Redefining \cite on input line 302.
 LaTeX Info: Redefining \nocite on input line 332.
 Package: cite 2015/02/27  v 5.5
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/booktabs\booktabs.sty
+) (c:/texlive/2023/texmf-dist/tex/latex/booktabs/booktabs.sty
 Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
 \heavyrulewidth=\dimen158
 \lightrulewidth=\dimen159
@@ -190,45 +191,51 @@ Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
 \cmidrulesep=\dimen165
 \cmidrulekern=\dimen166
 \defaultaddspace=\dimen167
-\@cmidla=\count282
-\@cmidlb=\count283
+\@cmidla=\count283
+\@cmidlb=\count284
 \@aboverulesep=\dimen168
 \@belowrulesep=\dimen169
-\@thisruleclass=\count284
-\@lastruleclass=\count285
+\@thisruleclass=\count285
+\@lastruleclass=\count286
 \@thisrulewidth=\dimen170
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
+) (c:/texlive/2023/texmf-dist/tex/latex/graphics/graphicx.sty
 Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
+ (c:/texlive/2023/texmf-dist/tex/latex/graphics/graphics.sty
 Package: graphics 2022/03/10 v1.4e Standard LaTeX Graphics (DPC,SPQR)
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty
+ (c:/texlive/2023/texmf-dist/tex/latex/graphics/trig.sty
 Package: trig 2021/08/11 v1.11 sin cos tan (DPC)
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.cfg
+) (c:/texlive/2023/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
 File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
 Package graphics Info: Driver file: pdftex.def on input line 107.
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdftex.def
+ (c:/texlive/2023/texmf-dist/tex/latex/graphics-def/pdftex.def
 File: pdftex.def 2022/09/22 v1.2b Graphics/color driver for pdftex
 ))
 \Gin@req@height=\dimen171
 \Gin@req@width=\dimen172
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/pgf/frontendlayer\tikz.sty (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\pgf.sty (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgfrcs.sty (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfutil-common.tex
-\pgfutil@everybye=\toks28
+) (c:/texlive/2023/texmf-dist/tex/latex/caption/subcaption.sty
+Package: subcaption 2023/07/28 v1.6b Sub-captions (AR)
+Package caption Info: New subtype `subfigure' on input line 238.
+\c@subfigure=\count287
+Package caption Info: New subtype `subtable' on input line 238.
+\c@subtable=\count288
+) (c:/texlive/2023/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty (c:/texlive/2023/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty (c:/texlive/2023/texmf-dist/tex/latex/pgf/utilities/pgfrcs.sty (c:/texlive/2023/texmf-dist/tex/generic/pgf/utilities/pgfutil-common.tex
+\pgfutil@everybye=\toks29
 \pgfutil@tempdima=\dimen173
 \pgfutil@tempdimb=\dimen174
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfutil-latex.def
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/utilities/pgfutil-latex.def
 \pgfutil@abb=\box55
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfrcs.code.tex (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf\pgf.revision.tex)
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/utilities/pgfrcs.code.tex (c:/texlive/2023/texmf-dist/tex/generic/pgf/pgf.revision.tex)
 Package: pgfrcs 2023-01-15 v3.1.10 (3.1.10)
 ))
 Package: pgf 2023-01-15 v3.1.10 (3.1.10)
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\pgfcore.sty (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/pgf/systemlayer\pgfsys.sty (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsys.code.tex
+ (c:/texlive/2023/texmf-dist/tex/latex/pgf/basiclayer/pgfcore.sty (c:/texlive/2023/texmf-dist/tex/latex/pgf/systemlayer/pgfsys.sty (c:/texlive/2023/texmf-dist/tex/generic/pgf/systemlayer/pgfsys.code.tex
 Package: pgfsys 2023-01-15 v3.1.10 (3.1.10)
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeys.code.tex
-\pgfkeys@pathtoks=\toks29
-\pgfkeys@temptoks=\toks30
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeyslibraryfiltered.code.tex
-\pgfkeys@tmptoks=\toks31
+ (c:/texlive/2023/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex
+\pgfkeys@pathtoks=\toks30
+\pgfkeys@temptoks=\toks31
+ (c:/texlive/2023/texmf-dist/tex/generic/pgf/utilities/pgfkeyslibraryfiltered.code.tex
+\pgfkeys@tmptoks=\toks32
 ))
 \pgf@x=\dimen175
 \pgf@y=\dimen176
@@ -242,35 +249,35 @@ Package: pgfsys 2023-01-15 v3.1.10 (3.1.10)
 \pgf@yd=\dimen184
 \w@pgf@writea=\write3
 \r@pgf@reada=\read2
-\c@pgf@counta=\count286
-\c@pgf@countb=\count287
-\c@pgf@countc=\count288
-\c@pgf@countd=\count289
-\t@pgf@toka=\toks32
-\t@pgf@tokb=\toks33
-\t@pgf@tokc=\toks34
-\pgf@sys@id@count=\count290
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgf.cfg
+\c@pgf@counta=\count289
+\c@pgf@countb=\count290
+\c@pgf@countc=\count291
+\c@pgf@countd=\count292
+\t@pgf@toka=\toks33
+\t@pgf@tokb=\toks34
+\t@pgf@tokc=\toks35
+\pgf@sys@id@count=\count293
+ (c:/texlive/2023/texmf-dist/tex/generic/pgf/systemlayer/pgf.cfg
 File: pgf.cfg 2023-01-15 v3.1.10 (3.1.10)
 )
 Driver file for pgf: pgfsys-pdftex.def
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsys-pdftex.def
+ (c:/texlive/2023/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-pdftex.def
 File: pgfsys-pdftex.def 2023-01-15 v3.1.10 (3.1.10)
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsys-common-pdf.def
+ (c:/texlive/2023/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-common-pdf.def
 File: pgfsys-common-pdf.def 2023-01-15 v3.1.10 (3.1.10)
-))) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsyssoftpath.code.tex
+))) (c:/texlive/2023/texmf-dist/tex/generic/pgf/systemlayer/pgfsyssoftpath.code.tex
 File: pgfsyssoftpath.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfsyssoftpath@smallbuffer@items=\count291
-\pgfsyssoftpath@bigbuffer@items=\count292
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsysprotocol.code.tex
+\pgfsyssoftpath@smallbuffer@items=\count294
+\pgfsyssoftpath@bigbuffer@items=\count295
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/systemlayer/pgfsysprotocol.code.tex
 File: pgfsysprotocol.code.tex 2023-01-15 v3.1.10 (3.1.10)
-)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/xcolor\xcolor.sty
+)) (c:/texlive/2023/texmf-dist/tex/latex/xcolor/xcolor.sty
 Package: xcolor 2022/06/12 v2.14 LaTeX color extensions (UK)
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\color.cfg
+ (c:/texlive/2023/texmf-dist/tex/latex/graphics-cfg/color.cfg
 File: color.cfg 2016/01/02 v1.6 sample color configuration
 )
 Package xcolor Info: Driver file: pdftex.def on input line 227.
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/graphics\mathcolor.ltx)
+ (c:/texlive/2023/texmf-dist/tex/latex/graphics/mathcolor.ltx)
 Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1353.
 Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1357.
 Package xcolor Info: Model `RGB' extended on input line 1369.
@@ -280,18 +287,18 @@ Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1373.
 Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1374.
 Package xcolor Info: Model `Gray' substituted by `gray' on input line 1375.
 Package xcolor Info: Model `wave' substituted by `hsb' on input line 1376.
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcore.code.tex
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcore.code.tex
 Package: pgfcore 2023-01-15 v3.1.10 (3.1.10)
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmath.code.tex (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathutil.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathparser.code.tex
+ (c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex (c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathutil.code.tex) (c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathparser.code.tex
 \pgfmath@dimen=\dimen185
-\pgfmath@count=\count293
+\pgfmath@count=\count296
 \pgfmath@box=\box56
-\pgfmath@toks=\toks35
-\pgfmath@stack@operand=\toks36
-\pgfmath@stack@operation=\toks37
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.basic.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.trigonometric.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.random.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.comparison.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.base.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.round.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.misc.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.integerarithmetics.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathcalc.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfloat.code.tex
-\c@pgfmathroundto@lastzeros=\count294
-)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfint.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorepoints.code.tex
+\pgfmath@toks=\toks36
+\pgfmath@stack@operand=\toks37
+\pgfmath@stack@operation=\toks38
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.code.tex) (c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.basic.code.tex) (c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.trigonometric.code.tex) (c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.random.code.tex) (c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.comparison.code.tex) (c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.base.code.tex) (c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.round.code.tex) (c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.misc.code.tex) (c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.integerarithmetics.code.tex) (c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathcalc.code.tex) (c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmathfloat.code.tex
+\c@pgfmathroundto@lastzeros=\count297
+)) (c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfint.code.tex) (c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepoints.code.tex
 File: pgfcorepoints.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgf@picminx=\dimen186
 \pgf@picmaxx=\dimen187
@@ -307,77 +314,77 @@ File: pgfcorepoints.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgf@yy=\dimen197
 \pgf@zx=\dimen198
 \pgf@zy=\dimen199
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorepathconstruct.code.tex
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathconstruct.code.tex
 File: pgfcorepathconstruct.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgf@path@lastx=\dimen256
 \pgf@path@lasty=\dimen257
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorepathusage.code.tex
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathusage.code.tex
 File: pgfcorepathusage.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgf@shorten@end@additional=\dimen258
 \pgf@shorten@start@additional=\dimen259
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorescopes.code.tex
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcorescopes.code.tex
 File: pgfcorescopes.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgfpic=\box57
 \pgf@hbox=\box58
 \pgf@layerbox@main=\box59
-\pgf@picture@serial@count=\count295
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcoregraphicstate.code.tex
+\pgf@picture@serial@count=\count298
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcoregraphicstate.code.tex
 File: pgfcoregraphicstate.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgflinewidth=\dimen260
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcoretransformations.code.tex
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretransformations.code.tex
 File: pgfcoretransformations.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgf@pt@x=\dimen261
 \pgf@pt@y=\dimen262
 \pgf@pt@temp=\dimen263
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorequick.code.tex
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcorequick.code.tex
 File: pgfcorequick.code.tex 2023-01-15 v3.1.10 (3.1.10)
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcoreobjects.code.tex
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreobjects.code.tex
 File: pgfcoreobjects.code.tex 2023-01-15 v3.1.10 (3.1.10)
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorepathprocessing.code.tex
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathprocessing.code.tex
 File: pgfcorepathprocessing.code.tex 2023-01-15 v3.1.10 (3.1.10)
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorearrows.code.tex
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcorearrows.code.tex
 File: pgfcorearrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgfarrowsep=\dimen264
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcoreshade.code.tex
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreshade.code.tex
 File: pgfcoreshade.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgf@max=\dimen265
-\pgf@sys@shading@range@num=\count296
-\pgf@shadingcount=\count297
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcoreimage.code.tex
+\pgf@sys@shading@range@num=\count299
+\pgf@shadingcount=\count300
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreimage.code.tex
 File: pgfcoreimage.code.tex 2023-01-15 v3.1.10 (3.1.10)
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcoreexternal.code.tex
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreexternal.code.tex
 File: pgfcoreexternal.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgfexternal@startupbox=\box60
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorelayers.code.tex
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcorelayers.code.tex
 File: pgfcorelayers.code.tex 2023-01-15 v3.1.10 (3.1.10)
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcoretransparency.code.tex
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretransparency.code.tex
 File: pgfcoretransparency.code.tex 2023-01-15 v3.1.10 (3.1.10)
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorepatterns.code.tex
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepatterns.code.tex
 File: pgfcorepatterns.code.tex 2023-01-15 v3.1.10 (3.1.10)
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorerdf.code.tex
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/basiclayer/pgfcorerdf.code.tex
 File: pgfcorerdf.code.tex 2023-01-15 v3.1.10 (3.1.10)
-))) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmoduleshapes.code.tex
+))) (c:/texlive/2023/texmf-dist/tex/generic/pgf/modules/pgfmoduleshapes.code.tex
 File: pgfmoduleshapes.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgfnodeparttextbox=\box61
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmoduleplot.code.tex
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/modules/pgfmoduleplot.code.tex
 File: pgfmoduleplot.code.tex 2023-01-15 v3.1.10 (3.1.10)
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibility\pgfcomp-version-0-65.sty
+) (c:/texlive/2023/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-version-0-65.sty
 Package: pgfcomp-version-0-65 2023-01-15 v3.1.10 (3.1.10)
 \pgf@nodesepstart=\dimen266
 \pgf@nodesepend=\dimen267
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibility\pgfcomp-version-1-18.sty
+) (c:/texlive/2023/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-version-1-18.sty
 Package: pgfcomp-version-1-18 2023-01-15 v3.1.10 (3.1.10)
-)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgffor.sty (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgfkeys.sty (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeys.code.tex)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/pgf/math\pgfmath.sty (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmath.code.tex)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgffor.code.tex
+)) (c:/texlive/2023/texmf-dist/tex/latex/pgf/utilities/pgffor.sty (c:/texlive/2023/texmf-dist/tex/latex/pgf/utilities/pgfkeys.sty (c:/texlive/2023/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex)) (c:/texlive/2023/texmf-dist/tex/latex/pgf/math/pgfmath.sty (c:/texlive/2023/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex)) (c:/texlive/2023/texmf-dist/tex/generic/pgf/utilities/pgffor.code.tex
 Package: pgffor 2023-01-15 v3.1.10 (3.1.10)
 \pgffor@iter=\dimen268
 \pgffor@skip=\dimen269
-\pgffor@stack=\toks38
-\pgffor@toks=\toks39
-)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz\tikz.code.tex
+\pgffor@stack=\toks39
+\pgffor@toks=\toks40
+)) (c:/texlive/2023/texmf-dist/tex/generic/pgf/frontendlayer/tikz/tikz.code.tex
 Package: tikz 2023-01-15 v3.1.10 (3.1.10)
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgflibraryplothandlers.code.tex
+ (c:/texlive/2023/texmf-dist/tex/generic/pgf/libraries/pgflibraryplothandlers.code.tex
 File: pgflibraryplothandlers.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgf@plot@mark@count=\count298
+\pgf@plot@mark@count=\count301
 \pgfplotmarksize=\dimen270
 )
 \tikz@lastx=\dimen271
@@ -392,196 +399,216 @@ File: pgflibraryplothandlers.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \tikz@figbox@bg=\box63
 \tikz@tempbox=\box64
 \tikz@tempbox@bg=\box65
-\tikztreelevel=\count299
-\tikznumberofchildren=\count300
-\tikznumberofcurrentchild=\count301
-\tikz@fig@count=\count302
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodulematrix.code.tex
+\tikztreelevel=\count302
+\tikznumberofchildren=\count303
+\tikznumberofcurrentchild=\count304
+\tikz@fig@count=\count305
+ (c:/texlive/2023/texmf-dist/tex/generic/pgf/modules/pgfmodulematrix.code.tex
 File: pgfmodulematrix.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfmatrixcurrentrow=\count303
-\pgfmatrixcurrentcolumn=\count304
-\pgf@matrix@numberofcolumns=\count305
+\pgfmatrixcurrentrow=\count306
+\pgfmatrixcurrentcolumn=\count307
+\pgf@matrix@numberofcolumns=\count308
 )
-\tikz@expandcount=\count306
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibrarytopaths.code.tex
+\tikz@expandcount=\count309
+ (c:/texlive/2023/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarytopaths.code.tex
 File: tikzlibrarytopaths.code.tex 2023-01-15 v3.1.10 (3.1.10)
-))) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibraryshapes.code.tex
+))) (c:/texlive/2023/texmf-dist/tex/latex/csvsimple/csvsimple.sty (c:/texlive/2023/texmf-dist/tex/latex/l3packages/l3keys2e/l3keys2e.sty (c:/texlive/2023/texmf-dist/tex/latex/l3kernel/expl3.sty
+Package: expl3 2023-11-01 L3 programming layer (loader) 
+ (c:/texlive/2023/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
+File: l3backend-pdftex.def 2023-10-23 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count310
+\l__pdf_internal_box=\box66
+))
+Package: l3keys2e 2023-10-10 LaTeX2e option processing using LaTeX3 keys
+)
+Package: csvsimple 2023/10/16 v2.5.0 LaTeX CSV file processing
+) (c:/texlive/2023/texmf-dist/tex/latex/csvsimple/csvsimple-legacy.sty
+Package: csvsimple-legacy 2023/10/16 version 2.5.0 LaTeX2e CSV file processing
+ (c:/texlive/2023/texmf-dist/tex/latex/etoolbox/etoolbox.sty
+Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
+\etb@tempcnta=\count311
+) (c:/texlive/2023/texmf-dist/tex/latex/tools/shellesc.sty
+Package: shellesc 2023/07/08 v1.0d unified shell escape interface for LaTeX
+Package shellesc Info: Restricted shell escape enabled on input line 77.
+)
+\csv@file=\read3
+\c@csvinputline=\count312
+\c@csvrow=\count313
+\c@csvcol=\count314
+\csv@out=\write4
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryshapes.code.tex
 File: tikzlibraryshapes.code.tex 2023-01-15 v3.1.10 (3.1.10)
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibraryshapes.geometric.code.tex
+ (c:/texlive/2023/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryshapes.geometric.code.tex
 File: tikzlibraryshapes.geometric.code.tex 2023-01-15 v3.1.10 (3.1.10)
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/shapes\pgflibraryshapes.geometric.code.tex
+ (c:/texlive/2023/texmf-dist/tex/generic/pgf/libraries/shapes/pgflibraryshapes.geometric.code.tex
 File: pgflibraryshapes.geometric.code.tex 2023-01-15 v3.1.10 (3.1.10)
-)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibraryshapes.misc.code.tex
+)) (c:/texlive/2023/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryshapes.misc.code.tex
 File: tikzlibraryshapes.misc.code.tex 2023-01-15 v3.1.10 (3.1.10)
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/shapes\pgflibraryshapes.misc.code.tex
+ (c:/texlive/2023/texmf-dist/tex/generic/pgf/libraries/shapes/pgflibraryshapes.misc.code.tex
 File: pgflibraryshapes.misc.code.tex 2023-01-15 v3.1.10 (3.1.10)
-)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibraryshapes.symbols.code.tex
+)) (c:/texlive/2023/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryshapes.symbols.code.tex
 File: tikzlibraryshapes.symbols.code.tex 2023-01-15 v3.1.10 (3.1.10)
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/shapes\pgflibraryshapes.symbols.code.tex
+ (c:/texlive/2023/texmf-dist/tex/generic/pgf/libraries/shapes/pgflibraryshapes.symbols.code.tex
 File: pgflibraryshapes.symbols.code.tex 2023-01-15 v3.1.10 (3.1.10)
-)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibraryshapes.arrows.code.tex
+)) (c:/texlive/2023/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryshapes.arrows.code.tex
 File: tikzlibraryshapes.arrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/shapes\pgflibraryshapes.arrows.code.tex
+ (c:/texlive/2023/texmf-dist/tex/generic/pgf/libraries/shapes/pgflibraryshapes.arrows.code.tex
 File: pgflibraryshapes.arrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
-)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibraryshapes.callouts.code.tex (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/shapes\pgflibraryshapes.callouts.code.tex)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibraryshapes.multipart.code.tex
+)) (c:/texlive/2023/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryshapes.callouts.code.tex (c:/texlive/2023/texmf-dist/tex/generic/pgf/libraries/shapes/pgflibraryshapes.callouts.code.tex)) (c:/texlive/2023/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryshapes.multipart.code.tex
 File: tikzlibraryshapes.multipart.code.tex 2023-01-15 v3.1.10 (3.1.10)
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/shapes\pgflibraryshapes.multipart.code.tex
+ (c:/texlive/2023/texmf-dist/tex/generic/pgf/libraries/shapes/pgflibraryshapes.multipart.code.tex
 File: pgflibraryshapes.multipart.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfnodepartlowerbox=\box66
-\pgfnodeparttwobox=\box67
-\pgfnodepartthreebox=\box68
-\pgfnodepartfourbox=\box69
-\pgfnodeparttwentybox=\box70
-\pgfnodepartnineteenbox=\box71
-\pgfnodeparteighteenbox=\box72
-\pgfnodepartseventeenbox=\box73
-\pgfnodepartsixteenbox=\box74
-\pgfnodepartfifteenbox=\box75
-\pgfnodepartfourteenbox=\box76
-\pgfnodepartthirteenbox=\box77
-\pgfnodeparttwelvebox=\box78
-\pgfnodepartelevenbox=\box79
-\pgfnodeparttenbox=\box80
-\pgfnodepartninebox=\box81
-\pgfnodeparteightbox=\box82
-\pgfnodepartsevenbox=\box83
-\pgfnodepartsixbox=\box84
-\pgfnodepartfivebox=\box85
-))) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgflibraryarrows.meta.code.tex
+\pgfnodepartlowerbox=\box67
+\pgfnodeparttwobox=\box68
+\pgfnodepartthreebox=\box69
+\pgfnodepartfourbox=\box70
+\pgfnodeparttwentybox=\box71
+\pgfnodepartnineteenbox=\box72
+\pgfnodeparteighteenbox=\box73
+\pgfnodepartseventeenbox=\box74
+\pgfnodepartsixteenbox=\box75
+\pgfnodepartfifteenbox=\box76
+\pgfnodepartfourteenbox=\box77
+\pgfnodepartthirteenbox=\box78
+\pgfnodeparttwelvebox=\box79
+\pgfnodepartelevenbox=\box80
+\pgfnodeparttenbox=\box81
+\pgfnodepartninebox=\box82
+\pgfnodeparteightbox=\box83
+\pgfnodepartsevenbox=\box84
+\pgfnodepartsixbox=\box85
+\pgfnodepartfivebox=\box86
+))) (c:/texlive/2023/texmf-dist/tex/generic/pgf/libraries/pgflibraryarrows.meta.code.tex
 File: pgflibraryarrows.meta.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgfarrowinset=\dimen279
 \pgfarrowlength=\dimen280
 \pgfarrowwidth=\dimen281
 \pgfarrowlinewidth=\dimen282
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibrarypositioning.code.tex
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarypositioning.code.tex
 File: tikzlibrarypositioning.code.tex 2023-01-15 v3.1.10 (3.1.10)
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibrarydecorations.pathreplacing.code.tex (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibrarydecorations.code.tex (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmoduledecorations.code.tex
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarydecorations.pathreplacing.code.tex (c:/texlive/2023/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarydecorations.code.tex (c:/texlive/2023/texmf-dist/tex/generic/pgf/modules/pgfmoduledecorations.code.tex
 \pgfdecoratedcompleteddistance=\dimen283
 \pgfdecoratedremainingdistance=\dimen284
 \pgfdecoratedinputsegmentcompleteddistance=\dimen285
 \pgfdecoratedinputsegmentremainingdistance=\dimen286
 \pgf@decorate@distancetomove=\dimen287
-\pgf@decorate@repeatstate=\count307
+\pgf@decorate@repeatstate=\count315
 \pgfdecorationsegmentamplitude=\dimen288
 \pgfdecorationsegmentlength=\dimen289
 )
-\tikz@lib@dec@box=\box86
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/decorations\pgflibrarydecorations.pathreplacing.code.tex)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.sty
-Package: hyperref 2023-04-22 v7.00x Hypertext links for LaTeX
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcmds.sty
+\tikz@lib@dec@box=\box87
+) (c:/texlive/2023/texmf-dist/tex/generic/pgf/libraries/decorations/pgflibrarydecorations.pathreplacing.code.tex)) (c:/texlive/2023/texmf-dist/tex/latex/hyperref/hyperref.sty
+Package: hyperref 2023-10-27 v7.01d Hypertext links for LaTeX
+ (c:/texlive/2023/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty
 Package: ltxcmds 2020-05-10 v1.25 LaTeX kernel commands for general use (HO)
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty
+) (c:/texlive/2023/texmf-dist/tex/generic/iftex/iftex.sty
 Package: iftex 2022/02/03 v1.0f TeX engine tests
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pdftexcmds\pdftexcmds.sty
+) (c:/texlive/2023/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
 Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO)
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/infwarerr\infwarerr.sty
+ (c:/texlive/2023/texmf-dist/tex/generic/infwarerr/infwarerr.sty
 Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
 )
 Package pdftexcmds Info: \pdf@primitive is available.
 Package pdftexcmds Info: \pdf@ifprimitive is available.
 Package pdftexcmds Info: \pdfdraftmode found.
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/kvsetkeys\kvsetkeys.sty
+) (c:/texlive/2023/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty
 Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
-)
-(C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/kvdefinekeys\kvdefinekeys.sty
+) (c:/texlive/2023/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty
 Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pdfescape\pdfescape.sty
+) (c:/texlive/2023/texmf-dist/tex/generic/pdfescape/pdfescape.sty
 Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/hycolor\hycolor.sty
+) (c:/texlive/2023/texmf-dist/tex/latex/hycolor/hycolor.sty
 Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/letltxmacro\letltxmacro.sty
+) (c:/texlive/2023/texmf-dist/tex/latex/letltxmacro/letltxmacro.sty
 Package: letltxmacro 2019/12/03 v1.6 Let assignment for LaTeX macros (HO)
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/auxhook\auxhook.sty
+) (c:/texlive/2023/texmf-dist/tex/latex/auxhook/auxhook.sty
 Package: auxhook 2019-12-17 v1.6 Hooks for auxiliary files (HO)
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
-Package: nameref 2022-05-17 v2.50 Cross-referencing by name of section
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty
+) (c:/texlive/2023/texmf-dist/tex/latex/hyperref/nameref.sty
+Package: nameref 2023-10-05 v2.54 Cross-referencing by name of section
+ (c:/texlive/2023/texmf-dist/tex/latex/refcount/refcount.sty
 Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/gettitlestring\gettitlestring.sty
+) (c:/texlive/2023/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
 Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/kvoptions\kvoptions.sty
+ (c:/texlive/2023/texmf-dist/tex/latex/kvoptions/kvoptions.sty
 Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
 ))
-\c@section@level=\count308
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.sty
-Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
-\etb@tempcnta=\count309
+\c@section@level=\count316
 )
 \@linkdim=\dimen290
-\Hy@linkcounter=\count310
-\Hy@pagecounter=\count311
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.def
-File: pd1enc.def 2023-04-22 v7.00x Hyperref: PDFDocEncoding definition (HO)
+\Hy@linkcounter=\count317
+\Hy@pagecounter=\count318
+ (c:/texlive/2023/texmf-dist/tex/latex/hyperref/pd1enc.def
+File: pd1enc.def 2023-10-27 v7.01d Hyperref: PDFDocEncoding definition (HO)
 Now handling font encoding PD1 ...
 ... no UTF-8 mapping file for font encoding PD1
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/intcalc\intcalc.sty
+) (c:/texlive/2023/texmf-dist/tex/generic/intcalc/intcalc.sty
 Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
 )
-\Hy@SavedSpaceFactor=\count312
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\puenc.def
-File: puenc.def 2023-04-22 v7.00x Hyperref: PDF Unicode definition (HO)
+\Hy@SavedSpaceFactor=\count319
+ (c:/texlive/2023/texmf-dist/tex/latex/hyperref/puenc.def
+File: puenc.def 2023-10-27 v7.01d Hyperref: PDF Unicode definition (HO)
 Now handling font encoding PU ...
 ... no UTF-8 mapping file for font encoding PU
 )
-Package hyperref Info: Option `colorlinks' set `true' on input line 4065.
-Package hyperref Info: Hyper figures OFF on input line 4182.
-Package hyperref Info: Link nesting OFF on input line 4187.
-Package hyperref Info: Hyper index ON on input line 4190.
-Package hyperref Info: Plain pages OFF on input line 4197.
-Package hyperref Info: Backreferencing OFF on input line 4202.
+Package hyperref Info: Option `colorlinks' set `true' on input line 4051.
+Package hyperref Info: Hyper figures OFF on input line 4168.
+Package hyperref Info: Link nesting OFF on input line 4173.
+Package hyperref Info: Hyper index ON on input line 4176.
+Package hyperref Info: Plain pages OFF on input line 4183.
+Package hyperref Info: Backreferencing OFF on input line 4188.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
-Package hyperref Info: Bookmarks ON on input line 4449.
-\c@Hy@tempcnt=\count313
-LaTeX Info: Redefining \url on input line 4787.
+Package hyperref Info: Bookmarks ON on input line 4435.
+\c@Hy@tempcnt=\count320
+LaTeX Info: Redefining \url on input line 4773.
 \XeTeXLinkMargin=\dimen291
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/bitset\bitset.sty
+ (c:/texlive/2023/texmf-dist/tex/generic/bitset/bitset.sty
 Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/bigintcalc\bigintcalc.sty
+ (c:/texlive/2023/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty
 Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO)
 ))
-\Fld@menulength=\count314
+\Fld@menulength=\count321
 \Field@Width=\dimen292
 \Fld@charsize=\dimen293
-Package hyperref Info: Hyper figures OFF on input line 6066.
-Package hyperref Info: Link nesting OFF on input line 6071.
-Package hyperref Info: Hyper index ON on input line 6074.
-Package hyperref Info: backreferencing OFF on input line 6081.
-Package hyperref Info: Link coloring ON on input line 6084.
-Package hyperref Info: Link coloring with OCG OFF on input line 6091.
-Package hyperref Info: PDF/A mode OFF on input line 6096.
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/base\atbegshi-ltx.sty
+Package hyperref Info: Hyper figures OFF on input line 6052.
+Package hyperref Info: Link nesting OFF on input line 6057.
+Package hyperref Info: Hyper index ON on input line 6060.
+Package hyperref Info: backreferencing OFF on input line 6067.
+Package hyperref Info: Link coloring ON on input line 6070.
+Package hyperref Info: Link coloring with OCG OFF on input line 6077.
+Package hyperref Info: PDF/A mode OFF on input line 6082.
+ (c:/texlive/2023/texmf-dist/tex/latex/base/atbegshi-ltx.sty
 Package: atbegshi-ltx 2021/01/10 v1.0c Emulation of the original atbegshi
 package with kernel methods
 )
-\Hy@abspage=\count315
-\c@Item=\count316
-\c@Hfootnote=\count317
+\Hy@abspage=\count322
+\c@Item=\count323
+\c@Hfootnote=\count324
 )
 Package hyperref Info: Driver (autodetected): hpdftex.
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hpdftex.def
-File: hpdftex.def 2023-04-22 v7.00x Hyperref driver for pdfTeX
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/base\atveryend-ltx.sty
+ (c:/texlive/2023/texmf-dist/tex/latex/hyperref/hpdftex.def
+File: hpdftex.def 2023-10-27 v7.01d Hyperref driver for pdfTeX
+ (c:/texlive/2023/texmf-dist/tex/latex/base/atveryend-ltx.sty
 Package: atveryend-ltx 2020/08/19 v1.0a Emulation of the original atveryend package
 with kernel methods
 )
-\Fld@listcount=\count318
-\c@bookmark@seq@number=\count319
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/rerunfilecheck\rerunfilecheck.sty
+\Fld@listcount=\count325
+\c@bookmark@seq@number=\count326
+ (c:/texlive/2023/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
 Package: rerunfilecheck 2022-07-10 v1.10 Rerun checks for auxiliary files (HO)
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/uniquecounter\uniquecounter.sty
+ (c:/texlive/2023/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
 Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
 )
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 285.
 )
 \Hy@SectionHShift=\skip65
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.sty
+) (c:/texlive/2023/texmf-dist/tex/latex/geometry/geometry.sty
 Package: geometry 2020/01/02 v5.9 Page Geometry
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifvtex.sty
+ (c:/texlive/2023/texmf-dist/tex/generic/iftex/ifvtex.sty
 Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 )
-\Gm@cnth=\count320
-\Gm@cntv=\count321
-\c@Gm@tempcnt=\count322
+\Gm@cnth=\count327
+\Gm@cntv=\count328
+\c@Gm@tempcnt=\count329
 \Gm@bindingoffset=\dimen294
 \Gm@wd@mp=\dimen295
 \Gm@odd@mp=\dimen296
@@ -590,58 +617,54 @@ Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 \Gm@layoutheight=\dimen299
 \Gm@layouthoffset=\dimen300
 \Gm@layoutvoffset=\dimen301
-\Gm@dimlist=\toks40
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.cfg)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdftex.def
-File: l3backend-pdftex.def 2023-04-19 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count323
-\l__pdf_internal_box=\box87
-) (main.aux)
+\Gm@dimlist=\toks41
+)
+No file main.aux.
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 30.
+LaTeX Font Info:    ... okay on input line 30.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 30.
+LaTeX Font Info:    ... okay on input line 30.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 30.
+LaTeX Font Info:    ... okay on input line 30.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 30.
+LaTeX Font Info:    ... okay on input line 30.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 30.
+LaTeX Font Info:    ... okay on input line 30.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 30.
+LaTeX Font Info:    ... okay on input line 30.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 30.
+LaTeX Font Info:    ... okay on input line 30.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 30.
+LaTeX Font Info:    ... okay on input line 30.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 30.
+LaTeX Font Info:    ... okay on input line 30.
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: hyperref package is loaded.
 Package caption Info: End \AtBeginDocument code.
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mkii
+(c:/texlive/2023/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count324
+\scratchcounter=\count330
 \scratchdimen=\dimen302
 \scratchbox=\box88
-\nofMPsegments=\count325
-\nofMParguments=\count326
-\everyMPshowfont=\toks41
-\MPscratchCnt=\count327
+\nofMPsegments=\count331
+\nofMParguments=\count332
+\everyMPshowfont=\toks42
+\MPscratchCnt=\count333
 \MPscratchDim=\dimen303
-\MPnumerator=\count328
-\makeMPintoPDFobject=\count329
-\everyMPtoPDFconversion=\toks42
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-base.sty
+\MPnumerator=\count334
+\makeMPintoPDFobject=\count335
+\everyMPtoPDFconversion=\toks43
+) (c:/texlive/2023/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/00miktex\epstopdf-sys.cfg
-File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
+ (c:/texlive/2023/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
-Package hyperref Info: Link coloring ON on input line 28.
- (main.out) (main.out)
-\@outlinefile=\write4
-\openout4 = `main.out'.
+Package hyperref Info: Link coloring ON on input line 30.
+\@outlinefile=\write5
+\openout5 = `main.out'.
 
 
 *geometry* driver: auto-detecting
@@ -678,212 +701,414 @@ Package hyperref Info: Link coloring ON on input line 28.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-LaTeX Font Info:    Trying to load font information for U+lasy on input line 31.
-(C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/base\ulasy.fd
+LaTeX Font Info:    Trying to load font information for U+lasy on input line 33.
+(c:/texlive/2023/texmf-dist/tex/latex/base/ulasy.fd
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 )
-LaTeX Font Info:    Trying to load font information for U+msa on input line 31.
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
+LaTeX Font Info:    Trying to load font information for U+msa on input line 33.
+ (c:/texlive/2023/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 31.
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
+LaTeX Font Info:    Trying to load font information for U+msb on input line 33.
+ (c:/texlive/2023/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-) [1{C:/Users/ajaoo/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}
+)
 
-] [2]
+LaTeX Warning: Citation `forman202012' on page 1 undefined on input line 40.
 
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:68: Package amsmath Error: Erroneous nesting of equation structures;
+
+LaTeX Warning: Citation `emanuel2020fair' on page 1 undefined on input line 40.
+
+
+LaTeX Warning: Citation `jiang2019emergency' on page 1 undefined on input line 40.
+
+
+LaTeX Warning: Citation `ehmann2021operational' on page 1 undefined on input line 40.
+
+
+LaTeX Warning: Citation `zaric2001resource' on page 1 undefined on input line 40.
+
+
+LaTeX Warning: Citation `brandeau2004allocating' on page 1 undefined on input line 40.
+
+[1{c:/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
+
+]
+<images/new_confirmed_per_100k.pdf, id=21, 1084.05pt x 578.16pt>
+File: images/new_confirmed_per_100k.pdf Graphic file (type pdf)
+<use images/new_confirmed_per_100k.pdf>
+Package pdftex.def Info: images/new_confirmed_per_100k.pdf  used on input line 53.
+(pdftex.def)             Requested size: 422.77664pt x 225.48149pt.
+ [2] [3{c:/texlive/2023/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc} <./images/new_confirmed_per_100k.pdf>]
+Overfull \hbox (6.32893pt too wide) in paragraph at lines 77--78
+[]\OT1/cmr/m/n/12 Using these com-pu-ta-tional meth-ods, this re-search of-fers sig-nif-i-cant in-for-ma-tion on the COVID-
+ []
+
+
+LaTeX Warning: Citation `kermack1927contribution' on page 4 undefined on input line 84.
+
+[4]
+
+c:/Users/olarinoyem/Project/Multivate-forecasting/PRP3/main.tex:96: Package amsmath Error: Erroneous nesting of equation structures;
 (amsmath)                trying to recover with `aligned'.
 
 See the amsmath package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.68     \end{align}
+l.96     \end{align}
                     
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
-[3]
 
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:125: Package amsmath Error: Erroneous nesting of equation structures;
+c:/Users/olarinoyem/Project/Multivate-forecasting/PRP3/main.tex:154: Package amsmath Error: Erroneous nesting of equation structures;
 (amsmath)                trying to recover with `aligned'.
 
 See the amsmath package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.125     \end{align}
+l.154     \end{align}
                      
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
-[4] [5]
-<images/image.png, id=89, 1780.6525pt x 999.735pt>
+[5] [6] [7]
+<images/image.png, id=126, 1780.6525pt x 999.735pt>
 File: images/image.png Graphic file (type png)
 <use images/image.png>
-Package pdftex.def Info: images/image.png  used on input line 187.
+Package pdftex.def Info: images/image.png  used on input line 216.
 (pdftex.def)             Requested size: 375.80544pt x 210.98787pt.
-Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on input line 194.
+ [8 <./images/image.png>]
 
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:196: Undefined control sequence.
-<recently read> \bm 
-                    
-l.196         \Require Training data tensors $\bm
-                                                 {S}_{\text{data}}$, $\bm{I}...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+LaTeX Warning: Citation `kumar2017weight' on page 9 undefined on input line 264.
 
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:196: Undefined control sequence.
-<recently read> \bm 
-                    
-l.196 ...data tensors $\bm{S}_{\text{data}}$, $\bm
-                                                  {I}_{\text{data}}$, $\bm{R...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+[9]
+Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on input line 268.
 
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:196: Undefined control sequence.
-<recently read> \bm 
-                    
-l.196 ...ext{data}}$, $\bm{I}_{\text{data}}$, $\bm
-                                                  {R}_{\text{data}}$, time t...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
 
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:196: Undefined control sequence.
-<recently read> \bm 
-                    
-l.196 ... $\bm{R}_{\text{data}}$, time tensor $\bm
-                                                  {t}_{\text{data}}$, popula...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+LaTeX Warning: Citation `rackauckas2020universal' on page 10 undefined on input line 285.
 
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:203: Undefined control sequence.
-<recently read> \bm 
-                    
-l.203             \State Forward pass: $\bm
-                                           {S}_{\text{pred}}$, $\bm{I}_{\tex...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+[10] [11]
+Overfull \hbox (22.64804pt too wide) in paragraph at lines 331--332
+[]\OT1/cmr/m/n/12 The op-ti-mi-sa-tion pro-cess is fa-cil-i-tated by the \OT1/cmtt/m/n/12 OptimizationFunction \OT1/cmr/m/n/12 and \OT1/cmtt/m/n/12 OptimizationProblem
+ []
 
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:203: Undefined control sequence.
-<recently read> \bm 
-                    
-l.203 ...orward pass: $\bm{S}_{\text{pred}}$, $\bm
-                                                  {I}_{\text{pred}}$, $\bm{R...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+[12]
 
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:203: Undefined control sequence.
-<recently read> \bm 
-                    
-l.203 ...ext{pred}}$, $\bm{I}_{\text{pred}}$, $\bm
-                                                  {R}_{\text{pred}} \gets NN...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+LaTeX Warning: Citation `amaral2021towards' on page 13 undefined on input line 372.
 
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:203: Undefined control sequence.
-l.203 ...ed}}$, $\bm{R}_{\text{pred}} \gets NN(\bm
-                                                  {t}_{\text{data}})$.
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-<images/weekly_icu_beds_occupancy.pdf, id=91, 1084.05pt x 578.16pt>
-File: images/weekly_icu_beds_occupancy.pdf Graphic file (type pdf)
-<use images/weekly_icu_beds_occupancy.pdf>
-Package pdftex.def Info: images/weekly_icu_beds_occupancy.pdf  used on input line 280.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
-<images/new_confirmed_per_100k.pdf, id=92, 1084.05pt x 578.16pt>
-File: images/new_confirmed_per_100k.pdf Graphic file (type pdf)
-<use images/new_confirmed_per_100k.pdf>
-Package pdftex.def Info: images/new_confirmed_per_100k.pdf  used on input line 288.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
-<images/pinn/I_predictions_East Midlands.pdf, id=93, 1084.05pt x 578.16pt>
-File: images/pinn/I_predictions_East Midlands.pdf Graphic file (type pdf)
-<use images/pinn/I_predictions_East Midlands.pdf>
-Package pdftex.def Info: images/pinn/I_predictions_East Midlands.pdf  used on input line 295.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
-<images/pinn/R_predictions_East Midlands.pdf, id=94, 1084.05pt x 578.16pt>
-File: images/pinn/R_predictions_East Midlands.pdf Graphic file (type pdf)
-<use images/pinn/R_predictions_East Midlands.pdf>
-Package pdftex.def Info: images/pinn/R_predictions_East Midlands.pdf  used on input line 302.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
-<images/pinn/Training_History_East Midlands.pdf, id=95, 1084.05pt x 578.16pt>
-File: images/pinn/Training_History_East Midlands.pdf Graphic file (type pdf)
-<use images/pinn/Training_History_East Midlands.pdf>
-Package pdftex.def Info: images/pinn/Training_History_East Midlands.pdf  used on input line 309.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
-<images/pinn/I_predictions_East of England.pdf, id=96, 1084.05pt x 578.16pt>
-File: images/pinn/I_predictions_East of England.pdf Graphic file (type pdf)
-<use images/pinn/I_predictions_East of England.pdf>
-Package pdftex.def Info: images/pinn/I_predictions_East of England.pdf  used on input line 316.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
-<images/pinn/R_predictions_East of England.pdf, id=97, 1084.05pt x 578.16pt>
-File: images/pinn/R_predictions_East of England.pdf Graphic file (type pdf)
-<use images/pinn/R_predictions_East of England.pdf>
-Package pdftex.def Info: images/pinn/R_predictions_East of England.pdf  used on input line 323.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
-<images/pinn/Training_History_East of England.pdf, id=98, 1084.05pt x 578.16pt>
-File: images/pinn/Training_History_East of England.pdf Graphic file (type pdf)
-<use images/pinn/Training_History_East of England.pdf>
-Package pdftex.def Info: images/pinn/Training_History_East of England.pdf  used on input line 330.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
-<images/pinn/I_predictions_London Region.pdf, id=99, 1084.05pt x 578.16pt>
+[13]
+<images/pinn/S_predictions_London Region.pdf, id=178, 1084.05pt x 578.16pt>
+File: images/pinn/S_predictions_London Region.pdf Graphic file (type pdf)
+<use images/pinn/S_predictions_London Region.pdf>
+Package pdftex.def Info: images/pinn/S_predictions_London Region.pdf  used on input line 379.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/pinn/I_predictions_London Region.pdf, id=179, 1084.05pt x 578.16pt>
 File: images/pinn/I_predictions_London Region.pdf Graphic file (type pdf)
 <use images/pinn/I_predictions_London Region.pdf>
-Package pdftex.def Info: images/pinn/I_predictions_London Region.pdf  used on input line 337.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
-<images/pinn/R_predictions_London Region.pdf, id=100, 1084.05pt x 578.16pt>
+Package pdftex.def Info: images/pinn/I_predictions_London Region.pdf  used on input line 385.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/pinn/R_predictions_London Region.pdf, id=180, 1084.05pt x 578.16pt>
 File: images/pinn/R_predictions_London Region.pdf Graphic file (type pdf)
 <use images/pinn/R_predictions_London Region.pdf>
-Package pdftex.def Info: images/pinn/R_predictions_London Region.pdf  used on input line 344.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
-<images/pinn/Training_History_London Region.pdf, id=101, 1084.05pt x 578.16pt>
+Package pdftex.def Info: images/pinn/R_predictions_London Region.pdf  used on input line 394.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/pinn/Training_History_London Region.pdf, id=181, 1084.05pt x 578.16pt>
 File: images/pinn/Training_History_London Region.pdf Graphic file (type pdf)
 <use images/pinn/Training_History_London Region.pdf>
-Package pdftex.def Info: images/pinn/Training_History_London Region.pdf  used on input line 351.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
-(main.bbl [6] [7 <./images/image.png>]) [8] [9 <./images/weekly_icu_beds_occupancy.pdf>] [10 <./images/new_confirmed_per_100k.pdf> <./images/pinn/I_predictions_East Midlands.pdf>] [11 <./images/pinn/R_predictions_East Midlands.pdf> <./images/pinn/Training_History_East Midlands.pdf>] [12 <./images/pinn/I_predictions_East of England.pdf> <./images/pinn/R_predictions_East of England.pdf>] [13 <./images/pinn/Training_History_East of England.pdf> <./images/pinn/I_predictions_London Region.pdf>] [14 <./images/pinn/R_predictions_London Region.pdf> <./images/pinn/Training_History_London Region.pdf>] (main.aux)
-Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 32D8D935E6D86B186971CCC61BF0059C;1257.
+Package pdftex.def Info: images/pinn/Training_History_London Region.pdf  used on input line 401.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/ude/London Region_infected_death_data.pdf, id=182, 451.6875pt x 307.1475pt>
+File: images/ude/London Region_infected_death_data.pdf Graphic file (type pdf)
+<use images/ude/London Region_infected_death_data.pdf>
+Package pdftex.def Info: images/ude/London Region_infected_death_data.pdf  used on input line 411.
+(pdftex.def)             Requested size: 375.80544pt x 255.56036pt.
+
+c:/Users/olarinoyem/Project/Multivate-forecasting/PRP3/main.tex:425: Undefined control sequence.
+<recently read> \multirow 
+                          
+l.425     \multirow
+                   {East Midland} & PINN & Infected & 1667.4842 & 2940.2779 \\
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+c:/Users/olarinoyem/Project/Multivate-forecasting/PRP3/main.tex:433: Undefined control sequence.
+<recently read> \multirow 
+                          
+l.433     \multirow
+                   {East of England} & PINN & Infected & 3583.8807 & 6745.15...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+c:/Users/olarinoyem/Project/Multivate-forecasting/PRP3/main.tex:442: Undefined control sequence.
+<recently read> \multirow 
+                          
+l.442     \multirow
+                   {London} & PINN & Infected & 5725.1872 & 12032.9975 \\
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+c:/Users/olarinoyem/Project/Multivate-forecasting/PRP3/main.tex:451: Undefined control sequence.
+l.451     \multirow
+                   {North East England} & PINN & Infected & 1304.2393 & 1944...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+c:/Users/olarinoyem/Project/Multivate-forecasting/PRP3/main.tex:460: Undefined control sequence.
+l.460     \multirow
+                   {North West England} & PINN & Infected & 5281.3856 & 8504...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+c:/Users/olarinoyem/Project/Multivate-forecasting/PRP3/main.tex:469: Undefined control sequence.
+l.469     \multirow
+                   {South East England} & PINN & Infected & 3924.1983 & 8271...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+c:/Users/olarinoyem/Project/Multivate-forecasting/PRP3/main.tex:478: Undefined control sequence.
+l.478     \multirow
+                   {South West England} & PINN & Infected & 1299.2248 & 2409...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+c:/Users/olarinoyem/Project/Multivate-forecasting/PRP3/main.tex:487: Undefined control sequence.
+l.487     \multirow
+                   {West midlands} & PINN & Infected & 2491.6001 & 4394.4118 \\
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+c:/Users/olarinoyem/Project/Multivate-forecasting/PRP3/main.tex:495: Undefined control sequence.
+<recently read> \multirow 
+                          
+l.495     \multirow
+                   {Yorkshire and the Humber} & PINN & Infected & 2396.9159 ...
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<images/pinn/S_predictions_West Midlands.pdf, id=183, 1084.05pt x 578.16pt>
+File: images/pinn/S_predictions_West Midlands.pdf Graphic file (type pdf)
+<use images/pinn/S_predictions_West Midlands.pdf>
+Package pdftex.def Info: images/pinn/S_predictions_West Midlands.pdf  used on input line 516.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/pinn/I_predictions_West Midlands.pdf, id=184, 1084.05pt x 578.16pt>
+File: images/pinn/I_predictions_West Midlands.pdf Graphic file (type pdf)
+<use images/pinn/I_predictions_West Midlands.pdf>
+Package pdftex.def Info: images/pinn/I_predictions_West Midlands.pdf  used on input line 522.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/pinn/R_predictions_West Midlands.pdf, id=185, 1084.05pt x 578.16pt>
+File: images/pinn/R_predictions_West Midlands.pdf Graphic file (type pdf)
+<use images/pinn/R_predictions_West Midlands.pdf>
+Package pdftex.def Info: images/pinn/R_predictions_West Midlands.pdf  used on input line 531.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/pinn/Training_History_West Midlands.pdf, id=186, 1084.05pt x 578.16pt>
+File: images/pinn/Training_History_West Midlands.pdf Graphic file (type pdf)
+<use images/pinn/Training_History_West Midlands.pdf>
+Package pdftex.def Info: images/pinn/Training_History_West Midlands.pdf  used on input line 538.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<images/ude/West Midlands_infected_death_data.pdf, id=187, 451.6875pt x 307.1475pt>
+File: images/ude/West Midlands_infected_death_data.pdf Graphic file (type pdf)
+<use images/ude/West Midlands_infected_death_data.pdf>
+Package pdftex.def Info: images/ude/West Midlands_infected_death_data.pdf  used on input line 549.
+(pdftex.def)             Requested size: 375.80544pt x 255.56036pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<images/pinn/S_predictions_South West England.pdf, id=188, 1084.05pt x 578.16pt>
+File: images/pinn/S_predictions_South West England.pdf Graphic file (type pdf)
+<use images/pinn/S_predictions_South West England.pdf>
+Package pdftex.def Info: images/pinn/S_predictions_South West England.pdf  used on input line 558.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/pinn/I_predictions_South West England.pdf, id=189, 1084.05pt x 578.16pt>
+File: images/pinn/I_predictions_South West England.pdf Graphic file (type pdf)
+<use images/pinn/I_predictions_South West England.pdf>
+Package pdftex.def Info: images/pinn/I_predictions_South West England.pdf  used on input line 564.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/pinn/R_predictions_South West England.pdf, id=190, 1084.05pt x 578.16pt>
+File: images/pinn/R_predictions_South West England.pdf Graphic file (type pdf)
+<use images/pinn/R_predictions_South West England.pdf>
+Package pdftex.def Info: images/pinn/R_predictions_South West England.pdf  used on input line 573.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/pinn/Training_History_South West England.pdf, id=191, 1084.05pt x 578.16pt>
+File: images/pinn/Training_History_South West England.pdf Graphic file (type pdf)
+<use images/pinn/Training_History_South West England.pdf>
+Package pdftex.def Info: images/pinn/Training_History_South West England.pdf  used on input line 580.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<images/ude/South West England_infected_death_data.pdf, id=192, 451.6875pt x 307.1475pt>
+File: images/ude/South West England_infected_death_data.pdf Graphic file (type pdf)
+<use images/ude/South West England_infected_death_data.pdf>
+Package pdftex.def Info: images/ude/South West England_infected_death_data.pdf  used on input line 591.
+(pdftex.def)             Requested size: 375.80544pt x 255.56036pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<images/pinn/S_predictions_South East England.pdf, id=193, 1084.05pt x 578.16pt>
+File: images/pinn/S_predictions_South East England.pdf Graphic file (type pdf)
+<use images/pinn/S_predictions_South East England.pdf>
+Package pdftex.def Info: images/pinn/S_predictions_South East England.pdf  used on input line 600.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/pinn/I_predictions_South East England.pdf, id=194, 1084.05pt x 578.16pt>
+File: images/pinn/I_predictions_South East England.pdf Graphic file (type pdf)
+<use images/pinn/I_predictions_South East England.pdf>
+Package pdftex.def Info: images/pinn/I_predictions_South East England.pdf  used on input line 606.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/pinn/R_predictions_South East England.pdf, id=195, 1084.05pt x 578.16pt>
+File: images/pinn/R_predictions_South East England.pdf Graphic file (type pdf)
+<use images/pinn/R_predictions_South East England.pdf>
+Package pdftex.def Info: images/pinn/R_predictions_South East England.pdf  used on input line 615.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/pinn/Training_History_South East England.pdf, id=196, 1084.05pt x 578.16pt>
+File: images/pinn/Training_History_South East England.pdf Graphic file (type pdf)
+<use images/pinn/Training_History_South East England.pdf>
+Package pdftex.def Info: images/pinn/Training_History_South East England.pdf  used on input line 622.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/ude/South East England_infected_death_data.pdf, id=197, 451.6875pt x 307.1475pt>
+File: images/ude/South East England_infected_death_data.pdf Graphic file (type pdf)
+<use images/ude/South East England_infected_death_data.pdf>
+Package pdftex.def Info: images/ude/South East England_infected_death_data.pdf  used on input line 633.
+(pdftex.def)             Requested size: 375.80544pt x 255.56036pt.
+<images/pinn/S_predictions_North West England.pdf, id=198, 1084.05pt x 578.16pt>
+File: images/pinn/S_predictions_North West England.pdf Graphic file (type pdf)
+<use images/pinn/S_predictions_North West England.pdf>
+Package pdftex.def Info: images/pinn/S_predictions_North West England.pdf  used on input line 641.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/pinn/I_predictions_North West England.pdf, id=199, 1084.05pt x 578.16pt>
+File: images/pinn/I_predictions_North West England.pdf Graphic file (type pdf)
+<use images/pinn/I_predictions_North West England.pdf>
+Package pdftex.def Info: images/pinn/I_predictions_North West England.pdf  used on input line 647.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/pinn/R_predictions_North West England.pdf, id=200, 1084.05pt x 578.16pt>
+File: images/pinn/R_predictions_North West England.pdf Graphic file (type pdf)
+<use images/pinn/R_predictions_North West England.pdf>
+Package pdftex.def Info: images/pinn/R_predictions_North West England.pdf  used on input line 656.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/pinn/Training_History_North West England.pdf, id=201, 1084.05pt x 578.16pt>
+File: images/pinn/Training_History_North West England.pdf Graphic file (type pdf)
+<use images/pinn/Training_History_North West England.pdf>
+Package pdftex.def Info: images/pinn/Training_History_North West England.pdf  used on input line 663.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/ude/North West England_infected_death_data.pdf, id=202, 451.6875pt x 307.1475pt>
+File: images/ude/North West England_infected_death_data.pdf Graphic file (type pdf)
+<use images/ude/North West England_infected_death_data.pdf>
+Package pdftex.def Info: images/ude/North West England_infected_death_data.pdf  used on input line 673.
+(pdftex.def)             Requested size: 375.80544pt x 255.56036pt.
+<images/pinn/S_predictions_North East England.pdf, id=203, 1084.05pt x 578.16pt>
+File: images/pinn/S_predictions_North East England.pdf Graphic file (type pdf)
+<use images/pinn/S_predictions_North East England.pdf>
+Package pdftex.def Info: images/pinn/S_predictions_North East England.pdf  used on input line 682.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/pinn/I_predictions_North East England.pdf, id=204, 1084.05pt x 578.16pt>
+File: images/pinn/I_predictions_North East England.pdf Graphic file (type pdf)
+<use images/pinn/I_predictions_North East England.pdf>
+Package pdftex.def Info: images/pinn/I_predictions_North East England.pdf  used on input line 688.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/pinn/R_predictions_North East England.pdf, id=205, 1084.05pt x 578.16pt>
+File: images/pinn/R_predictions_North East England.pdf Graphic file (type pdf)
+<use images/pinn/R_predictions_North East England.pdf>
+Package pdftex.def Info: images/pinn/R_predictions_North East England.pdf  used on input line 697.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/pinn/Training_History_North East England.pdf, id=206, 1084.05pt x 578.16pt>
+File: images/pinn/Training_History_North East England.pdf Graphic file (type pdf)
+<use images/pinn/Training_History_North East England.pdf>
+Package pdftex.def Info: images/pinn/Training_History_North East England.pdf  used on input line 704.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/ude/North East England_infected_death_data.pdf, id=207, 451.6875pt x 307.1475pt>
+File: images/ude/North East England_infected_death_data.pdf Graphic file (type pdf)
+<use images/ude/North East England_infected_death_data.pdf>
+Package pdftex.def Info: images/ude/North East England_infected_death_data.pdf  used on input line 714.
+(pdftex.def)             Requested size: 375.80544pt x 255.56036pt.
+<images/pinn/S_predictions_Yorkshire and the Humber.pdf, id=208, 1084.05pt x 578.16pt>
+File: images/pinn/S_predictions_Yorkshire and the Humber.pdf Graphic file (type pdf)
+<use images/pinn/S_predictions_Yorkshire and the Humber.pdf>
+Package pdftex.def Info: images/pinn/S_predictions_Yorkshire and the Humber.pdf  used on input line 723.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/pinn/I_predictions_Yorkshire and the Humber.pdf, id=209, 1084.05pt x 578.16pt>
+File: images/pinn/I_predictions_Yorkshire and the Humber.pdf Graphic file (type pdf)
+<use images/pinn/I_predictions_Yorkshire and the Humber.pdf>
+Package pdftex.def Info: images/pinn/I_predictions_Yorkshire and the Humber.pdf  used on input line 729.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/pinn/R_predictions_Yorkshire and the Humber.pdf, id=210, 1084.05pt x 578.16pt>
+File: images/pinn/R_predictions_Yorkshire and the Humber.pdf Graphic file (type pdf)
+<use images/pinn/R_predictions_Yorkshire and the Humber.pdf>
+Package pdftex.def Info: images/pinn/R_predictions_Yorkshire and the Humber.pdf  used on input line 738.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+<images/pinn/Training_History_Yorkshire and the Humber.pdf, id=211, 1084.05pt x 578.16pt>
+File: images/pinn/Training_History_Yorkshire and the Humber.pdf Graphic file (type pdf)
+<use images/pinn/Training_History_Yorkshire and the Humber.pdf>
+Package pdftex.def Info: images/pinn/Training_History_Yorkshire and the Humber.pdf  used on input line 745.
+(pdftex.def)             Requested size: 211.38832pt x 112.73633pt.
+(./main.bbl) [14 <./images/pinn/S_predictions_London Region.pdf> <./images/pinn/I_predictions_London Region.pdf> <./images/pinn/R_predictions_London Region.pdf> <./images/pinn/Training_History_London Region.pdf>] [15 <./images/ude/London Region_infected_death_data.pdf>] [16] [17 <./images/pinn/S_predictions_West Midlands.pdf> <./images/pinn/I_predictions_West Midlands.pdf> <./images/pinn/R_predictions_West Midlands.pdf> <./images/pinn/Training_History_West Midlands.pdf>] [18 <./images/ude/West Midlands_infected_death_data.pdf>] [19 <./images/pinn/S_predictions_South West England.pdf> <./images/pinn/I_predictions_South West England.pdf> <./images/pinn/R_predictions_South West England.pdf> <./images/pinn/Training_History_South West England.pdf>] [20 <./images/ude/South West England_infected_death_data.pdf>] [21 <./images/pinn/S_predictions_South East England.pdf> <./images/pinn/I_predictions_South East England.pdf> <./images/pinn/R_predictions_South East England.pdf> <./images/pinn/Training_History_South East England.pdf>] [22 <./images/ude/South East England_infected_death_data.pdf>] [23 <./images/pinn/S_predictions_North West England.pdf> <./images/pinn/I_predictions_North West England.pdf> <./images/pinn/R_predictions_North West England.pdf> <./images/pinn/Training_History_North West England.pdf>] [24 <./images/ude/North West England_infected_death_data.pdf>] [25 <./images/pinn/S_predictions_North East England.pdf> <./images/pinn/I_predictions_North East England.pdf> <./images/pinn/R_predictions_North East England.pdf> <./images/pinn/Training_History_North East England.pdf>] [26 <./images/ude/North East England_infected_death_data.pdf>] [27 <./images/pinn/S_predictions_Yorkshire and the Humber.pdf> <./images/pinn/I_predictions_Yorkshire and the Humber.pdf> <./images/pinn/R_predictions_Yorkshire and the Humber.pdf> <./images/pinn/Training_History_Yorkshire and the Humber.pdf>] (./main.aux)
+ ***********
+LaTeX2e <2023-11-01>
+L3 programming layer <2023-11-01>
+ ***********
+
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package rerunfilecheck Warning: File `main.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `main.out':
+(rerunfilecheck)             Before: <no file>
+(rerunfilecheck)             After:  1E8997A009366D6B8E6916C8C7B4A7DA;3183.
  ) 
 Here is how much of TeX's memory you used:
- 26109 strings out of 476411
- 521780 string characters out of 5789134
- 1877845 words of memory out of 5000000
- 45949 multiletter control sequences out of 15000+600000
- 524567 words of font info for 83 fonts, out of 8000000 for 9000
+ 26833 strings out of 474271
+ 537021 string characters out of 5751527
+ 1973533 words of memory out of 5000000
+ 48491 multiletter control sequences out of 15000+600000
+ 571755 words of font info for 92 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,14n,89p,2011b,898s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmcsc10.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsl10.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt12.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on main.pdf (14 pages, 707269 bytes).
+ 84i,14n,93p,2007b,900s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb><c:/texlive/2023/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb>
+Output written on main.pdf (27 pages, 1089974 bytes).
 PDF statistics:
- 670 PDF objects out of 1000 (max. 8388607)
- 55 named destinations out of 1000 (max. 500000)
- 137 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1550 PDF objects out of 1728 (max. 8388607)
+ 422 compressed objects within 5 object streams
+ 87 named destinations out of 1000 (max. 500000)
+ 193 words of extra memory for PDF output out of 10000 (max. 10000000)
 
