@@ -1,0 +1,48 @@
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{FAMM20}
+
+\bibitem[Bra04]{brandeau2004allocating}
+Margaret~L Brandeau.
+\newblock Allocating resources to control infectious diseases.
+\newblock {\em Operations research and health care: a handbook of methods and
+  applications}, pages 443--464, 2004.
+
+\bibitem[EPU{\etalchar{+}}20]{emanuel2020fair}
+Ezekiel~J Emanuel, Govind Persad, Ross Upshur, Beatriz Thome, Michael Parker,
+  Aaron Glickman, Cathy Zhang, Connor Boyle, Maxwell Smith, and James~P
+  Phillips.
+\newblock Fair allocation of scarce medical resources in the time of covid-19,
+  2020.
+
+\bibitem[EZL{\etalchar{+}}21]{ehmann2021operational}
+Michael~R Ehmann, Elizabeth~K Zink, Amanda~B Levin, Jose~I Suarez, Harolyn~ME
+  Belcher, Elizabeth L~Daugherty Biddison, Danielle~J Doberman, Karen
+  D’Souza, Derek~M Fine, Brian~T Garibaldi, et~al.
+\newblock Operational recommendations for scarce resource allocation in a
+  public health crisis.
+\newblock {\em Chest}, 159(3):1076--1083, 2021.
+
+\bibitem[FAMM20]{forman202012}
+Rebecca Forman, Rifat Atun, Martin McKee, and Elias Mossialos.
+\newblock 12 lessons learned from the management of the coronavirus pandemic.
+\newblock {\em Health Policy}, 124(6):577--580, 2020.
+
+\bibitem[JY19]{jiang2019emergency}
+Yiping Jiang and Yufei Yuan.
+\newblock Emergency logistics in a large-scale disaster context: Achievements
+  and challenges.
+\newblock {\em International journal of environmental research and public
+  health}, 16(5):779, 2019.
+
+\bibitem[KM27]{kermack1927contribution}
+William~Ogilvy Kermack and Anderson~G McKendrick.
+\newblock A contribution to the mathematical theory of epidemics.
+\newblock {\em Proceedings of the royal society of london. Series A, Containing
+  papers of a mathematical and physical character}, 115(772):700--721, 1927.
+
+\bibitem[ZB01]{zaric2001resource}
+Gregory~S Zaric and Margaret~L Brandeau.
+\newblock Resource allocation for epidemic control over short time horizons.
+\newblock {\em Mathematical Biosciences}, 171(1):33--58, 2001.
+
+\end{thebibliography}

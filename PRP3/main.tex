@@ -1,9 +1,8 @@
 \documentclass[12pt]{article}
 \usepackage[utf8]{inputenc}
-\usepackage{graphicx} % Required for inserting images
-\usepackage{amsmath,amsfonts,amssymb}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{sigsam,amsmath,amsfonts,amssymb}
 \usepackage{cite}
 \usepackage{url}
 \usepackage{booktabs}
@@ -21,8 +20,8 @@
 
 \title{Modeling Regional Infectious Disease Spread with Physics-Informed Neural Networks: A Study on COVID-19 Dynamics}
 \author{Michael Ajao-olarinoye \\
-    center for computational science and mathematical modelling \\
-    coventry university \\
+    Center for Computational Science and Mathematical Modelling \\
+    Coventry University \\
     \url{olarinoyem@coventry.ac.uk}}
 \date{}
 
@@ -42,7 +41,11 @@ These will help in developing strategies for disease prevention and control, as 
 
 There are different ways to model infectious diseases like covid-19. One way is to count the number of people who are infected, recovered, dead, or susceptible in an epidemic. This is called the compartmental model, and it is the most popular mathematical model that researchers use to study the disease. The compartmental model can be either deterministic or stochastic. Deterministic models can simulate a general scenario of how the disease spreads. Stochastic models can simulate how the disease spreads in small or sub-grouped populations, or predict the possible outcomes. Other mathematical models have also been used to describe infectious disease, such as in
 
-\section{literature review}
+\section{Literature Review}
+
+The literature on COVID-19 has rapidly expanded since the onset of the pandemic, covering various aspects from epidemiological modeling to healthcare resource allocation. Key studies have focused on the development and application of compartmental models, such as the SIR and SEIRD models, to predict the spread of COVID-19 and its impact on public health systems. Recent advancements in machine learning, particularly Physics-Informed Neural Networks (PINNs), have introduced innovative approaches to modeling infectious diseases by incorporating known disease dynamics directly into the learning process. This integration allows for more accurate predictions and dynamic parameter estimation, adapting to the evolving nature of the pandemic.
+
+Significant contributions have been made in the application of PINNs to epidemiological modeling, demonstrating their capability to reconcile data-driven approaches with traditional model-based simulations. These hybrid models have shown promise in forecasting disease spread and resource demand, informing public health responses and policy-making. Furthermore, the literature highlights the importance of considering non-pharmaceutical interventions and their effectiveness in controlling the pandemic's trajectory. Studies on social distancing, lockdown measures, and vaccination strategies have provided insights into the multifaceted approach required to manage COVID-19 effectively.
 
 
 
@@ -58,23 +61,17 @@ The SIR and SEIRD models are pivotal in understanding the dynamics of infectious
 The SIR model compartmentalizes the population into three categories: Susceptible (S), Infectious (I), and Recovered (R) individuals. The transitions between these categories are governed by a set of ordinary differential equations (ODEs) as follows:
 
 \begin{equation}
-\frac{dS}{dt} &= -\beta \frac{SI}{N}, \\
-\frac{dI}{dt} &= \beta \frac{SI}{N} - \gamma I, \\
-\frac{dR}{dt} &= \gamma I,
+    \begin{align}
+        \frac{dS}{dt} &= -\beta \frac{SI}{N}, \\
+        \frac{dI}{dt} &= \beta \frac{SI}{N} - \gamma I, \\
+        \frac{dR}{dt} &= \gamma I,
+    \end{align}
 \end{equation}
 
-where $S$ represents the number of susceptible individuals who are not yet infected but can be, $I$ denotes the number of infectious individuals who can transmit the disease to susceptible individuals and recover, and $R$ represents the number of recovered individuals who are immune to the disease. The parameters $\beta$ and $\gamma$ represent the transmission rate and recovery rate, respectively. The total population size is denoted by $N = S + I + R$. The SIR model is a simple and effective tool for understanding the dynamics of infectious diseases and has been widely used to model the spread of various diseases, including COVID-19.
+where $S$ represents the number of susceptible individuals who are not yet infected but can be, $I$ denotes the number of infectious individuals who can transmit the disease to susceptible individuals and recover, and $R$ represents the number of recovered individuals who are immune to the disease. The parameters $\beta$ and $\gamma$ represent the transmission rate and recovery rate, respectively. The SIR model is a simple and effective tool for understanding the dynamics of infectious diseases and has been widely used to model the spread of various diseases, including COVID-19.
 
-\begin{tabular}{ll}
-    \toprule
-    \textbf{Parameter} & \textbf{Definition} \
-    \midrule
-    $\beta$ & Transmission rate \
-    $\gamma$ & Recovery rate \
-    \bottomrule
-\end{tabular}
-    
-The SIR model is fundamental in epidemiology for its simplicity and effectiveness in capturing the basic dynamics of disease spread. However, it assumes lifelong immunity post-recovery, which may not apply to all diseases, including COVID-19.
+Equation (1) is governed by the following initial conditions: $S(t_0) > 0$, $I(t_0) \geq 0$, and $R(t_0) \geq 0$, where $t_0$ represents the initial point in time. These conditions ensure that the population starts with a positive number of susceptible individuals and non-negative numbers of infectious and recovered individuals. 
+
 \begin{figure}[h!]
     \centering
     \begin{tikzpicture}[node distance=2cm, auto, thick]
@@ -95,14 +92,37 @@ The SIR model is fundamental in epidemiology for its simplicity and effectivenes
     \caption{Compartmental flow of the SIR model for infection transmission dynamics.}
 \end{figure}
 
+The model operates under the assumption of population conservation, formulated as:
+\begin{equation}
+    S(t) + I(t) + R(t) = N, \quad \forall t \geq t_0,
+\end{equation}
+where $N$ denotes the total constant population size. This equation implies that the total number of individuals in the model remains constant over time, encapsulating the assumption that the timescale of the epidemic's evolution is significantly shorter than the average lifespan of individuals in the population. Consequently, demographic processes such as births and natural deaths are not considered, under the premise that their impact on the total population size is negligible within the timeframe of the epidemic's spread.
+
+% \begin{table}[h!]
+%     \centering
+%     \begin{tabular}{ll}
+%     \toprule
+%     \textbf{Parameter} & \textbf{Definition} \
+%     \midrule
+%     $\beta$ & Transmission rate \
+%     $\gamma$ & Recovery rate \
+%     \bottomrule
+%     \end{tabular}
+%     \caption{Parameters of the SIR Model}
+% \end{table}
+    
+The SIR model is fundamental in epidemiology for its simplicity and effectiveness in capturing the basic dynamics of disease spread. However, it assumes lifelong immunity post-recovery, which may not apply to all diseases, including COVID-19.
+
 To account for the characteristics of COVID-19, including the existence of a latent period and the possibility of death, the SEIRD model extends the SIR framework by including two additional compartments: Exposed (E) and Dead (D) individuals. The SEIRD model is described by the following differential equations:
 
 \begin{equation}
-\frac{dS}{dt} &= -\beta \frac{SI}{N}, \\
-\frac{dE}{dt} &= \beta \frac{SI}{N} - \sigma E, \\
-\frac{dI}{dt} &= \sigma E - \rho I - \alpha I, \\
-\frac{dR}{dt} &= \rho I, \\
-\frac{dD}{dt} &= \alpha I,
+    \begin{align}
+        \frac{dS}{dt} &= -\beta \frac{SI}{N}, \\
+        \frac{dE}{dt} &= \beta \frac{SI}{N} - \sigma E, \\
+        \frac{dI}{dt} &= \sigma E - \rho I - \alpha I, \\
+        \frac{dR}{dt} &= \rho I, \\
+        \frac{dD}{dt} &= \alpha I,
+    \end{align}
 \end{equation}
 
 where $E$ represents the number of exposed individuals who are infected but not yet infectious, and $D$ represents the number of deceased individuals. The parameters $\sigma$, $\rho$, and $\alpha$ represent the rate of exposed individuals becoming infectious, the recovery rate, and the mortality rate, respectively. The total population size is denoted by $N = S + E + I + R + D$. The SEIRD model provides a more comprehensive representation of disease dynamics and is particularly useful for capturing the spread of COVID-19, which exhibits a latent period and the possibility of death. This model more accurately reflects the disease dynamics of COVID-19 by considering the exposed phase, during which individuals are infected but not yet infectious, and the mortality due to the disease. The addition of these compartments allows for a more nuanced understanding of the pandemic's progression and the impact of interventions such as social distancing, vaccination, and treatment strategies.
@@ -120,19 +140,87 @@ where $E$ represents the number of exposed individuals who are infected but not 
         \node [squarednode] (S) {\( S(t) \)};
         \node [squarednode, right=of S] (E) {\( E(t) \)};
         \node [squarednode, right=of E] (I) {\( I(t) \)};
-        \node [squarednode, right=of I] (R) { \( R(t) \)};
-        \node [squarednode, right=of R] (D) { \( D(t) \)};
+        \node [squarednode, above right=of I] (R) { \( R(t) \)};
+        \node [squarednode, below right=of I] (D) { \( D(t) \)};
         
         % Connect nodes with paths
         \path [line] (S) -- node { \( \beta S I \) } (E);
         \path [line] (E) -- node { \(  \sigma E \) } (I);
         \path [line] (I) -- node { \( \rho I\) } (R);
-        \path [line] (R) -- node { \( \alpha \) } (D);
+        \path [line] (I) -- node { \( \alpha \) } (D);
 
     \end{tikzpicture}
     \caption{Compartmental flow of the SEIRD model for COVID-19 transmission dynamics.}
 \end{figure}
 
+\subsection{Physics-Informed Neural Networks}
+
+Physics-Informed Neural Networks (PINNs) embody a novel approach to embedding a priori system knowledge, such as fundamental physical principles or domain expertise, directly into the learning mechanism of deep neural networks. This incorporation is typically achieved through the utilization of ordinary or partial differential equations (ODEs/PDEs) within the loss function formulation. During training, PINNs aim not only to adjust network weights and biases but also to refine parameters within the encapsulated physical laws. The composite loss function encompasses two primary components: the data fidelity loss ($L_{\text{data}}$) and the physics-based residual loss ($L_{\text{residual}}$), the latter serving as a regularization mechanism that enforces adherence to established differential equations.
+
+Consider a system governed by a set of first-order ODEs expressed as:
+\begin{equation}
+\frac{\partial U}{\partial t}(t) + F(U(t); \lambda) = 0, \quad t \in [t_0, T],
+\end{equation}
+where $U(t) = [u_1(t), \ldots, u_n(t)]^T$ and $F(U) = [f_1(U), \ldots, f_n(U)]^T$ with $u_i \in \mathbb{R}$ and $f_i: \mathbb{R}^n \rightarrow \mathbb{R}$ for $i = 1, \ldots, n$. The interval $[t_0, T]$ denotes the time domain from initial to final time, with $\lambda \in \mathbb{R}^k$ representing unknown parameters of the system. The observed data $U_s$ at times $t_1, \ldots, t_m$ are used to determine $\lambda$, leading to the data loss:
+\begin{equation}
+L_{\text{data}} = \sum_{s=1}^{m} \|U(t_s) - U_s\|^2.
+\end{equation}
+
+Traditionally, the optimal parameter vector $\lambda$ is identified by minimizing $L_{\text{data}}$, thereby deriving a solution $U(t)$ that closely aligns with the observed data in terms of least squares deviations. PINNs leverage a general neural network framework, denoted as $NN_{\omega,b}(t): \mathbb{R} \rightarrow \mathbb{R}^n$, which approximates the solution $U(t): \mathbb{R} \rightarrow \mathbb{R}^n$ of the ODE system. The network's weights $\omega$ and biases $b$ are optimized to minimize the mean squared error (MSE) between the network's predictions and the observed data:
+
+\begin{equation}[h]
+    MSE_{\omega,b}^U = \frac{1}{m} \sum_{s=1}^{m} \|NN_{\omega,b}(t_s) - U_s\|^2.
+\end{equation}
+
+The residual loss, derived from the system of ODEs, is formulated as:
+\begin{equation}
+F(NN_{\omega,b}, t; \lambda) = \frac{\partial NN_{\omega,b}}{\partial t}(t) + F(NN_{\omega,b}(t); \lambda),
+\end{equation}
+enabling the extension of $NN_{\omega,b}$ into a PINN by incorporating the residual term into the loss function. Through automatic differentiation, the neural network computes derivatives of its output with respect to its input, thus ensuring compliance with the ODE dynamics by enforcing $F(NN_{\omega,b}, t; \lambda) = 0$ for all $t \in [t_0, T]$. Consequently, PINNs facilitate the simultaneous identification of optimal neural network parameters ($\omega$ and $b$) and ODE parameters ($\lambda$), through the minimization of the combined loss:
+\begin{equation}
+\text{arg min}_{\omega, b, \lambda} \left( MSE_{\omega,b}^U + MSE_{\omega,b,\lambda}^F \right),
+\end{equation}
+where $MSE_{\omega,b,\lambda}^F$ represents the mean squared residual error, integrating the system's dynamics into the optimization process.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/image.png}
+    \caption{Caption}
+    \label{fig:enter-label}
+\end{figure}
+
+\begin{algorithm}[ht]
+    \label{alg:PINN}
+    \caption{Training of Physics-Informed Neural Network (PINN) for Epidemic Modeling}
+    \begin{algorithmic}[1]
+        \Require Training data tensors $\bm{S}_{\text{data}}$, $\bm{I}_{\text{data}}$, $\bm{R}_{\text{data}}$, time tensor $\bm{t}_{\text{data}}$, population size $N$.
+        \State Initialize a PINN model $NN$ with Xavier initialization.
+
+        \State Configure the Adam optimizer with a specified learning rate and weight decay.
+        
+        \For{$epoch = 1$ to $num\_epochs$}
+        
+            \State Forward pass: $\bm{S}_{\text{pred}}$, $\bm{I}_{\text{pred}}$, $\bm{R}_{\text{pred}} \gets NN(\bm{t}_{\text{data}})$.
+            
+            \State Calculate gradients via automatic differentiation.
+            
+            \State Compute mean squared error $MSE_{SIR}$ between predictions and data.
+            
+            \[ MSE_{SIR} = \frac{1}{s}\sum_{i=1}^{s} \left((S_i - S_{i, \text{data}})^2 + (I_i - I_{i, \text{data}})^2 + (R_i - R_{i, \text{data}})^2\right). \]
+            
+            \State Calculate residuals' mean squared error $MSE_{residuals}$.
+            
+            \[ MSE_{residuals} = \frac{1}{q}\sum_{i=1}^{q} \left(\left|\frac{dS_i}{dt} + \frac{\beta S_i I_i}{N}\right|^2 + \left|\frac{dI_i}{dt} - \frac{\beta S_i I_i}{N} + \gamma I_i\right|^2 + \left|\frac{dR_i}{dt} - \gamma I_i\right|^2\right). \]
+
+
+            \[Loss = MSE_{SIR} + MSE_{residuals}\].
+            
+            \State Update model weights by backpropagation and optimization.
+            \State Apply learning rate scheduler and early stopping if conditions are met.
+            
+        \EndFor
+    \end{algorithmic}
+\end{algorithm}
 
 
 \section{Results and Discussion}
@@ -140,209 +228,8 @@ where $E$ represents the number of exposed individuals who are infected but not 
 
 
 
-
 \section{Conclusion}
 
-
-
-
-\begin{algorithm}
-\caption{Physics-Informed Neural Network (PINN) Training for Epidemic Modeling}
-\begin{algorithmic}[1]
-\Require Training data tensors $S_{data}$, $I_{data}$, $R_{data}$, Time tensor $t_{data}$, Population $N$, Neural Network $NN$ with weights $w$ and biases $b$
-\Ensure Preprocessed tensors on the same device
-\State Initialize $NN$ with Xavier initialization for weights $w$ and biases $b$
-\State Define early stopping criteria with patience and delta
-\State Set learning rate $lr$ and regularization parameters $\lambda$, $p$
-
-\For{each epoch up to $num\_epochs$}
-    \State Compute predictions: $S_{pred}$, $I_{pred}$, $R_{pred} \gets NN(t_{data})$
-    \State Compute time derivatives of $S_{pred}$, $I_{pred}$, $R_{pred}$ via autograd
-    \State Calculate residuals using SIR model equations:
-    \begin{align*}
-    \frac{dS}{dt} & = -\beta \frac{S_{pred} I_{pred}}{N} \\
-    \frac{dI}{dt} & = \beta \frac{S_{pred} I_{pred}}{N} - \gamma I_{pred} \\
-    \frac{dR}{dt} & = \gamma I_{pred}
-    \end{align*}
-    \State Compute loss function components:
-    \State $MSE_{SIR} \gets \frac{1}{q} \sum_{i=1}^{q} \left[ \left(S_{i} - S_{pred_i}\right)^2 + \left(I_{i} - I_{pred_i}\right)^2 + \left(R_{i} - R_{pred_i}\right)^2 \right]$
-    \State $MSE_{residuals} \gets \frac{1}{q} \sum_{i=1}^{q} \left[ \left(\frac{dS_i}{dt} - \frac{dS_{pred_i}}{dt}\right)^2 + \left(\frac{dI_i}{dt} - \frac{dI_{pred_i}}{dt}\right)^2 + \left(\frac{dR_i}{dt} - \frac{dR_{pred_i}}{dt}\right)^2 \right]$
-    \State $Loss \gets MSE_{SIR} + MSE_{residuals} + \lambda \cdot \text{Regularization}(NN)$
-    \State Update $NN$ parameters via backpropagation and optimization step
-    \State Adjust learning rate with learning rate scheduler if needed
-    \State Check for early stopping, break if condition is met
-\EndFor
-
-\State \textbf{Output:} Trained PINN model $NN$
-\end{algorithmic}
-\end{algorithm}
-
-
-\begin{algorithm}
-\caption{Training of Physics-Informed Neural Network (PINN) for Epidemic Modeling}
-\begin{algorithmic}[1]
-\Require Training data tensors $\bm{S}_{data}$, $\bm{I}_{data}$, $\bm{R}_{data}$, time tensor $\bm{t}_{data}$, population size $N$, initial learning rate $lr$, regularization parameters $\lambda_{reg}$, $p_{reg}$, and number of epochs $num\_epochs$.
-\Ensure All tensors are on the computational device, e.g., GPU.
-\State Initialize PINN $NN$ with weights $\bm{w}$ and biases $\bm{b}$ using Xavier initialization.
-\State Define EarlyStopping class with patience, delta, and verbose output.
-\State Set up the Adam optimizer with learning rate $lr$ and weight decay.
-\State Set up learning rate scheduler with reduction factor and patience.
-
-\For{$epoch = 1$ to $num\_epochs$}
-    \State Compute predictions $\bm{S}_{pred}$, $\bm{I}_{pred}$, $\bm{R}_{pred}$ from $NN(\bm{t}_{data})$.
-    \State Compute gradients $\frac{d\bm{S}_{pred}}{dt}$, $\frac{d\bm{I}_{pred}}{dt}$, $\frac{d\bm{R}_{pred}}{dt}$ with respect to $\bm{t}_{data}$ using automatic differentiation.
-    
-    \State Define the SIR model's theoretical dynamics:
-    \begin{align*}
-    \frac{dS}{dt} & = -\beta \frac{S I}{N}, \\
-    \frac{dI}{dt} & = \beta \frac{S I}{N} - \gamma I, \\
-    \frac{dR}{dt} & = \gamma I.
-    \end{align*}
-    
-    \State Compute the loss components:
-    \begin{align*}
-    MSE_{SIR} & = \frac{1}{q} \sum_{i=1}^{q} \left[ \left(\bm{S}_{i} - \bm{S}_{pred_i}\right)^2 + \left(\bm{I}_{i} - \bm{I}_{pred_i}\right)^2 + \left(\bm{R}_{i} - \bm{R}_{pred_i}\right)^2 \right], \\
-    MSE_{residuals} & = \frac{1}{q} \sum_{i=1}^{q} \left[ \left(\frac{d\bm{S}_{pred_i}}{dt} + \beta \frac{\bm{S}_{pred_i} \bm{I}_{pred_i}}{N}\right)^2 + \left(\frac{d\bm{I}_{pred_i}}{dt} - \beta \frac{\bm{S}_{pred_i} \bm{I}_{pred_i}}{N} + \gamma \bm{I}_{pred_i}\right)^2 + \left(\frac{d\bm{R}_{pred_i}}{dt} - \gamma \bm{I}_{pred_i}\right)^2 \right].
-    \end{align*}
-    
-    \State Compute regularization term (if L2 regularization is used):
-    \begin{align*}
-    Reg_{L2} = \lambda_{reg} \sum_{\bm{w}} \|\bm{w}\|^{p_{reg}}.
-    \end{align*}
-    
-    \State Compute total loss:
-    \begin{align*}
-    Loss = MSE_{SIR} + MSE_{residuals} + Reg_{L2}.
-    \end{align*}
-    
-    \State Perform backpropagation and update PINN parameters using the optimizer.
-    \State Update learning rate with scheduler based on the validation loss.
-    
-    \If{EarlyStopping condition is met}
-        \State \textbf{break}
-    \EndIf
-    
-    \If{$(epoch + 1) \mod 100 = 0$ or $epoch = 0$}
-        \State Log current epoch and loss for monitoring.
-    \EndIf
-\EndFor
-
-\State \textbf{Output:} Trained PINN $NN$.
-\end{algorithmic}
-\end{algorithm}
-
-
-\begin{algorithm}
-\caption{Physics-Informed Neural Network (PINN) for SIR Dynamics}
-\begin{algorithmic}[1]
-
-\Require Training dataset $\mathcal{D} = \{(t_i, S_i, I_i, R_i)\}_{i=1}^{N}$, where $t_i$ denotes time, and $S_i$, $I_i$, $R_i$ represent susceptible, infected, and recovered individuals at time $t_i$, respectively.
-
-\State \textbf{Data Preprocessing:}
-\State Convert $\mathcal{D}$ into tensors: $\mathbf{S}, \mathbf{I}, \mathbf{R} \in \mathbb{R}^{N \times 1}$ and $\mathbf{t} \in \mathbb{R}^{N \times 1}$.
-
-\State \textbf{Neural Network Architecture:}
-\State Define a fully connected neural network $\mathcal{N}(\mathbf{t}; \theta)$ with input $\mathbf{t}$, parameters $\theta$, hidden layers, and Tanh activation functions. The network predicts $\hat{\mathbf{S}}, \hat{\mathbf{I}}, \hat{\mathbf{R}}$ at times $\mathbf{t}$.
-
-\State \textbf{Loss Function:}
-\State The loss function $\mathcal{L}(\theta)$ consists of two parts: the prediction loss and the differential equation loss.
-\State Prediction loss: $\mathcal{L}_{\text{pred}} = \frac{1}{N}\sum_{i=1}^{N} \left( ||\hat{\mathbf{S}}_i - \mathbf{S}_i||^2 + ||\hat{\mathbf{I}}_i - \mathbf{I}_i||^2 + ||\hat{\mathbf{R}}_i - \mathbf{R}_i||^2 \right)$.
-\State DE loss: Compute the gradients $\frac{d\hat{\mathbf{S}}}{dt}, \frac{d\hat{\mathbf{I}}}{dt}, \frac{d\hat{\mathbf{R}}}{dt}$ using automatic differentiation. Use these to define the SIR model's dynamics:
-\begin{align*}
-\frac{dS}{dt} &= -\beta \frac{SI}{N}, \\
-\frac{dI}{dt} &= \beta \frac{SI}{N} - \gamma I, \\
-\frac{dR}{dt} &= \gamma I.
-\end{align*}
-\State $\mathcal{L}_{\text{DE}} = \frac{1}{N}\sum_{i=1}^{N} \left( ||\frac{d\hat{\mathbf{S}}_i}{dt} + \beta \frac{\hat{\mathbf{S}}_i \hat{\mathbf{I}}_i}{N}||^2 + ||\frac{d\hat{\mathbf{I}}_i}{dt} - \beta \frac{\hat{\mathbf{S}}_i \hat{\mathbf{I}}_i}{N} + \gamma \hat{\mathbf{I}}_i||^2 + ||\frac{d\hat{\mathbf{R}}_i}{dt} - \gamma \hat{\mathbf{I}}_i||^2 \right)$.
-\State Total loss: $\mathcal{L} = \mathcal{L}_{\text{pred}} + \mathcal{L}_{\text{DE}}$.
-
-\State \textbf{Training:}
-\State Use gradient descent to minimize $\mathcal{L}(\theta)$ with respect to $\theta$.
-\State Apply early stopping based on validation loss to prevent overfitting.
-
-\State \textbf{Evaluation:}
-\State Evaluate the trained model $\mathcal{N}(\mathbf{t}; \theta^*)$ on test data to predict $\hat{\mathbf{S}}, \hat{\mathbf{I}}, \hat{\mathbf{R}}$.
-\State Compare predictions with actual data to assess model performance.
-
-\end{algorithmic}
-\end{algorithm}
-
-
-
-\begin{algorithm}
-\caption{PINNs used to determine simultaneously the parameters of the neural network and the embedded SIR model.}
-\begin{algorithmic}[1]
-
-\Require Time points $t$, initial susceptible $S^0$, infected $I^0$, and recovered $R^0$ populations.
-\State Randomly initialize weights $w$, biases $b$, and dynamics parameters $\beta, \gamma$;
-
-\For{each epoch in epochs}
-    \State The values of each compartment of the SIR model can be obtained from the forward propagation of the neural network with the input as $t$:
-    \State $S, I, R = NN(t)$;
-    
-    \State Evaluate the composed loss function, including the data loss (with $s$ to be the number of observations in each compartment, thus the number of time points collected):
-    \State $MSE_{SIR} = \frac{1}{s}\sum_{i=1}^{s} \left((S_i - S_i^0)^2 + (I_i - I_i^0)^2 + (R_i - R_i^0)^2\right)$, denoting the mismatch of the output of the neural network and observation data.
-    
-    \State Here the residual loss:
-    \State $MSE_{residuals} = \frac{1}{q}\sum_{i=1}^{q} \left(\left|\left|\frac{dS_i}{dt_i} + \frac{\beta S_i I_i}{N}\right|\right|^2 + \left|\left|\frac{dI_i}{dt_i} - \frac{\beta S_i I_i}{N} + \gamma I_i\right|\right|^2 + \left|\left|\frac{dR_i}{dt_i} - \gamma I_i\right|\right|^2\right)$,
-    \State stands for the sum of the residual errors for each compartment of the SIR model.
-    
-    \State Thus, the total loss function can be obtained:
-    \State $Loss = MSE_{SIR} + MSE_{residuals}$;
-    
-    \State The Adam Optimizer toolkit in Pytorch is utilized to update the weights $w$ and biases $b$, as well as $\beta$ and $\gamma$ by minimizing the loss function.
-\EndFor
-
-\end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}
-\caption{Training PINN for SIR Model}
-\begin{algorithmic}[1]
-
-\Require Time points $t$, initial susceptible $S_0$, infected $I_0$, recovered $R_0$, population $N$.
-\State Randomly initialize neural network parameters $\theta$.
-
-\For{each epoch}
-    \State Obtain $S, I, R$ from neural network: $S, I, R = \mathcal{N}(t; \theta)$.
-    \State Calculate data loss $MSE_{SIR}$:
-    \State $MSE_{SIR} = \frac{1}{N}\sum_{i=1}^{N} ((S_i - S_{0i})^2 + (I_i - I_{0i})^2 + (R_i - R_{0i})^2)$.
-    
-    \State Compute residuals $\frac{dS}{dt}, \frac{dI}{dt}, \frac{dR}{dt}$ via autodiff.
-    \State Calculate SIR model loss $MSE_{residuals}$:
-    \State $MSE_{residuals} = \frac{1}{N}\sum_{i=1}^{N} \left( \left|\frac{dS_i}{dt} + \beta \frac{S_i I_i}{N}\right|^2 + \left|\frac{dI_i}{dt} - \beta \frac{S_i I_i}{N} + \gamma I_i\right|^2 + \left|\frac{dR_i}{dt} - \gamma I_i\right|^2 \right)$.
-    
-    \State Total loss $Loss = MSE_{SIR} + MSE_{residuals}$.
-    \State Update $\theta$ using optimizer to minimize $Loss$.
-    \State Implement early stopping if validation loss does not improve.
-\EndFor
-
-\end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}
-\caption{Streamlined PINN Algorithm for SIR Model}
-\begin{algorithmic}[1]
-
-\Require Time points $t$, initial conditions $S_0, I_0, R_0$, total population $N$.
-\State Randomly initialize network parameters $\theta$ and disease parameters $\beta, \gamma$.
-
-\For{each epoch}
-    \State Propagate $t$ through network to get $S, I, R = \mathcal{N}(t; \theta)$.
-    
-    \State Compute data fidelity loss $MSE_{SIR}$:
-    \State $MSE_{SIR} = \frac{1}{N}\sum_{i=1}^{N} \big((S_i - S_{0i})^2 + (I_i - I_{0i})^2 + (R_i - R_{0i})^2\big)$.
-    
-    \State Derive SIR dynamics residuals via autodiff:
-    \State $MSE_{residuals} = \frac{1}{N}\sum_{i=1}^{N} \left( \left|\frac{dS_i}{dt} + \beta \frac{S_i I_i}{N}\right|^2 + \left|\frac{dI_i}{dt} - \beta \frac{S_i I_i}{N} + \gamma I_i\right|^2 + \left|\frac{dR_i}{dt} - \gamma I_i\right|^2 \right)$.
-    
-    \State Define total loss $Loss = MSE_{SIR} + MSE_{residuals}$.
-    \State Minimize $Loss$ to update $\theta$, $\beta$, and $\gamma$ with optimizer.
-    \State Apply early stopping based on validation loss.
-\EndFor
-
-\end{algorithmic}
-\end{algorithm}
 
 \begin{algorithm}
 \caption{Parameter Estimation for SEIRD Model via Differential Equation Learning}
@@ -374,17 +261,6 @@ where $E$ represents the number of exposed individuals who are infected but not 
 
 \end{algorithmic}
 \end{algorithm}
-
-
-The SEIRD model extends the SIR model by including compartments for exposed (E) and dead (D) individuals:
-\begin{align}
-\frac{dS}{dt} &= -\beta \frac{SI}{N}, \\
-\frac{dE}{dt} &= \beta \frac{SI}{N} - \delta E, \\
-\frac{dI}{dt} &= \delta E - (\gamma + \alpha) I, \\
-\frac{dR}{dt} &= \gamma I, \\
-\frac{dD}{dt} &= \alpha I,
-\end{align}
-where $E$ represents the exposed individuals who are infected but not yet infectious, and $D$ represents the deceased individuals.
 
 
 
