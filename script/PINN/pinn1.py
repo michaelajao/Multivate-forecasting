@@ -105,7 +105,7 @@ def get_region_name_from_filepath(filepath):
     return os.path.splitext(base)[0]
 
 
-path = "../../data/region_daily_data/West Midlands.csv"
+path = "../../data/region_daily_data/Yorkshire and the Humber.csv"
 region_name = get_region_name_from_filepath(path)
 df = load_and_preprocess_data(f"../../data/region_daily_data/{region_name}.csv")
 
