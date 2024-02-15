@@ -14,11 +14,13 @@ function load_data(path)
     return data
 end
 
-# Get the device determined by Lux
-device = gpu_device()
+# # Get the device determined by Lux
+# device = gpu_device()
 
+region_name = "North East England"
 
-data_path = "/share/home2/olarinoyem/Project/Multivate-forecasting/data/region_daily_data/East Midlands.csv"
+data_path = "/share/home2/olarinoyem/Project/Multivate-forecasting/data/region_daily_data/$(region_name).csv"
+
 data = load_data(data_path)
 
 infected_data = data[!, "new_confirmed"]
@@ -48,7 +50,6 @@ t = range(tspan[1], tspan[2], length=data_length)
 function create_NN(input_size, hidden_size, output_size)
     nn = Chain(
         Dense(input_size, hidden_size, Lux.tanh_fast),
-        Dense(hidden_size, hidden_size, Lux.tanh_fast),
         Dense(hidden_size, hidden_size, Lux.tanh_fast),
         Dense(hidden_size, hidden_size, Lux.tanh_fast),
         Dense(hidden_size, output_size))
@@ -128,7 +129,7 @@ function loss_adjoint(θ)
     global c = 1e-1
     loss = sum(abs2, log.(abs.(infected_data) .+ c) .- log.(abs.(prediction[3, :]) .+ c)) +
            sum(abs2, log.(abs.(death_data) .+ c) .- log.(abs.(prediction[5, :]) .+ c)) +
-           sum(abs2.(Rt_values .- 1.0))
+           sum(abs2, abs.(Rt_values .- 1.0))
     return loss
 end
 
@@ -194,14 +195,14 @@ println("Final training loss after $(length(losses)) iterations: $(losses[end])"
 
 # Visualize the training loss for the adam and bfgs optimization
 fig = with_theme(theme_web()) do
-    fig = Figure(resolution = (1000, 700))
-    ax = CairoMakie.Axis(fig[1, 1], xlabel = "Iterations", ylabel = "Loss", title = "Training Loss")
+    fig = Figure(resolution=(1000, 700))
+    ax = CairoMakie.Axis(fig[1, 1], xlabel="Iterations", ylabel="Loss", title="Training Loss $(region_name)")
     lines!(ax, losses, label="Loss", linewidth=2, legend=:topleft)
     return fig
 end
 
 # save images
-save("/share/home2/olarinoyem/Project/Multivate-forecasting/images/ude/east_midlands_training_loss.pdf", fig)
+save("/share/home2/olarinoyem/Project/Multivate-forecasting/images/ude/$(region_name)_training_loss.pdf", fig)
 
 # Optimization
 # optf = Optimization.OptimizationFunction((θ, _) -> loss_adjoint(θ), Optimization.AutoZygote())
@@ -235,16 +236,16 @@ println("Root Mean Squared Error death_data: $rmse")
 
 # Plot infected and death data
 fig = with_theme(theme_web()) do
-    fig = Figure(resolution = (1000, 700))
-    ax = CairoMakie.Axis(fig[1, 1], xlabel = "Days", ylabel = "Number of Cases", title = "Model Predictions vs Actual Data")
-    
+    fig = Figure(; size =(1000, 700))
+    ax = CairoMakie.Axis(fig[1, 1], xlabel="Days", ylabel="Number of Cases", title="Model Predictions vs Actual Data for $(region_name)")
+
     # Use `barplot` for bar plots in CairoMakie
-    barplot!(ax, t, infected_data, color = :red, alpha = 0.5, label = "I data")
-    barplot!(ax, t, death_data, color = :blue, alpha = 0.5, label = "D data")
-    
+    barplot!(ax, t, infected_data, color=:red, alpha=0.5, label="I data")
+    barplot!(ax, t, death_data, color=:blue, alpha=0.5, label="D data")
+
     # Use `lines!` for line plots
-    lines!(ax, t, predicted_data[3, :], color = :red, linewidth = 2, label = "I prediction")
-    lines!(ax, t, predicted_data[5, :], color = :blue, linewidth = 2, label = "D prediction")
+    lines!(ax, t, predicted_data[3, :], color=:red, linewidth=2, label="I prediction")
+    lines!(ax, t, predicted_data[5, :], color=:blue, linewidth=2, label="D prediction")
 
     # Add the legend
     leg = Legend(fig[1, 2], ax, "Legend", labelsize=12, fontsize=10, font="Arial", valign=:top, halign=:right)
@@ -253,128 +254,58 @@ fig = with_theme(theme_web()) do
     return fig
 end
 
+save("/share/home2/olarinoyem/Project/Multivate-forecasting/images/ude/$(region_name)_infected_death_data.pdf", fig)
+
 # Plot Rt values
 fig = with_theme(theme_web()) do
-    fig = Figure(resolution = (1000, 700))
-    ax = CairoMakie.Axis(fig[1, 1], xlabel = "Days", ylabel = "Rₜ", title = "Effective Reproduction Number Rₜ Over Time")
-    lines!(ax, t, Rt_values, color = :black, label = "Rₜ", linewidth = 2)
-    lines!(ax, [minimum(t), maximum(t)], [1, 1], color = :red, linestyle = :dash, linewidth = 2, label = "Threshold Rₜ=1")
+    fig = Figure(; size =(1000, 700))
+    ax = CairoMakie.Axis(fig[1, 1], xlabel="Days", ylabel="Rₜ", title="Effective Reproduction Number Rₜ Over Time for $(region_name)")
+    lines!(ax, t, Rt_values, color=:black, label="Rₜ", linewidth=2)
+    lines!(ax, [minimum(t), maximum(t)], [1, 1], color=:red, linestyle=:dash, linewidth=2, label="Threshold Rₜ=1")
 
     leg = Legend(fig[1, 2], ax, "Legend", valign=:top, halign=:right)
     fig[1, 2] = leg  # Assign legend to the right side of the plot
     return fig
 end
 
+save("/share/home2/olarinoyem/Project/Multivate-forecasting/images/ude/$(region_name)_Rt_values.pdf", fig)
+
 # Plot beta
 fig = with_theme(theme_web()) do
-    fig = Figure(resolution = (1000, 700))
-    ax = CairoMakie.Axis(fig[1, 1], xlabel = "Days", ylabel = "Parameter Value", title = "Parameter Dynamics Over Time")
-    lines!(ax, t, β_values, color = :blue, label = "β (Transmission Rate)", linewidth = 2)
+    fig = Figure(; size =(1000, 700))
+    ax = CairoMakie.Axis(fig[1, 1], xlabel="Days", ylabel="Parameter Value", title="Parameter Dynamics Over Time for $(region_name)")
+    lines!(ax, t, β_values, color=:blue, label="β (Transmission Rate)", linewidth=2)
     return fig
 end
+
+save("/share/home2/olarinoyem/Project/Multivate-forecasting/images/ude/$(region_name)_beta_parameter_dynamics.pdf", fig)
 
 # Plot gamma
 fig = with_theme(theme_web()) do
-    fig = Figure(resolution = (1000, 700))
-    ax = CairoMakie.Axis(fig[1, 1], xlabel = "Days", ylabel = "Parameter Value", title = "Parameter Dynamics Over Time")
-    lines!(ax, t, γ_values, color = :green, label = "γ (Recovery Rate)", linewidth = 2)
+    fig = Figure(; size =(1000, 700))
+    ax = CairoMakie.Axis(fig[1, 1], xlabel="Days", ylabel="Parameter Value", title="Parameter Dynamics Over Time for $(region_name)")
+    lines!(ax, t, γ_values, color=:green, label="γ (Recovery Rate)", linewidth=2)
     return fig
 end
+
+save("/share/home2/olarinoyem/Project/Multivate-forecasting/images/ude/$(region_name)_gamma_parameter_dynamics.pdf", fig)
 
 # Plot rho
 fig = with_theme(theme_web()) do
-    fig = Figure(resolution = (1000, 700))
-    ax = CairoMakie.Axis(fig[1, 1], xlabel = "Days", ylabel = "Parameter Value", title = "Parameter Dynamics Over Time")
-    lines!(ax, t, δ_values, color = :red, label = "δ (Mortality Rate)", linewidth = 2)
+    fig = Figure(; size =(1000, 700))
+    ax = CairoMakie.Axis(fig[1, 1], xlabel="Days", ylabel="Parameter Value", title="Parameter Dynamics Over Time for $(region_name)")
+    lines!(ax, t, δ_values, color=:red, label="δ (Mortality Rate)", linewidth=2)
     return fig
 end
+
+save("/share/home2/olarinoyem/Project/Multivate-forecasting/images/ude/$(region_name)_rho_parameter_dynamics.pdf", fig)
 
 # Plot alpha
 fig = with_theme(theme_web()) do
-    fig = Figure(resolution = (1000, 700))
-    ax = CairoMakie.Axis(fig[1, 1], xlabel = "Days", ylabel = "Parameter Value", title = "Parameter Dynamics Over Time")
-    lines!(ax, t, α_values, color = :orange, label = "α (Incubation Rate)", linewidth = 2)
+    fig = Figure(; size =(1000, 700))
+    ax = CairoMakie.Axis(fig[1, 1], xlabel="Days", ylabel="Parameter Value", title="Parameter Dynamics Over Time for $(region_name)")
+    lines!(ax, t, α_values, color=:orange, label="α (Incubation Rate)", linewidth=2)
     return fig
 end
 
-
-
-# function plot_training_loss(losses)
-#     plot(losses, label="Loss", xlabel="Iterations", ylabel="Loss", title="Training Loss", linewidth=2, legend=:topleft)
-#     savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/training_loss1.pdf")
-# end
-
-# function plot_infection_data(t, infected_data, predicted_infected)
-#     p = bar(t, infected_data, label="I data", title="Infection_data Plot", color=:red, alpha=0.5)
-#     plot!(p, t, predicted_infected, label="I prediction", color=:red, linewidth=2)
-#     savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/plot_infection_data1.pdf")
-#     return p
-# end
-
-# function plot_death_data(t, death_data, predicted_death)
-#     p = bar(t, death_data, label="D data", title="death_data prediction plot", color=:blue, alpha=0.5)
-#     plot!(p, t, predicted_death, label="D prediction", color=:blue, linewidth=2)
-#     savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/plot_death_data2.pdf")
-#     return p
-# end
-
-# function plot_rt_values(t, Rt_values)
-#     p = plot(t, Rt_values, label="Rₜ", color=:black, ylabel="Rₜ", xlabel="Days", title="Effective Reproduction Number Rₜ Over Time", linewidth=2, legend=:topleft)
-#     hline!([1], linestyle=:dash, label="Threshold Rₜ=1")
-#     savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/Rt_values1.pdf")
-#     return p
-# end
-
-# # function plot_parameter_dynamics(t, β_values, γ_values, δ_values)
-# #     p = plot(t, β_values, label="β (Transmission Rate)", color=:blue, legend=:topright, xlabel="Time (days)", ylabel="Parameter Value", title="Parameter Dynamics Over Time")
-# #     plot!(p, t, γ_values, label="γ (Recovery Rate)", color=:green)
-# #     plot!(p, t, δ_values, label="δ (Mortality Rate)", color=:red)
-# #     plot!(p, t, α_values, label="α (Incubation Rate)", color=:orange)
-# #     savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/parameter_dynamics1.pdf")
-# #     return p
-# # end
-
-# function plot_beta(t, β_values)
-#     p = plot(t, β_values, label="β (Transmission Rate)", color=:blue, legend=:topright, xlabel="Time (days)", ylabel="Parameter Value", title="Parameter Dynamics Over Time")
-#     savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/beta_parameter_dynamics1.pdf")
-#     return p
-
-# end
-
-# function plot_gamma(t, γ_values)
-#     p = plot(t, γ_values, label="γ (Recovery Rate)", color=:green, legend=:topright, xlabel="Time (days)", ylabel="Parameter Value", title="Parameter Dynamics Over Time")
-#     savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/gamma_parameter_dynamics1.pdf")
-#     return p
-
-# end
-
-# function plot_rho(t, δ_values)
-#     p = plot(t, δ_values, label="δ (Mortality Rate)", color=:red, legend=:topright, xlabel="Time (days)", ylabel="Parameter Value", title="Parameter Dynamics Over Time")
-#     savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/rho_parameter_dynamics1.pdf")
-#     return p
-
-# end
-
-# function plot_alpha(t, α_values)
-#     p = plot(t, α_values, label="α (Incubation Rate)", color=:orange, legend=:topright, xlabel="Time (days)", ylabel="Parameter Value", title="Parameter Dynamics Over Time")
-#     savefig("/share/home2/olarinoyem/Project/Multivate-forecasting/images/alpha_parameter_dynamics1.pdf")
-#     return p
-
-# end
-
-# pl_loss = plot_training_loss(losses)
-# pl_infected = plot_infection_data(t, infected_data, predicted_data[3, :])
-# pl_death = plot_death_data(t, death_data, predicted_data[5, :])
-# pl_Rt = plot_rt_values(t, Rt_values)
-
-# pl_beta = plot_beta(t, β_values)
-# pl_gamma = plot_gamma(t, γ_values)
-# pl_rho = plot_rho(t, δ_values)
-# pl_alpha = plot_alpha(t, α_values)
-
-# final_plot = plot(pl_loss, pl_infected, pl_death, pl_Rt, pl_beta, pl_gamma, pl_rho, pl_alpha, layout=(4, 2), size=(1000, 800))
-
-# pl_parameters = plot_parameter_dynamics(t, β_values, γ_values, δ_values)
-
-# final_plot = plot(pl_loss, pl_infected, pl_death, pl_Rt, pl_parameters, layout=(3, 2), size=(1000, 800))
-# savefig(final_plot, "C:\\Users\\ajaoo\\Desktop\\Projects\\hospitalisation-PINN\reports\\figures\\SEIRD_UDE.png")
+save("/share/home2/olarinoyem/Project/Multivate-forecasting/images/ude/$(region_name)_alpha_parameter_dynamics.pdf", fig)

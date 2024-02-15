@@ -100,13 +100,12 @@ def load_and_preprocess_data(filepath):
 
 
 def get_region_name_from_filepath(filepath):
-    # Assuming the region's name is part of the filename like 'East Midlands.csv'
-    # This will extract 'East Midlands' from the full path
+
     base = os.path.basename(filepath)
     return os.path.splitext(base)[0]
 
 
-path = "../../data/region_daily_data/East of England.csv"
+path = "../../data/region_daily_data/West Midlands.csv"
 region_name = get_region_name_from_filepath(path)
 df = load_and_preprocess_data(f"../../data/region_daily_data/{region_name}.csv")
 
@@ -321,7 +320,7 @@ plt.plot(np.arange(1, len(history) + 1), np.log10(history), label="Train Loss")
 plt.xlabel("Epoch")
 plt.ylabel("Log10(Loss)")
 plt.title(f"Training History {region_name}")
-plt.savefig(f"../../images/Training_History_{region_name}.pdf")
+plt.savefig(f"../../images/PINN/Training_History_{region_name}.pdf")
 plt.legend()
 plt.show()
 
@@ -437,7 +436,7 @@ plt.xlabel("Days since: 2020-04-01")
 plt.ylabel("Population")
 plt.title(f"Susceptible: Predictions vs Actual Data {region_name}")
 plt.legend()
-plt.savefig(f"../../images/S_predictions_{region_name}.pdf")
+plt.savefig(f"../../images/PINN/S_predictions_{region_name}.pdf")
 plt.show()
 
 
@@ -451,7 +450,7 @@ plt.xlabel("Days since: 2020-04-01")
 plt.ylabel("Population")
 plt.title(f"Infected: Predictions vs Actual Data {region_name}")
 plt.legend()
-plt.savefig(f"../../images/I_predictions_{region_name}.pdf")
+plt.savefig(f"../../images/PINN/I_predictions_{region_name}.pdf")
 plt.show()
 
 
@@ -465,7 +464,7 @@ plt.xlabel("Days since: 2020-04-01")
 plt.ylabel("Population")
 plt.title(f"Recovered: Predictions vs Actual Data {region_name}")
 plt.legend()
-plt.savefig(f"../../images/R_predictions_{region_name}.pdf")
+plt.savefig(f"../../images/PINN/R_predictions_{region_name}.pdf")
 plt.show()
 
 
