@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.5) (preloaded format=pdflatex 2023.5.23)  15 FEB 2024 02:45
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.5) (preloaded format=pdflatex 2023.5.23)  15 FEB 2024 10:42
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -6,20 +6,19 @@ entering extended mode
 **c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex
 (c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex
 LaTeX2e <2022-11-01> patch level 1
-L3 programming layer <2023-05-15> (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/base\report.cls
-Document Class: report 2022/07/02 v1.4n Standard LaTeX document class
+L3 programming layer <2023-05-15> (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
+Document Class: article 2022/07/02 v1.4n Standard LaTeX document class
 (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/base\size12.clo
 File: size12.clo 2022/07/02 v1.4n Standard LaTeX file (size option)
 )
 \c@part=\count185
-\c@chapter=\count186
-\c@section=\count187
-\c@subsection=\count188
-\c@subsubsection=\count189
-\c@paragraph=\count190
-\c@subparagraph=\count191
-\c@figure=\count192
-\c@table=\count193
+\c@section=\count186
+\c@subsection=\count187
+\c@subsubsection=\count188
+\c@paragraph=\count189
+\c@subparagraph=\count190
+\c@figure=\count191
+\c@table=\count192
 \abovecaptionskip=\skip48
 \belowcaptionskip=\skip49
 \bibindent=\dimen140
@@ -62,14 +61,14 @@ Package: amsbsy 1999/11/29 v1.2d Bold Symbols
 ) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsopn.sty
 Package: amsopn 2022/04/08 v2.04 operator names
 )
-\inf@bad=\count194
+\inf@bad=\count193
 LaTeX Info: Redefining \frac on input line 234.
-\uproot@=\count195
-\leftroot@=\count196
+\uproot@=\count194
+\leftroot@=\count195
 LaTeX Info: Redefining \overline on input line 399.
 LaTeX Info: Redefining \colon on input line 410.
-\classnum@=\count197
-\DOTSCASE@=\count198
+\classnum@=\count196
+\DOTSCASE@=\count197
 LaTeX Info: Redefining \ldots on input line 496.
 LaTeX Info: Redefining \dots on input line 499.
 LaTeX Info: Redefining \cdots on input line 620.
@@ -82,20 +81,20 @@ LaTeX Info: Redefining \Bigg on input line 725.
 \big@size=\dimen145
 LaTeX Font Info:    Redeclaring font encoding OML on input line 743.
 LaTeX Font Info:    Redeclaring font encoding OMS on input line 744.
-\macc@depth=\count199
+\macc@depth=\count198
 LaTeX Info: Redefining \bmod on input line 905.
 LaTeX Info: Redefining \pmod on input line 910.
 LaTeX Info: Redefining \smash on input line 940.
 LaTeX Info: Redefining \relbar on input line 970.
 LaTeX Info: Redefining \Relbar on input line 971.
-\c@MaxMatrixCols=\count266
+\c@MaxMatrixCols=\count199
 \dotsspace@=\muskip16
-\c@parentequation=\count267
-\dspbrk@lvl=\count268
+\c@parentequation=\count266
+\dspbrk@lvl=\count267
 \tag@help=\toks20
-\row@=\count269
-\column@=\count270
-\maxfields@=\count271
+\row@=\count268
+\column@=\count269
+\maxfields@=\count270
 \andhelp@=\toks21
 \eqnshift@=\dimen146
 \alignsep@=\dimen147
@@ -122,7 +121,7 @@ Package: amssymb 2013/01/14 v3.01 AMS font symbols
 Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating environment
  (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/float\float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count272
+\c@float@type=\count271
 \float@exts=\toks24
 \float@box=\box53
 \@float@everytoks=\toks25
@@ -131,22 +130,22 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 Package: ifthen 2022/04/13 v1.1d Standard LaTeX ifthen package (DPC)
 )
 \@float@every@algorithm=\toks26
-\c@algorithm=\count273
+\c@algorithm=\count272
 ) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/algorithmicx\algpseudocode.sty
 Package: algpseudocode 
  (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/algorithmicx\algorithmicx.sty
 Package: algorithmicx 2005/04/27 v1.2 Algorithmicx
 
 Document Style algorithmicx 1.2 - a greatly improved `algorithmic' style
-\c@ALG@line=\count274
-\c@ALG@rem=\count275
-\c@ALG@nested=\count276
+\c@ALG@line=\count273
+\c@ALG@rem=\count274
+\c@ALG@nested=\count275
 \ALG@tlm=\skip53
 \ALG@thistlm=\skip54
-\c@ALG@Lnr=\count277
-\c@ALG@blocknr=\count278
-\c@ALG@storecount=\count279
-\c@ALG@tmpcounter=\count280
+\c@ALG@Lnr=\count276
+\c@ALG@blocknr=\count277
+\c@ALG@storecount=\count278
+\c@ALG@tmpcounter=\count279
 \ALG@tmplength=\skip55
 )
 Document Style - pseudocode environments for use with the `algorithmicx' style
@@ -169,12 +168,12 @@ Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
 \cmidrulesep=\dimen159
 \cmidrulekern=\dimen160
 \defaultaddspace=\dimen161
-\@cmidla=\count281
-\@cmidlb=\count282
+\@cmidla=\count280
+\@cmidlb=\count281
 \@aboverulesep=\dimen162
 \@belowrulesep=\dimen163
-\@thisruleclass=\count283
-\@lastruleclass=\count284
+\@thisruleclass=\count282
+\@lastruleclass=\count283
 \@thisrulewidth=\dimen164
 ) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/caption\caption.sty
 Package: caption 2023/03/12 v3.6j Customizing captions (AR)
@@ -190,10 +189,264 @@ Package: caption3 2023/03/12 v2.4 caption3 kernel (AR)
 \caption@hangindent=\dimen172
 Package caption Info: Standard document class detected.
 )
-\c@caption@flags=\count285
-\c@continuedfloat=\count286
+\c@caption@flags=\count284
+\c@continuedfloat=\count285
 Package caption Info: float package is loaded.
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.sty
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/pgf/frontendlayer\tikz.sty (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\pgf.sty (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgfrcs.sty (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfutil-common.tex
+\pgfutil@everybye=\toks27
+\pgfutil@tempdima=\dimen173
+\pgfutil@tempdimb=\dimen174
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfutil-latex.def
+\pgfutil@abb=\box55
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfrcs.code.tex (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf\pgf.revision.tex)
+Package: pgfrcs 2023-01-15 v3.1.10 (3.1.10)
+))
+Package: pgf 2023-01-15 v3.1.10 (3.1.10)
+ (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\pgfcore.sty (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/pgf/systemlayer\pgfsys.sty (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsys.code.tex
+Package: pgfsys 2023-01-15 v3.1.10 (3.1.10)
+ (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeys.code.tex
+\pgfkeys@pathtoks=\toks28
+\pgfkeys@temptoks=\toks29
+ (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeyslibraryfiltered.code.tex
+\pgfkeys@tmptoks=\toks30
+))
+\pgf@x=\dimen175
+\pgf@y=\dimen176
+\pgf@xa=\dimen177
+\pgf@ya=\dimen178
+\pgf@xb=\dimen179
+\pgf@yb=\dimen180
+\pgf@xc=\dimen181
+\pgf@yc=\dimen182
+\pgf@xd=\dimen183
+\pgf@yd=\dimen184
+\w@pgf@writea=\write3
+\r@pgf@reada=\read2
+\c@pgf@counta=\count286
+\c@pgf@countb=\count287
+\c@pgf@countc=\count288
+\c@pgf@countd=\count289
+\t@pgf@toka=\toks31
+\t@pgf@tokb=\toks32
+\t@pgf@tokc=\toks33
+\pgf@sys@id@count=\count290
+ (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgf.cfg
+File: pgf.cfg 2023-01-15 v3.1.10 (3.1.10)
+)
+Driver file for pgf: pgfsys-pdftex.def
+ (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsys-pdftex.def
+File: pgfsys-pdftex.def 2023-01-15 v3.1.10 (3.1.10)
+ (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsys-common-pdf.def
+File: pgfsys-common-pdf.def 2023-01-15 v3.1.10 (3.1.10)
+))) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsyssoftpath.code.tex
+File: pgfsyssoftpath.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfsyssoftpath@smallbuffer@items=\count291
+\pgfsyssoftpath@bigbuffer@items=\count292
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsysprotocol.code.tex
+File: pgfsysprotocol.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/xcolor\xcolor.sty
+Package: xcolor 2022/06/12 v2.14 LaTeX color extensions (UK)
+ (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: pdftex.def on input line 227.
+ (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/graphics\mathcolor.ltx)
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1353.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1357.
+Package xcolor Info: Model `RGB' extended on input line 1369.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1371.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1372.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1373.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1374.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1375.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1376.
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcore.code.tex
+Package: pgfcore 2023-01-15 v3.1.10 (3.1.10)
+ (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmath.code.tex (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathutil.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathparser.code.tex
+\pgfmath@dimen=\dimen185
+\pgfmath@count=\count293
+\pgfmath@box=\box56
+\pgfmath@toks=\toks34
+\pgfmath@stack@operand=\toks35
+\pgfmath@stack@operation=\toks36
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.basic.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.trigonometric.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.random.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.comparison.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.base.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.round.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.misc.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.integerarithmetics.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathcalc.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfloat.code.tex
+\c@pgfmathroundto@lastzeros=\count294
+)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfint.code.tex) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorepoints.code.tex
+File: pgfcorepoints.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@picminx=\dimen186
+\pgf@picmaxx=\dimen187
+\pgf@picminy=\dimen188
+\pgf@picmaxy=\dimen189
+\pgf@pathminx=\dimen190
+\pgf@pathmaxx=\dimen191
+\pgf@pathminy=\dimen192
+\pgf@pathmaxy=\dimen193
+\pgf@xx=\dimen194
+\pgf@xy=\dimen195
+\pgf@yx=\dimen196
+\pgf@yy=\dimen197
+\pgf@zx=\dimen198
+\pgf@zy=\dimen199
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorepathconstruct.code.tex
+File: pgfcorepathconstruct.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@path@lastx=\dimen256
+\pgf@path@lasty=\dimen257
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorepathusage.code.tex
+File: pgfcorepathusage.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@shorten@end@additional=\dimen258
+\pgf@shorten@start@additional=\dimen259
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorescopes.code.tex
+File: pgfcorescopes.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfpic=\box57
+\pgf@hbox=\box58
+\pgf@layerbox@main=\box59
+\pgf@picture@serial@count=\count295
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcoregraphicstate.code.tex
+File: pgfcoregraphicstate.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgflinewidth=\dimen260
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcoretransformations.code.tex
+File: pgfcoretransformations.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@pt@x=\dimen261
+\pgf@pt@y=\dimen262
+\pgf@pt@temp=\dimen263
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorequick.code.tex
+File: pgfcorequick.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcoreobjects.code.tex
+File: pgfcoreobjects.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorepathprocessing.code.tex
+File: pgfcorepathprocessing.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorearrows.code.tex
+File: pgfcorearrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfarrowsep=\dimen264
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcoreshade.code.tex
+File: pgfcoreshade.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@max=\dimen265
+\pgf@sys@shading@range@num=\count296
+\pgf@shadingcount=\count297
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcoreimage.code.tex
+File: pgfcoreimage.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcoreexternal.code.tex
+File: pgfcoreexternal.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfexternal@startupbox=\box60
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorelayers.code.tex
+File: pgfcorelayers.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcoretransparency.code.tex
+File: pgfcoretransparency.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorepatterns.code.tex
+File: pgfcorepatterns.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorerdf.code.tex
+File: pgfcorerdf.code.tex 2023-01-15 v3.1.10 (3.1.10)
+))) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmoduleshapes.code.tex
+File: pgfmoduleshapes.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfnodeparttextbox=\box61
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmoduleplot.code.tex
+File: pgfmoduleplot.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibility\pgfcomp-version-0-65.sty
+Package: pgfcomp-version-0-65 2023-01-15 v3.1.10 (3.1.10)
+\pgf@nodesepstart=\dimen266
+\pgf@nodesepend=\dimen267
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibility\pgfcomp-version-1-18.sty
+Package: pgfcomp-version-1-18 2023-01-15 v3.1.10 (3.1.10)
+)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgffor.sty (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgfkeys.sty (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeys.code.tex)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/pgf/math\pgfmath.sty (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmath.code.tex)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgffor.code.tex
+Package: pgffor 2023-01-15 v3.1.10 (3.1.10)
+\pgffor@iter=\dimen268
+\pgffor@skip=\dimen269
+\pgffor@stack=\toks37
+\pgffor@toks=\toks38
+)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz\tikz.code.tex
+Package: tikz 2023-01-15 v3.1.10 (3.1.10)
+ (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgflibraryplothandlers.code.tex
+File: pgflibraryplothandlers.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@plot@mark@count=\count298
+\pgfplotmarksize=\dimen270
+)
+\tikz@lastx=\dimen271
+\tikz@lasty=\dimen272
+\tikz@lastxsaved=\dimen273
+\tikz@lastysaved=\dimen274
+\tikz@lastmovetox=\dimen275
+\tikz@lastmovetoy=\dimen276
+\tikzleveldistance=\dimen277
+\tikzsiblingdistance=\dimen278
+\tikz@figbox=\box62
+\tikz@figbox@bg=\box63
+\tikz@tempbox=\box64
+\tikz@tempbox@bg=\box65
+\tikztreelevel=\count299
+\tikznumberofchildren=\count300
+\tikznumberofcurrentchild=\count301
+\tikz@fig@count=\count302
+ (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodulematrix.code.tex
+File: pgfmodulematrix.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfmatrixcurrentrow=\count303
+\pgfmatrixcurrentcolumn=\count304
+\pgf@matrix@numberofcolumns=\count305
+)
+\tikz@expandcount=\count306
+ (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibrarytopaths.code.tex
+File: tikzlibrarytopaths.code.tex 2023-01-15 v3.1.10 (3.1.10)
+))) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibraryshapes.code.tex
+File: tikzlibraryshapes.code.tex 2023-01-15 v3.1.10 (3.1.10)
+ (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibraryshapes.geometric.code.tex
+File: tikzlibraryshapes.geometric.code.tex 2023-01-15 v3.1.10 (3.1.10)
+ (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/shapes\pgflibraryshapes.geometric.code.tex
+File: pgflibraryshapes.geometric.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibraryshapes.misc.code.tex
+File: tikzlibraryshapes.misc.code.tex 2023-01-15 v3.1.10 (3.1.10)
+ (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/shapes\pgflibraryshapes.misc.code.tex
+File: pgflibraryshapes.misc.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibraryshapes.symbols.code.tex
+File: tikzlibraryshapes.symbols.code.tex 2023-01-15 v3.1.10 (3.1.10)
+ (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/shapes\pgflibraryshapes.symbols.code.tex
+File: pgflibraryshapes.symbols.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibraryshapes.arrows.code.tex
+File: tikzlibraryshapes.arrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
+ (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/shapes\pgflibraryshapes.arrows.code.tex
+File: pgflibraryshapes.arrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibraryshapes.callouts.code.tex (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/shapes\pgflibraryshapes.callouts.code.tex)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibraryshapes.multipart.code.tex
+File: tikzlibraryshapes.multipart.code.tex 2023-01-15 v3.1.10 (3.1.10)
+ (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/shapes\pgflibraryshapes.multipart.code.tex
+File: pgflibraryshapes.multipart.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfnodepartlowerbox=\box66
+\pgfnodeparttwobox=\box67
+\pgfnodepartthreebox=\box68
+\pgfnodepartfourbox=\box69
+\pgfnodeparttwentybox=\box70
+\pgfnodepartnineteenbox=\box71
+\pgfnodeparteighteenbox=\box72
+\pgfnodepartseventeenbox=\box73
+\pgfnodepartsixteenbox=\box74
+\pgfnodepartfifteenbox=\box75
+\pgfnodepartfourteenbox=\box76
+\pgfnodepartthirteenbox=\box77
+\pgfnodeparttwelvebox=\box78
+\pgfnodepartelevenbox=\box79
+\pgfnodeparttenbox=\box80
+\pgfnodepartninebox=\box81
+\pgfnodeparteightbox=\box82
+\pgfnodepartsevenbox=\box83
+\pgfnodepartsixbox=\box84
+\pgfnodepartfivebox=\box85
+))) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgflibraryarrows.meta.code.tex
+File: pgflibraryarrows.meta.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfarrowinset=\dimen279
+\pgfarrowlength=\dimen280
+\pgfarrowwidth=\dimen281
+\pgfarrowlinewidth=\dimen282
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibrarypositioning.code.tex
+File: tikzlibrarypositioning.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibrarydecorations.pathreplacing.code.tex (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibrarydecorations.code.tex (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmoduledecorations.code.tex
+\pgfdecoratedcompleteddistance=\dimen283
+\pgfdecoratedremainingdistance=\dimen284
+\pgfdecoratedinputsegmentcompleteddistance=\dimen285
+\pgfdecoratedinputsegmentremainingdistance=\dimen286
+\pgf@decorate@distancetomove=\dimen287
+\pgf@decorate@repeatstate=\count307
+\pgfdecorationsegmentamplitude=\dimen288
+\pgfdecorationsegmentlength=\dimen289
+)
+\tikz@lib@dec@box=\box86
+) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries/decorations\pgflibrarydecorations.pathreplacing.code.tex)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.sty
 Package: hyperref 2023-04-22 v7.00x Hypertext links for LaTeX
  (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcmds.sty
 Package: ltxcmds 2020-05-10 v1.25 LaTeX kernel commands for general use (HO)
@@ -221,21 +474,22 @@ Package: letltxmacro 2019/12/03 v1.6 Let assignment for LaTeX macros (HO)
 Package: auxhook 2019-12-17 v1.6 Hooks for auxiliary files (HO)
 ) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
 Package: nameref 2022-05-17 v2.50 Cross-referencing by name of section
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty
+
+(C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty
 Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
 ) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/gettitlestring\gettitlestring.sty
 Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
  (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/kvoptions\kvoptions.sty
 Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
 ))
-\c@section@level=\count287
+\c@section@level=\count308
 ) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.sty
 Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
-\etb@tempcnta=\count288
+\etb@tempcnta=\count309
 )
-\@linkdim=\dimen173
-\Hy@linkcounter=\count289
-\Hy@pagecounter=\count290
+\@linkdim=\dimen290
+\Hy@linkcounter=\count310
+\Hy@pagecounter=\count311
  (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.def
 File: pd1enc.def 2023-04-22 v7.00x Hyperref: PDFDocEncoding definition (HO)
 Now handling font encoding PD1 ...
@@ -243,7 +497,7 @@ Now handling font encoding PD1 ...
 ) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/intcalc\intcalc.sty
 Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
 )
-\Hy@SavedSpaceFactor=\count291
+\Hy@SavedSpaceFactor=\count312
  (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\puenc.def
 File: puenc.def 2023-04-22 v7.00x Hyperref: PDF Unicode definition (HO)
 Now handling font encoding PU ...
@@ -257,17 +511,17 @@ Package hyperref Info: Plain pages OFF on input line 4197.
 Package hyperref Info: Backreferencing OFF on input line 4202.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4449.
-\c@Hy@tempcnt=\count292
+\c@Hy@tempcnt=\count313
 LaTeX Info: Redefining \url on input line 4787.
-\XeTeXLinkMargin=\dimen174
+\XeTeXLinkMargin=\dimen291
  (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/bitset\bitset.sty
 Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
  (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/bigintcalc\bigintcalc.sty
 Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO)
 ))
-\Fld@menulength=\count293
-\Field@Width=\dimen175
-\Fld@charsize=\dimen176
+\Fld@menulength=\count314
+\Field@Width=\dimen292
+\Fld@charsize=\dimen293
 Package hyperref Info: Hyper figures OFF on input line 6066.
 Package hyperref Info: Link nesting OFF on input line 6071.
 Package hyperref Info: Hyper index ON on input line 6074.
@@ -279,9 +533,9 @@ Package hyperref Info: PDF/A mode OFF on input line 6096.
 Package: atbegshi-ltx 2021/01/10 v1.0c Emulation of the original atbegshi
 package with kernel methods
 )
-\Hy@abspage=\count294
-\c@Item=\count295
-\c@Hfootnote=\count296
+\Hy@abspage=\count315
+\c@Item=\count316
+\c@Hfootnote=\count317
 )
 Package hyperref Info: Driver (autodetected): hpdftex.
  (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hpdftex.def
@@ -290,8 +544,8 @@ File: hpdftex.def 2023-04-22 v7.00x Hyperref driver for pdfTeX
 Package: atveryend-ltx 2020/08/19 v1.0a Emulation of the original atveryend package
 with kernel methods
 )
-\Fld@listcount=\count297
-\c@bookmark@seq@number=\count298
+\Fld@listcount=\count318
+\c@bookmark@seq@number=\count319
  (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/rerunfilecheck\rerunfilecheck.sty
 Package: rerunfilecheck 2022-07-10 v1.10 Rerun checks for auxiliary files (HO)
  (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/uniquecounter\uniquecounter.sty
@@ -300,78 +554,61 @@ Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 285.
 )
 \Hy@SectionHShift=\skip56
-) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/xcolor\xcolor.sty
-Package: xcolor 2022/06/12 v2.14 LaTeX color extensions (UK)
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\color.cfg
-File: color.cfg 2016/01/02 v1.6 sample color configuration
-)
-Package xcolor Info: Driver file: pdftex.def on input line 227.
- (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/graphics\mathcolor.ltx)
-Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1353.
-Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1357.
-Package xcolor Info: Model `RGB' extended on input line 1369.
-Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1371.
-Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1372.
-Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1373.
-Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1374.
-Package xcolor Info: Model `Gray' substituted by `gray' on input line 1375.
-Package xcolor Info: Model `wave' substituted by `hsb' on input line 1376.
 ) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.sty
 Package: geometry 2020/01/02 v5.9 Page Geometry
  (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifvtex.sty
 Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 )
-\Gm@cnth=\count299
-\Gm@cntv=\count300
-\c@Gm@tempcnt=\count301
-\Gm@bindingoffset=\dimen177
-\Gm@wd@mp=\dimen178
-\Gm@odd@mp=\dimen179
-\Gm@even@mp=\dimen180
-\Gm@layoutwidth=\dimen181
-\Gm@layoutheight=\dimen182
-\Gm@layouthoffset=\dimen183
-\Gm@layoutvoffset=\dimen184
-\Gm@dimlist=\toks27
+\Gm@cnth=\count320
+\Gm@cntv=\count321
+\c@Gm@tempcnt=\count322
+\Gm@bindingoffset=\dimen294
+\Gm@wd@mp=\dimen295
+\Gm@odd@mp=\dimen296
+\Gm@even@mp=\dimen297
+\Gm@layoutwidth=\dimen298
+\Gm@layoutheight=\dimen299
+\Gm@layouthoffset=\dimen300
+\Gm@layoutvoffset=\dimen301
+\Gm@dimlist=\toks39
  (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.cfg)) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdftex.def
 File: l3backend-pdftex.def 2023-04-19 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count302
-\l__pdf_internal_box=\box55
-)
-No file main.aux.
+\l__color_backend_stack_int=\count323
+\l__pdf_internal_box=\box87
+) (main.aux)
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-(C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mkii
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 29.
+LaTeX Font Info:    ... okay on input line 29.
+ (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count303
-\scratchdimen=\dimen185
-\scratchbox=\box56
-\nofMPsegments=\count304
-\nofMParguments=\count305
-\everyMPshowfont=\toks28
-\MPscratchCnt=\count306
-\MPscratchDim=\dimen186
-\MPnumerator=\count307
-\makeMPintoPDFobject=\count308
-\everyMPtoPDFconversion=\toks29
+\scratchcounter=\count324
+\scratchdimen=\dimen302
+\scratchbox=\box88
+\nofMPsegments=\count325
+\nofMParguments=\count326
+\everyMPshowfont=\toks40
+\MPscratchCnt=\count327
+\MPscratchDim=\dimen303
+\MPnumerator=\count328
+\makeMPintoPDFobject=\count329
+\everyMPtoPDFconversion=\toks41
 ) (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
@@ -381,16 +618,17 @@ File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: hyperref package is loaded.
 Package caption Info: End \AtBeginDocument code.
-Package hyperref Info: Link coloring ON on input line 23.
-\@outlinefile=\write3
-\openout3 = `main.out'.
+Package hyperref Info: Link coloring ON on input line 29.
+ (main.out) (main.out)
+\@outlinefile=\write4
+\openout4 = `main.out'.
 
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
 *geometry* verbose mode - [ preamble ] result:
 * driver: pdftex
-* paper: letterpaper
+* paper: <default>
 * layout: <same size as paper>
 * layoutoffset:(h,v)=(0.0pt,0.0pt)
 * modes: 
@@ -420,643 +658,86 @@ Package hyperref Info: Link coloring ON on input line 23.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-LaTeX Font Info:    Trying to load font information for U+msa on input line 26.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 32.
 (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 26.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 32.
  (C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-) [1
+)
+
+LaTeX Warning: Citation `forman202012' on page 1 undefined on input line 39.
+
+
+LaTeX Warning: Citation `emanuel2020fair' on page 1 undefined on input line 39.
+
+
+LaTeX Warning: Citation `jiang2019emergency' on page 1 undefined on input line 39.
+
+
+LaTeX Warning: Citation `ehmann2021operational' on page 1 undefined on input line 39.
+
+
+LaTeX Warning: Citation `zaric2001resource' on page 1 undefined on input line 39.
+
+
+LaTeX Warning: Citation `brandeau2004allocating' on page 1 undefined on input line 39.
+
+[1
 
 {C:/Users/ajaoo/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}]
-Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on input line 29.
 
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:63: Undefined control sequence.
-<recently read> \bm 
-                    
-l.63 \Require Training data tensors $\bm
-                                        {S}_{data}$, $\bm{I}_{data}$, $\bm{R...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+LaTeX Warning: Citation `kermack1927contribution' on page 2 undefined on input line 53.
 
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:63: Undefined control sequence.
-<recently read> \bm 
-                    
-l.63 ...raining data tensors $\bm{S}_{data}$, $\bm
-                                                  {I}_{data}$, $\bm{R}_{data...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+[2]
+c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:61: Misplaced alignment tab character &.
+l.61 \frac{dS}{dt} &
+                    = -\beta \frac{SI}{N}, \\
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
 
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:63: Undefined control sequence.
-<recently read> \bm 
-                    
-l.63 ...ors $\bm{S}_{data}$, $\bm{I}_{data}$, $\bm
-                                                  {R}_{data}$, time tensor $...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:62: Misplaced alignment tab character &.
+l.62 \frac{dI}{dt} &
+                    = \beta \frac{SI}{N} - \gamma I, \\
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
 
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:63: Undefined control sequence.
-<recently read> \bm 
-                    
-l.63 ...{data}$, $\bm{R}_{data}$, time tensor $\bm
-                                                  {t}_{data}$, population si...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:63: Misplaced alignment tab character &.
+l.63 \frac{dR}{dt} &
+                    = \gamma I,
+I can't figure out why you would want to use a tab mark
+here. If you just want an ampersand, the remedy is
+simple: Just type `I\&' now. But if some right brace
+up above has ended a previous alignment prematurely,
+you're probably due for more error messages, and you
+might try typing `S' now just to see what is salvageable.
 
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:65: Undefined control sequence.
-<recently read> \bm 
-                    
-l.65 \State Initialize PINN $NN$ with weights $\bm
-                                                  {w}$ and biases $\bm{b}$ u...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:71: Misplaced \noalign.
+\midrule ->\noalign 
+                    {\ifnum 0=`}\fi \@aboverulesep =\aboverulesep \global \@...
+l.71     \midrule
+                 
+I expect to see \noalign only after the \cr of
+an alignment. Proceed, and I'll ignore this case.
 
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:65: Undefined control sequence.
-<recently read> \bm 
-                    
-l.65 ...$NN$ with weights $\bm{w}$ and biases $\bm
-                                                  {b}$ using Xavier initiali...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
+c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:72: Missing } inserted.
+<inserted text> 
+                }
+l.72     $
+          \beta$ & Transmission rate \
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
 
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:71: Undefined control sequence.
-<recently read> \bm 
-                    
-l.71     \State Compute predictions $\bm
-                                        {S}_{pred}$, $\bm{I}_{pred}$, $\bm{R...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:71: Undefined control sequence.
-<recently read> \bm 
-                    
-l.71 ... Compute predictions $\bm{S}_{pred}$, $\bm
-                                                  {I}_{pred}$, $\bm{R}_{pred...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:71: Undefined control sequence.
-<recently read> \bm 
-                    
-l.71 ...ons $\bm{S}_{pred}$, $\bm{I}_{pred}$, $\bm
-                                                  {R}_{pred}$ from $NN(\bm{t...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:71: Undefined control sequence.
-l.71 ...m{I}_{pred}$, $\bm{R}_{pred}$ from $NN(\bm
-                                                  {t}_{data})$.
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:72: Undefined control sequence.
-<argument> d\bm 
-                {S}_{pred}
-l.72 ...mpute gradients $\frac{d\bm{S}_{pred}}{dt}
-                                                  $, $\frac{d\bm{I}_{pred}}{...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:72: Undefined control sequence.
-<argument> d\bm 
-                {I}_{pred}
-l.72 ...}_{pred}}{dt}$, $\frac{d\bm{I}_{pred}}{dt}
-                                                  $, $\frac{d\bm{R}_{pred}}{...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:72: Undefined control sequence.
-<argument> d\bm 
-                {R}_{pred}
-l.72 ...}_{pred}}{dt}$, $\frac{d\bm{R}_{pred}}{dt}
-                                                  $ with respect to $\bm{t}_...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:72: Undefined control sequence.
-<recently read> \bm 
-                    
-l.72 ...{d\bm{R}_{pred}}{dt}$ with respect to $\bm
-                                                  {t}_{data}$ using automati...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> ... \sum _{i=1}^{q} \left [ \left (\bm 
-                                                  {S}_{i} - \bm {S}_{pred_i}...
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> ...q} \left [ \left (\bm {S}_{i} - \bm 
-                                                  {S}_{pred_i}\right )^2 + \...
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> ...{S}_{pred_i}\right )^2 + \left (\bm 
-                                                  {I}_{i} - \bm {I}_{pred_i}...
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> ...ight )^2 + \left (\bm {I}_{i} - \bm 
-                                                  {I}_{pred_i}\right )^2 + \...
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> ...{I}_{pred_i}\right )^2 + \left (\bm 
-                                                  {R}_{i} - \bm {R}_{pred_i}...
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> ...ight )^2 + \left (\bm {R}_{i} - \bm 
-                                                  {R}_{pred_i}\right )^2 \ri...
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> d\bm 
-                {S}_{pred_i}
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> \bm 
-               {S}_{pred_i} \bm {I}_{pred_i}
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> \bm {S}_{pred_i} \bm 
-                                {I}_{pred_i}
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> d\bm 
-                {I}_{pred_i}
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> \bm 
-               {S}_{pred_i} \bm {I}_{pred_i}
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> \bm {S}_{pred_i} \bm 
-                                {I}_{pred_i}
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> ...} \bm {I}_{pred_i}}{N} + \gamma \bm 
-                                                  {I}_{pred_i}\right )^2 + \...
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> d\bm 
-                {R}_{pred_i}
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> ...d\bm {R}_{pred_i}}{dt} - \gamma \bm 
-                                                  {I}_{pred_i}\right )^2 \ri...
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> ... \sum _{i=1}^{q} \left [ \left (\bm 
-                                                  {S}_{i} - \bm {S}_{pred_i}...
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> ...q} \left [ \left (\bm {S}_{i} - \bm 
-                                                  {S}_{pred_i}\right )^2 + \...
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> ...{S}_{pred_i}\right )^2 + \left (\bm 
-                                                  {I}_{i} - \bm {I}_{pred_i}...
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> ...ight )^2 + \left (\bm {I}_{i} - \bm 
-                                                  {I}_{pred_i}\right )^2 + \...
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> ...{I}_{pred_i}\right )^2 + \left (\bm 
-                                                  {R}_{i} - \bm {R}_{pred_i}...
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> ...ight )^2 + \left (\bm {R}_{i} - \bm 
-                                                  {R}_{pred_i}\right )^2 \ri...
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> d\bm 
-                {S}_{pred_i}
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> \bm 
-               {S}_{pred_i} \bm {I}_{pred_i}
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> \bm {S}_{pred_i} \bm 
-                                {I}_{pred_i}
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> d\bm 
-                {I}_{pred_i}
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> \bm 
-               {S}_{pred_i} \bm {I}_{pred_i}
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> \bm {S}_{pred_i} \bm 
-                                {I}_{pred_i}
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> ...} \bm {I}_{pred_i}}{N} + \gamma \bm 
-                                                  {I}_{pred_i}\right )^2 + \...
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> d\bm 
-                {R}_{pred_i}
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:85: Undefined control sequence.
-<argument> ...d\bm {R}_{pred_i}}{dt} - \gamma \bm 
-                                                  {I}_{pred_i}\right )^2 \ri...
-l.85     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-
-Overfull \hbox (132.3353pt too wide) detected at line 85
-[]
- []
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:90: Undefined control sequence.
-<argument>  Reg_{L2} = \lambda _{reg} \sum _{\bm 
-                                                 {w}} \|\bm {w}\|^{p_{reg}}. 
-l.90     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:90: Undefined control sequence.
-<argument> ...lambda _{reg} \sum _{\bm {w}} \|\bm 
-                                                  {w}\|^{p_{reg}}. 
-l.90     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:90: Undefined control sequence.
-<argument>  Reg_{L2} = \lambda _{reg} \sum _{\bm 
-                                                 {w}} \|\bm {w}\|^{p_{reg}}. 
-l.90     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:90: Undefined control sequence.
-<argument> ...lambda _{reg} \sum _{\bm {w}} \|\bm 
-                                                  {w}\|^{p_{reg}}. 
-l.90     \end{align*}
-                     
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-
-LaTeX Warning: Float too large for page by 27.53828pt on input line 111.
-
-
-Overfull \hbox (57.12059pt too wide) in paragraph at lines 262--273
-\OT1/cmr/m/n/12 is the num-ber of re-cov-ered in-di-vid-u-als, and $\OML/cmm/m/it/12 N$ \OT1/cmr/m/n/12 is the to-tal pop-u-la-tion. []
- []
-
-
-pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has been already used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.273 \begin{align}
-                    [1] [2] [3] [4] [5]
-<images/weekly_icu_beds_occupancy.pdf, id=52, 1084.05pt x 578.16pt>
-File: images/weekly_icu_beds_occupancy.pdf Graphic file (type pdf)
-<use images/weekly_icu_beds_occupancy.pdf>
-Package pdftex.def Info: images/weekly_icu_beds_occupancy.pdf  used on input line 297.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
-<images/new_confirmed_per_100k.pdf, id=53, 1084.05pt x 578.16pt>
-File: images/new_confirmed_per_100k.pdf Graphic file (type pdf)
-<use images/new_confirmed_per_100k.pdf>
-Package pdftex.def Info: images/new_confirmed_per_100k.pdf  used on input line 305.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
-<images/pinn/I_predictions_East Midlands.pdf, id=54, 1084.05pt x 578.16pt>
-File: images/pinn/I_predictions_East Midlands.pdf Graphic file (type pdf)
-<use images/pinn/I_predictions_East Midlands.pdf>
-Package pdftex.def Info: images/pinn/I_predictions_East Midlands.pdf  used on input line 312.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
-<images/pinn/R_predictions_East Midlands.pdf, id=55, 1084.05pt x 578.16pt>
-File: images/pinn/R_predictions_East Midlands.pdf Graphic file (type pdf)
-<use images/pinn/R_predictions_East Midlands.pdf>
-Package pdftex.def Info: images/pinn/R_predictions_East Midlands.pdf  used on input line 319.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
-<images/pinn/Training_History_East Midlands.pdf, id=56, 1084.05pt x 578.16pt>
-File: images/pinn/Training_History_East Midlands.pdf Graphic file (type pdf)
-<use images/pinn/Training_History_East Midlands.pdf>
-Package pdftex.def Info: images/pinn/Training_History_East Midlands.pdf  used on input line 326.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
-<images/pinn/I_predictions_East of England.pdf, id=57, 1084.05pt x 578.16pt>
-File: images/pinn/I_predictions_East of England.pdf Graphic file (type pdf)
-<use images/pinn/I_predictions_East of England.pdf>
-Package pdftex.def Info: images/pinn/I_predictions_East of England.pdf  used on input line 333.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
-<images/pinn/R_predictions_East of England.pdf, id=58, 1084.05pt x 578.16pt>
-File: images/pinn/R_predictions_East of England.pdf Graphic file (type pdf)
-<use images/pinn/R_predictions_East of England.pdf>
-Package pdftex.def Info: images/pinn/R_predictions_East of England.pdf  used on input line 340.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
-<images/pinn/Training_History_East of England.pdf, id=59, 1084.05pt x 578.16pt>
-File: images/pinn/Training_History_East of England.pdf Graphic file (type pdf)
-<use images/pinn/Training_History_East of England.pdf>
-Package pdftex.def Info: images/pinn/Training_History_East of England.pdf  used on input line 347.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
-<images/pinn/I_predictions_London Region.pdf, id=60, 1084.05pt x 578.16pt>
-File: images/pinn/I_predictions_London Region.pdf Graphic file (type pdf)
-<use images/pinn/I_predictions_London Region.pdf>
-Package pdftex.def Info: images/pinn/I_predictions_London Region.pdf  used on input line 354.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
-<images/pinn/R_predictions_London Region.pdf, id=61, 1084.05pt x 578.16pt>
-File: images/pinn/R_predictions_London Region.pdf Graphic file (type pdf)
-<use images/pinn/R_predictions_London Region.pdf>
-Package pdftex.def Info: images/pinn/R_predictions_London Region.pdf  used on input line 361.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
-<images/pinn/Training_History_London Region.pdf, id=62, 1084.05pt x 578.16pt>
-File: images/pinn/Training_History_London Region.pdf Graphic file (type pdf)
-<use images/pinn/Training_History_London Region.pdf>
-Package pdftex.def Info: images/pinn/Training_History_London Region.pdf  used on input line 368.
-(pdftex.def)             Requested size: 375.80544pt x 200.427pt.
- (main.bbl) [6 <./images/weekly_icu_beds_occupancy.pdf>] [7 <./images/new_confirmed_per_100k.pdf> <./images/pinn/I_predictions_East Midlands.pdf>] [8 <./images/pinn/R_predictions_East Midlands.pdf> <./images/pinn/Training_History_East Midlands.pdf>] [9 <./images/pinn/I_predictions_East of England.pdf> <./images/pinn/R_predictions_East of England.pdf>] [10 <./images/pinn/Training_History_East of England.pdf> <./images/pinn/I_predictions_London Region.pdf>] [11 <./images/pinn/R_predictions_London Region.pdf> <./images/pinn/Training_History_London Region.pdf>] (main.aux)
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
-
-Package rerunfilecheck Warning: File `main.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `main.out':
-(rerunfilecheck)             Before: <no file>
-(rerunfilecheck)             After:  2036DD5F4B759807B8F13C4D6FEFE5D3;60.
- ) 
-Here is how much of TeX's memory you used:
- 13042 strings out of 476411
- 212022 string characters out of 5789134
- 1903845 words of memory out of 5000000
- 33191 multiletter control sequences out of 15000+600000
- 521665 words of font info for 68 fonts, out of 8000000 for 9000
- 1141 hyphenation exceptions out of 8191
- 75i,13n,76p,457b,473s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx8.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmcsc10.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on main.pdf (12 pages, 515442 bytes).
-PDF statistics:
- 605 PDF objects out of 1000 (max. 8388607)
- 39 named destinations out of 1000 (max. 500000)
- 56 words of extra memory for PDF output out of 10000 (max. 10000000)
-
+c:/Users/ajaoo/Desktop/Projects/Multivate-forecasting/PRP3/main.tex:72: Missing } i

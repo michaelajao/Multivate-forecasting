@@ -1,4 +1,4 @@
-\documentclass[12pt, letterpaper]{report}
+\documentclass[12pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx} % Required for inserting images
 \usepackage{amsmath,amsfonts,amssymb}
@@ -9,22 +9,143 @@
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{caption}
+\usepackage{tikz}
+\usetikzlibrary{shapes, arrows.meta, positioning, decorations.pathreplacing}
 \usepackage[colorlinks]{hyperref}
 \usepackage{xcolor}
 \usepackage[margin=1in]{geometry}
 
 \setlength{\parskip}{1em}
 \setlength{\parindent}{0em}
+\setcounter{page}{1}
 
-\title{Efficient algorithms for infectious disease resource allocation model}
-\author{Michael Ajao-olarinoye}
-\date{April 2023}
+\title{Modeling Regional Infectious Disease Spread with Physics-Informed Neural Networks: A Study on COVID-19 Dynamics}
+\author{Michael Ajao-olarinoye \\
+    center for computational science and mathematical modelling \\
+    coventry university \\
+    \url{olarinoyem@coventry.ac.uk}}
+\date{}
 
 \begin{document}
 
 \maketitle
 
-\section{new}
+\begin{abstract}
+    The COVID-19 pandemic has presented numerous challenges to healthcare systems globally, particularly in managing the demand for critical resources such as mechanical ventilators. Accurate forecasting of ventilator demand is paramount to ensure effective resource allocation and preparedness. This study employs a novel approach by integrating Universal Differential Equations (UDE) within a SEIR-based epidemiological model to forecast the demand for mechanical ventilators in England using real-world COVID-19 data. Our model uniquely blends data-driven machine learning components with traditional epidemiological modeling, allowing for a nuanced understanding of disease transmission dynamics and healthcare resource utilization. Utilizing data on daily case counts, hospital admissions, and mechanical ventilator usage over time, we trained neural network components to estimate key parameters dynamically. Our results indicate that the UDE-based model provides robust short-term forecasts of ventilator demand, aiding in timely resource allocation and policy interventions. This approach showcases the potential of hybrid modeling techniques in enhancing healthcare system preparedness and response during public health crises.
+\end{abstract}
+
+\section{Introduction}
+
+The virus SARS-COV-2 causes COVID-19, a severe respiratory disease with a high mortality rate that has triggered a global pandemic \cite{forman202012}. The disease have affected more than 210 countries and territories, infecting hundreds of millions of people and killing millions. COVID-19 poses a complex and unprecedented challenge for public health and society, requiring scientific efforts to understand, model, diagnose and control the virus and disease. The COVID-19 pandemic has strained healthcare systems worldwide, requiring effective resource allocation and intervention strategies to mitigate the virus's impact \cite{emanuel2020fair}. Resource allocation is the process of distributing and allocating resources, which can include financial and non-financial assets, to achieve specific objectives or goals \cite{jiang2019emergency}. Resource allocation interventions for the COVID-19 pandemic can be divided into pharmaceutical and non-pharmaceutical interventions \cite{ehmann2021operational}. For instance, in healthcare systems, resource allocation may include both pharmaceutical resources, such as medications and vaccines, and non-pharmaceutical resources, such as ICU beds, medical equipment and personnel, to ensure effective and efficient delivery of healthcare services \cite{zaric2001resource, brandeau2004allocating}. Current studies often focus on the allocation of a single type of resource, such as pharmaceutical or non-pharmaceutical resources. However, in reality, resource allocation often involves multiple types of resources that are interrelated and have different allocation principles. Epidemiological modelling and resource demand forecasting are essential for informing resource allocation decisions. These models use data on various factors, such as disease prevalence, population demographics, and healthcare capacity, to predict the demand for different types of resources.
+
+These will help in developing strategies for disease prevention and control, as well as sustainable public health policies and economic activity guidelines. Mathematical models have always been useful in understanding the transmission mechanisms of a disease outbreak and providing valuable insights for controlling it. 
+
+There are different ways to model infectious diseases like covid-19. One way is to count the number of people who are infected, recovered, dead, or susceptible in an epidemic. This is called the compartmental model, and it is the most popular mathematical model that researchers use to study the disease. The compartmental model can be either deterministic or stochastic. Deterministic models can simulate a general scenario of how the disease spreads. Stochastic models can simulate how the disease spreads in small or sub-grouped populations, or predict the possible outcomes. Other mathematical models have also been used to describe infectious disease, such as in
+
+\section{literature review}
+
+
+
+
+\section{Methodology}
+This section describes the methodology used in this study. It includes the data collection, data preprocessing, model development, and model evaluation.
+\subsection{mathematical modeling of infectious disease}
+In the context of the COVID-19 pandemic, accurate epidemiological modelling and resource demand forecasting play a crucial role in informing healthcare professionals and governments on how to effectively manage the overburdened healthcare systems. The use of predictive models has been crucial in the context of the COVID-19 pandemic, aiding healthcare professionals and governments in effectively managing the overburdened healthcare systems. The most common model is the Susceptible-Infectious-Removed (SIR) epidemic model. It was proposed by Kermack-Mckendrick in 1927 \cite{kermack1927contribution}. 
+
+\subsection{SIR and SEIRD models}
+The SIR and SEIRD models are pivotal in understanding the dynamics of infectious diseases, such as COVID-19, providing insights into how diseases spread and recede within populations. These models help in predicting the number of individuals affected by a disease over time and are crucial for public health planning and intervention strategies.
+
+The SIR model compartmentalizes the population into three categories: Susceptible (S), Infectious (I), and Recovered (R) individuals. The transitions between these categories are governed by a set of ordinary differential equations (ODEs) as follows:
+
+\begin{equation}
+\frac{dS}{dt} &= -\beta \frac{SI}{N}, \\
+\frac{dI}{dt} &= \beta \frac{SI}{N} - \gamma I, \\
+\frac{dR}{dt} &= \gamma I,
+\end{equation}
+
+where $S$ represents the number of susceptible individuals who are not yet infected but can be, $I$ denotes the number of infectious individuals who can transmit the disease to susceptible individuals and recover, and $R$ represents the number of recovered individuals who are immune to the disease. The parameters $\beta$ and $\gamma$ represent the transmission rate and recovery rate, respectively. The total population size is denoted by $N = S + I + R$. The SIR model is a simple and effective tool for understanding the dynamics of infectious diseases and has been widely used to model the spread of various diseases, including COVID-19.
+
+\begin{tabular}{ll}
+    \toprule
+    \textbf{Parameter} & \textbf{Definition} \
+    \midrule
+    $\beta$ & Transmission rate \
+    $\gamma$ & Recovery rate \
+    \bottomrule
+\end{tabular}
+    
+The SIR model is fundamental in epidemiology for its simplicity and effectiveness in capturing the basic dynamics of disease spread. However, it assumes lifelong immunity post-recovery, which may not apply to all diseases, including COVID-19.
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[node distance=2cm, auto, thick]
+        % Define block styles
+        \tikzstyle{block} = [rectangle, draw=blue!60, fill=blue!5, very thick, minimum size=1cm, text centered]
+        \tikzstyle{line} = [draw, -{Latex[length=2mm, width=2mm]}]
+
+        % Define nodes
+        \node [block] (S) {\( S(t) \)};
+        \node [block, right of=S] (I) {\( I(t) \)};
+        \node [block, right of=I] (R) { \( R(t) \)};
+
+        % Connect nodes with paths
+        \path [line] (S) -- node { \( \beta S I \) } (I);
+        \path [line] (I) -- node { \( \gamma I \) } (R);
+
+    \end{tikzpicture}
+    \caption{Compartmental flow of the SIR model for infection transmission dynamics.}
+\end{figure}
+
+To account for the characteristics of COVID-19, including the existence of a latent period and the possibility of death, the SEIRD model extends the SIR framework by including two additional compartments: Exposed (E) and Dead (D) individuals. The SEIRD model is described by the following differential equations:
+
+\begin{equation}
+\frac{dS}{dt} &= -\beta \frac{SI}{N}, \\
+\frac{dE}{dt} &= \beta \frac{SI}{N} - \sigma E, \\
+\frac{dI}{dt} &= \sigma E - \rho I - \alpha I, \\
+\frac{dR}{dt} &= \rho I, \\
+\frac{dD}{dt} &= \alpha I,
+\end{equation}
+
+where $E$ represents the number of exposed individuals who are infected but not yet infectious, and $D$ represents the number of deceased individuals. The parameters $\sigma$, $\rho$, and $\alpha$ represent the rate of exposed individuals becoming infectious, the recovery rate, and the mortality rate, respectively. The total population size is denoted by $N = S + E + I + R + D$. The SEIRD model provides a more comprehensive representation of disease dynamics and is particularly useful for capturing the spread of COVID-19, which exhibits a latent period and the possibility of death. This model more accurately reflects the disease dynamics of COVID-19 by considering the exposed phase, during which individuals are infected but not yet infectious, and the mortality due to the disease. The addition of these compartments allows for a more nuanced understanding of the pandemic's progression and the impact of interventions such as social distancing, vaccination, and treatment strategies.
+
+
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}[node distance=1.5cm, auto, thick]
+        % Define block styles
+        \tikzstyle{roundnode} = [circle, draw=green!60, fill=green!5, very thick, minimum size=1cm, text centered]
+        \tikzstyle{squarednode} = [rectangle, draw=red!60, fill=red!5, very thick, text width=1.5cm, text centered, rounded corners, minimum height=1.5cm]
+        \tikzstyle{line} = [draw, -{Latex[length=2mm, width=2mm]}]
+    
+        % Define nodes
+        \node [squarednode] (S) {\( S(t) \)};
+        \node [squarednode, right=of S] (E) {\( E(t) \)};
+        \node [squarednode, right=of E] (I) {\( I(t) \)};
+        \node [squarednode, right=of I] (R) { \( R(t) \)};
+        \node [squarednode, right=of R] (D) { \( D(t) \)};
+        
+        % Connect nodes with paths
+        \path [line] (S) -- node { \( \beta S I \) } (E);
+        \path [line] (E) -- node { \(  \sigma E \) } (I);
+        \path [line] (I) -- node { \( \rho I\) } (R);
+        \path [line] (R) -- node { \( \alpha \) } (D);
+
+    \end{tikzpicture}
+    \caption{Compartmental flow of the SEIRD model for COVID-19 transmission dynamics.}
+\end{figure}
+
+
+
+\section{Results and Discussion}
+
+
+
+
+
+\section{Conclusion}
+
+
+
+
 \begin{algorithm}
 \caption{Physics-Informed Neural Network (PINN) Training for Epidemic Modeling}
 \begin{algorithmic}[1]
@@ -254,21 +375,7 @@
 \end{algorithmic}
 \end{algorithm}
 
-The SIR model is described by the following set of differential equations:
-\begin{align}
-\frac{dS}{dt} &= -\beta \frac{SI}{N}, \\
-\frac{dI}{dt} &= \beta \frac{SI}{N} - \gamma I, \\
-\frac{dR}{dt} &= \gamma I,
-\end{align}
-where $S$ is the number of susceptible individuals, $I$ is the number of infectious individuals, $R$ is the number of recovered individuals, and $N$ is the total population.
-\begin{tabular}{ll}
-\toprule
-\textbf{Parameter} & \textbf{Definition} \\
-\midrule
-$\beta$ & Transmission rate \\
-$\gamma$ & Recovery rate \\
-\bottomrule
-\end{tabular}
+
 The SEIRD model extends the SIR model by including compartments for exposed (E) and dead (D) individuals:
 \begin{align}
 \frac{dS}{dt} &= -\beta \frac{SI}{N}, \\
