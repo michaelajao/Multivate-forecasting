@@ -5,7 +5,7 @@ CUDA.allowscalar(false)
 
 CairoMakie.activate!()
 
-
+gpu_device = gpu_device()
 pwd()
 Random.seed!(1234)
 # Load data
