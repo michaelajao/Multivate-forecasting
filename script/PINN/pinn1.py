@@ -13,7 +13,7 @@ np.random.seed(42)
 torch.manual_seed(42)
 
 # Set the default style
-plt.style.use("fivethirtyeight")
+# plt.style.use("fivethirtyeight")
 plt.rcParams.update(
     {
         "lines.linewidth": 2,

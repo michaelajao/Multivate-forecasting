@@ -1,9 +1,0 @@
-rnn_type: RNN
-input_size: 10
-hidden_size: 128
-num_layers: 10
-bidirectional: true
-learning_rate: 0.0001
-optimizer_params: {}
-lr_scheduler: null
-lr_scheduler_params: {}
