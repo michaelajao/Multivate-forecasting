@@ -148,9 +148,13 @@ class FeatureConfig:
         if not exogenous:
             feature_list = list(set(feature_list) - set(self.exogenous_features))
         feature_list = list(set(feature_list))
+        
+        # Convert set to list here for indexing
+        feature_list_plus_index_cols = list(set(feature_list + self.index_cols))
+        
         delete_index_cols = list(set(self.index_cols) - set(self.feature_list))
         (X, y, y_orig) = (
-            df.loc[:, set(feature_list + self.index_cols)]
+            df.loc[:, feature_list_plus_index_cols]
             .set_index(self.index_cols, drop=False)
             .drop(columns=delete_index_cols),
             df.loc[:, [self.target] + self.index_cols].set_index(
