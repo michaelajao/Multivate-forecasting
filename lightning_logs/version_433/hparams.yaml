@@ -1,0 +1,11 @@
+rnn_type: RNN
+input_size: 11
+hidden_size: 233
+num_layers: 94
+bidirectional: true
+learning_rate: 0.03412839448947758
+optimizer_params: {}
+lr_scheduler: null
+lr_scheduler_params:
+  step_size: 10
+  gamma: 0.1
