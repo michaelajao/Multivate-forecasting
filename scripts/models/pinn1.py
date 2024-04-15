@@ -320,7 +320,7 @@ plt.plot(np.arange(1, len(history) + 1), np.log10(history), label="Train Loss")
 plt.xlabel("Epoch")
 plt.ylabel("Log10(Loss)")
 plt.title(f"Training History {region_name}")
-plt.savefig(f"../../images/PINN/Training_History_{region_name}.pdf")
+plt.savefig(f"../../reports/images/Training_History_{region_name}.pdf")
 plt.legend()
 plt.show()
 
@@ -436,7 +436,7 @@ plt.xlabel("Days since: 2020-04-01")
 plt.ylabel("Population")
 plt.title(f"Susceptible: Predictions vs Actual Data {region_name}")
 plt.legend()
-plt.savefig(f"../../images/PINN/S_predictions_{region_name}.pdf")
+plt.savefig(f"../../reports/images/PINN/S_predictions_{region_name}.pdf")
 plt.show()
 
 
@@ -450,7 +450,7 @@ plt.xlabel("Days since: 2020-04-01")
 plt.ylabel("Population")
 plt.title(f"Infected: Predictions vs Actual Data {region_name}")
 plt.legend()
-plt.savefig(f"../../images/PINN/I_predictions_{region_name}.pdf")
+plt.savefig(f"../../reports/images/PINN/I_predictions_{region_name}.pdf")
 plt.show()
 
 
@@ -464,7 +464,7 @@ plt.xlabel("Days since: 2020-04-01")
 plt.ylabel("Population")
 plt.title(f"Recovered: Predictions vs Actual Data {region_name}")
 plt.legend()
-plt.savefig(f"../../images/PINN/R_predictions_{region_name}.pdf")
+plt.savefig(f"../../reports/images/PINN/R_predictions_{region_name}.pdf")
 plt.show()
 
 
@@ -478,80 +478,4 @@ print(
     f"Recovered - MAE: {D_mae:.4f}, MSE: {D_mse:.4f}, RMSE: {D_rmse:.4f}, MAPE: {D_mape:.2f}%"
 )
 
-
-# forecast future predictions for 3, 5, 7, and 14 days ahead after the last date in the training data
-
-# Predictions for 3, 5, 7 and 14 days ahead
-future_days = [3, 5, 7, 14]
-future_predictions = []
-
-for days in future_days:
-    future_t = torch.tensor([len(training_data) + days], dtype=torch.float32).view(-1, 1).to(device)
-    with torch.no_grad():
-        future_prediction = model(future_t)
-        future_predictions.append(future_prediction.cpu().numpy().flatten())
-        
-# Apply inverse transformation
-future_predictions = transformer.inverse_transform(future_predictions)
-
-#plot the future predictions for the next 14 days after the last date in the training data, make sure you show when the training data ends and the future predictions start
-plt.figure(figsize=(15, 8))
-plt.plot(time_points, I_actual_transformed, 'r', label='Infected Actual', linewidth=2)
-plt.plot(time_points, I_pred_transformed, 'r--', label='Infected Predicted', linewidth=2)
-
-# Plot the future predictions
-for i, days in enumerate(future_days):
-    plt.plot(len(training_data) + days, future_predictions[i][1], 'bo', label=f'Infected Prediction {days} days ahead')
-    
-plt.axvline(x=len(training_data), color='k', linestyle='--', label='End of Training Data')
-plt.xlabel("Days since: 2020-04-01")
-plt.ylabel("Population")
-plt.title("Infected: Actual vs Predicted")
-plt.legend()
-plt.show()
-
-# plt.savefig(f"../../images/PINN/future_predictions_{region_name}.pdf")
-
-
-
-# Predictions for 3, 5, 7 and 14 days ahead
-# future_days = [3, 5, 7, 14]
-# future_predictions = []
-
-# for days in future_days:
-#     future_t = torch.tensor([len(training_data) + days], dtype=torch.float32).view(-1, 1).to(device)
-#     with torch.no_grad():
-#         future_prediction = model(future_t)
-#         future_predictions.append(future_prediction.cpu().numpy().flatten())
-
-# # Apply inverse transformation
-# future_predictions = transformer.inverse_transform(future_predictions)
-
-# # Print the future predictions
-# for i, days in enumerate(future_days):
-#     print(f"Predictions for {days} days ahead: {future_predictions[i]}")
-#     print()
-
-# # visualise the training data and the future predictions for the next 14 days
-# plt.figure(figsize=(15, 8))
-# plt.plot(time_points, I_actual_transformed, 'r', label='Infected Actual', linewidth=2)
-# plt.plot(time_points, I_pred_transformed, 'r--', label='Infected Predicted', linewidth=2)
-
-# # Plot the future predictions
-# for i, days in enumerate(future_days):
-#     plt.plot(len(training_data) + days, future_predictions[i][1], 'bo', label=f'Infected Prediction {days} days ahead')
-
-# plt.xlabel("Days since: 2020-04-01")
-# plt.ylabel("Population")
-# plt.title("Infected: Actual vs Predicted")
-# plt.legend()
-# plt.show()
-
-
-# # Save the future predictions to a CSV file
-# future_predictions_df = pd.DataFrame(future_predictions, columns=columns_to_scale)
-# future_predictions_df["days_ahead"] = future_days
-# future_predictions_df.to_csv("../../data/future_predictions.csv", index=False)
-# print("Future predictions saved to 'future_predictions.csv'")
-
-# Save the model
+# rather than NeuralNet for training the model, lets make use of an RNN architecture to train the model

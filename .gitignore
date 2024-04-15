@@ -1,3 +1,4 @@
 
 .vscode/settings.json
 lightning_logs/*
+models/sir_model.pth
