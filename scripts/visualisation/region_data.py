@@ -1,8 +1,28 @@
 import os
+    """
+    The code provided loads, merges, preprocesses, and visualizes COVID-19 data for NHS regions,
+    including time series graphs, scatter plots, heat maps, box plots, correlation analysis, weekly
+    trends, and clustering analysis.
+    
+    :param file_path: The `file_path` parameter in the code you provided is a string variable that
+    stores the path to the directory where the data files are located. It is used in functions like
+    `load_and_prepare_data` to construct the full path to the data files by joining it with the
+    `filename`
+    :param filename: The `filename` parameter in the code you provided is a variable used to store the
+    name of the file being loaded and prepared as data. It is used as an input to the
+    `load_and_prepare_data` function to specify the name of the file to be read and processed
+    :param date_col: The `date_col` parameter is used to specify the column in the dataset that contains
+    date information. In the provided code, the `date_col` parameter is used in functions like
+    `load_and_prepare_data` and `map_regions_and_merge` to properly format and manipulate date-related
+    data. It helps
+    :return: The code provided returns visualizations and analysis based on the COVID-19 data for NHS
+    regions. Here is a summary of what is being returned:
+    """
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+
 
 # Set the default style for plots
 plt.style.use("fivethirtyeight")
@@ -16,7 +36,7 @@ plt.rcParams.update(
         "figure.autolayout": True,
         "axes.spines.top": False,
         "axes.spines.right": False,
-        "axes.grid": True,
+        "axes.grid": False,
         "grid.color": "0.75",
         "legend.fontsize": "medium",
     }
@@ -156,7 +176,7 @@ plt.ylabel("New Confirmed Cases per 100,000 Population")
 plt.legend()
 plt.xticks(rotation=45)
 plt.tight_layout()
-plt.savefig("../../images/new_confirmed_per_100k.pdf")
+# plt.savefig("../../images/new_confirmed_per_100k.pdf")
 plt.show()
 
 
@@ -237,7 +257,7 @@ plt.ylabel('Average ICU Beds Occupied')
 plt.legend()
 plt.xticks(rotation=45)
 plt.tight_layout()
-plt.savefig('../../images/weekly_icu_beds_occupancy.pdf')
+# plt.savefig('../../images/weekly_icu_beds_occupancy.pdf')
 plt.show()
 
 
@@ -270,3 +290,15 @@ plt.xlabel('Number of Clusters')
 plt.ylabel('Silhouette Score')
 plt.show()
 
+kmeans = KMeans(n_clusters=5, random_state=42)
+cluster_data['cluster'] = kmeans.fit_predict(cluster_features)
+
+# plot the clusters on a scatter plot based on all the features
+plt.figure(figsize=(12, 8))
+sns.scatterplot(data=cluster_data, x='new_confirmed', y='new_deceased', hue='cluster', style='cluster', palette='viridis')
+plt.title('Clusters of Regions based on COVID-19 Metrics')
+plt.xlabel('New Confirmed Cases')
+plt.ylabel('New Deceased Cases')
+plt.legend(title='Cluster')
+plt.tight_layout()
+plt.show()
