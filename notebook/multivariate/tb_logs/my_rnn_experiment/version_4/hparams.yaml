@@ -1,0 +1,9 @@
+rnn_type: GRU
+input_size: 11
+hidden_size: 32
+num_layers: 10
+bidirectional: false
+learning_rate: 0.001
+optimizer_params: {}
+lr_scheduler: null
+lr_scheduler_params: {}
