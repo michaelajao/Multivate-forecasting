@@ -499,7 +499,7 @@ def create_and_save_forecast_plot(df, algorithm_name, experiment_type, start_dat
 
     # save as PDF
     save_path = f"images/forecast_multivariate_{experiment_type}_{algorithm_name}.pdf"
-    pio.write_image(fig, save_path, format='pdf')
+    fig.write_image(save_path, engine="kaleido")
     fig.show()
     
 create_and_save_forecast_plot(pred_df, algorithm_name, "Vanilla", "2021-09-26", "2021-12-31")
