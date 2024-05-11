@@ -498,7 +498,7 @@ def create_and_save_forecast_plot(df, algorithm_name, experiment_type, start_dat
     )
 
     # save as PDF
-    save_path = f"figures/forecast_multivariate_{experiment_type}_{algorithm_name}.pdf"
+    save_path = f"reports/images/forecast_multivariate_{experiment_type}_{algorithm_name}.pdf"
     pio.write_image(fig, save_path)
     fig.show()
     
