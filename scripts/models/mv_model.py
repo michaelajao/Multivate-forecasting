@@ -239,32 +239,5 @@ fig = format_plot(fig, title=f"Exponential Smoothing: MAE={metrics['MAE']:.2f} |
 fig.update_xaxes(type='date', rangeslider_visible=True)
 fig.show()
 
-# LSTM model
-from darts.models import RNNModel
-
-name = "LSTM"
-
-model = RNNModel(
-    input_chunk_length=7,
-    model='LSTM',
-    hidden_dim=20,
-    dropout=0.1,
-    batch_size=16,
-    n_epochs=100,
-    optimizer_kwargs={'lr': 1e-3},
-    model_name='LSTM',
-    log_tensorboard=True,
-    random_state=42
-)
-
-with LogTime() as It:
-    y_pred, metrics = eval_model(model, ts_train, ts_val, name)
-metrics['Time elapsed'] = It.elapsed
-metric_record.append(metrics)
-y_pred = format_y_pred(y_pred, 'LSTM prediction')
-pred_df = pred_df.join(y_pred)
-
-fig = plot_forecast(pred_df, ['LSTM prediction'], ['LSTM prediction'])
-fig = format_plot(fig, title=f"LSTM: MAE={metrics['MAE']:.2f} | MSE={metrics['MSE']:.2f} | MASE={metrics['MASE']:.2f} | Forecast Bias={metrics['Forecast Bias']:.2f}")
-fig.update_xaxes(type='date', rangeslider_visible=True)
-fig.show()
+# LSTM model with pytorch forecasting
+import lightning as pl

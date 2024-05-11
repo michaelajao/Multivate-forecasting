@@ -393,7 +393,7 @@ class Seq2SeqModel(BaseModel):
             y_hat, _ = self.forward(batch)
         return y_hat
 
-
+    
 @dataclass
 class Seq2SeqwAttnConfig:
     """Configuration for RNN"""
