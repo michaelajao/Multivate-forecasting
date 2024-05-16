@@ -7,7 +7,6 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import StepLR
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import mean_absolute_error, mean_squared_error, mean_absolute_percentage_error
 from tqdm.notebook import tqdm
 from scipy.integrate import odeint
 import os
@@ -243,10 +242,18 @@ def pinn_loss(tensor_data, parameters, model_output, t, N, device):
     r_t = torch.autograd.grad(outputs=R_pred, inputs=t, grad_outputs=torch.ones_like(R_pred), create_graph=True)[0]
     d_t = torch.autograd.grad(outputs=D_pred, inputs=t, grad_outputs=torch.ones_like(D_pred), create_graph=True)[0]
 
-    dSdt_pred, dIdt_pred, dHdt_pred, dCdt_pred, dRdt_pred, dDdt_pred = SIHCRD_model(
-        [S_pred, I_pred, H_pred, C_pred, R_pred, D_pred], t,
-        beta_pred, gamma_pred, delta_pred, rho_pred, eta_pred, kappa_pred, mu_pred, xi_pred, N
-    )
+    with torch.no_grad():
+        dSdt_pred, dIdt_pred, dHdt_pred, dCdt_pred, dRdt_pred, dDdt_pred = SIHCRD_model(
+            [S_pred.cpu().numpy(), I_pred.cpu().numpy(), H_pred.cpu().numpy(), C_pred.cpu().numpy(), R_pred.cpu().numpy(), D_pred.cpu().numpy()], t.cpu().numpy(),
+            beta_pred.cpu().numpy(), gamma_pred.cpu().numpy(), delta_pred.cpu().numpy(), rho_pred.cpu().numpy(), eta_pred.cpu().numpy(), kappa_pred.cpu().numpy(), mu_pred.cpu().numpy(), xi_pred.cpu().numpy(), N
+        )
+
+    dSdt_pred = tensor(dSdt_pred, dtype=torch.float32).to(device)
+    dIdt_pred = tensor(dIdt_pred, dtype=torch.float32).to(device)
+    dHdt_pred = tensor(dHdt_pred, dtype=torch.float32).to(device)
+    dCdt_pred = tensor(dCdt_pred, dtype=torch.float32).to(device)
+    dRdt_pred = tensor(dRdt_pred, dtype=torch.float32).to(device)
+    dDdt_pred = tensor(dDdt_pred, dtype=torch.float32).to(device)
 
     data_loss = torch.mean((S - S_pred) ** 2 + (I - I_pred) ** 2 + (H - H_pred) ** 2 + (C - C_pred) ** 2 + (R - R_pred) ** 2 + (D - D_pred) ** 2)
     physics_loss = torch.mean((s_t - dSdt_pred) ** 2 + (i_t - dIdt_pred) ** 2 + (h_t - dHdt_pred) ** 2 + (c_t - dCdt_pred) ** 2 + (r_t - dRdt_pred) ** 2 + (d_t - dDdt_pred) ** 2)
@@ -282,7 +289,7 @@ class EarlyStopping:
             self.best_score = score
             self.counter = 0
 
-def train_model(tensor_data, model, beta_net, model_optimizer, params_optimizer, model_scheduler, params_scheduler, early_stopping, num_epochs=50000):
+def train_model(tensor_data, model, beta_net, model_optimizer, params_optimizer, model_scheduler, params_scheduler, N, early_stopping, num_epochs=50000):
     """Train the model."""
     loss_history = []
 
@@ -340,8 +347,11 @@ params_scheduler = StepLR(params_optimizer, step_size=5000, gamma=0.998)
 # Early stopping criteria
 early_stopping = EarlyStopping(patience=20, verbose=False)
 
+# Total population  
+N = data["population"].values[0]
+
 # Train the model
-loss_history = train_model(tensor_data, model, beta_net, model_optimizer, params_optimizer, model_scheduler, params_scheduler, early_stopping, num_epochs=50000)
+loss_history = train_model(tensor_data, model, beta_net, model_optimizer, params_optimizer, model_scheduler, params_scheduler, N, early_stopping, num_epochs=50000)
 
 # Plot training loss in log scale
 plt.figure(figsize=(10, 5))
@@ -383,7 +393,7 @@ def integrate_step_by_step(u0, t, params, N):
     u = u0
     for i in range(len(t) - 1):
         t_span = [t[i], t[i + 1]]
-        beta, gamma, delta, rho, eta, kappa, mu, xi = params[:, i]
+        beta, gamma, delta, rho, eta, kappa, mu, xi = params[i]
         sol = odeint(SIHCRD_model, u, t_span, args=(beta, gamma, delta, rho, eta, kappa, mu, xi, N))
         u = sol[-1]  # Update the initial condition for the next step
         res.append(u)
@@ -416,13 +426,13 @@ def plot_results_comparation(country, data_type, real_data, pre_data, ode_data, 
     plt.scatter(t[:train_size], real_data[:train_size], color='black', marker='*', label=f'{data_type}_train')  # type: ignore
     plt.plot(t, pre_data, color='red', label=f'{data_type}_pinn')
     plt.plot(t, ode_data, color='green', label=f'{data_type}_ode')
-
-    plt.xlabel('Time t (days)', fontsize=25)
-    plt.ylabel('Numbers of individuals', fontsize=25)
-
-    plt.xticks(fontsize=25)
-    plt.yticks(fontsize=25)
-    plt.legend(fontsize=25)
+    
+    plt.xlabel('Days')
+    plt.ylabel(f'{data_type}')
+    plt.title(f'{country} {data_type} Results')
+    plt.legend()
+    plt.tight_layout()
+    
 
     plt.savefig(os.path.join(path_results, f'{country}_{data_type}_results_{plot_type}_comparation.pdf'), dpi=600)
     plt.close()
