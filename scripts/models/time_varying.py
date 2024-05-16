@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import tqdm.autonotebook as tqdm
 
 import torch
 from torch import tensor
@@ -366,7 +367,7 @@ loss_history = []
 N = data["population"].values[0]  # Assuming the population is constant and given in the data
 
 def train_model(tensor_data, model, beta_net, optimizer, scheduler, early_stopping, num_epochs=10000):
-    for epoch in range(num_epochs):
+    for epoch in tqdm(range(num_epochs)):
         model.train()
         beta_net.train()
         
@@ -455,6 +456,28 @@ def forecast(model, beta_net, start_day, forecast_days, device):
         model_output_forecast = model(t_forecast)
     
     return params_forecast, model_output_forecast
+
+# Plot training loss
+plt.figure(figsize=(10, 5))
+plt.plot(loss_history, label='Training Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.title('Training Loss over Epochs')
+plt.legend()
+plt.show()
+
+# Plot parameter evolution
+params_names = ['beta', 'gamma', 'delta', 'rho', 'eta', 'kappa', 'mu', 'xi']
+params_forecast_np = params_forecast.cpu().numpy()
+
+plt.figure(figsize=(10, 5))
+for i, name in enumerate(params_names):
+    plt.plot(params_forecast_np[:, i], label=f'{name}')
+plt.xlabel('Days')
+plt.ylabel('Parameter value')
+plt.title('Parameter Evolution')
+plt.legend()
+plt.show()
 
 # Forecast future data
 forecast_days = 30  # Number of days to forecast
