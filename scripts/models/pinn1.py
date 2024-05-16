@@ -14,6 +14,7 @@ torch.manual_seed(42)
 
 # Set the default style
 # plt.style.use("fivethirtyeight")
+plt.style.use("seaborn-v0_8-poster")
 plt.rcParams.update(
     {
         "lines.linewidth": 2,
