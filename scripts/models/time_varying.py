@@ -7,7 +7,7 @@ from torch import tensor
 import torch.nn as nn
 import torch.optim as optim
 from torch.autograd import grad
-from torch.optim.lr_scheduler import ReduceLROnPlateau, StepLR
+from torch.optim.lr_scheduler import StepLR
 
 from sklearn.preprocessing import MinMaxScaler
 from tqdm.notebook import tqdm
@@ -84,7 +84,6 @@ def check_pytorch():
         
 check_pytorch()
 
-
 def SIHCRD_model(t, y, beta, gamma, delta, rho, eta, kappa, mu, xi, N):
     """
     Define the SIHCRD model as a system of differential equations.
@@ -97,7 +96,6 @@ def SIHCRD_model(t, y, beta, gamma, delta, rho, eta, kappa, mu, xi, N):
     dRdt = gamma * I + kappa * H + mu * C
     dDdt = delta * I + xi * C
     return [dSdt, dIdt, dHdt, dCdt, dRdt, dDdt]
-
 
 def load_and_preprocess_data(filepath, areaname, recovery_period=16, rolling_window=7, start_date="2020-04-01", end_date="2020-12-31"):
     df = pd.read_csv(filepath)
@@ -134,40 +132,37 @@ def prepare_tensors(data, device):
     C = tensor(data["covidOccupiedMVBeds"].values, dtype=torch.float32).view(-1, 1).to(device)
     return t, S, I, R, D, H, C
 
-def split_and_scale_data(data, training_sizes, features, device):
+def split_and_scale_data(data, train_size, features, device):
     """
     Splits data into training and validation sets, scales the features, and prepares tensors.
     """
     scaler = MinMaxScaler()
     scaler.fit(data[features])
-    all_tensors = {}
 
-    for train_size in training_sizes:
-        train_data = data.iloc[:train_size]
-        val_data = data.iloc[train_size:]
-        
-        scaled_train_data = pd.DataFrame(scaler.transform(train_data[features]), columns=features)
-        scaled_val_data = pd.DataFrame(scaler.transform(val_data[features]), columns=features)
+    train_data = data.iloc[:train_size]
+    val_data = data.iloc[train_size:]
+    
+    scaled_train_data = pd.DataFrame(scaler.transform(train_data[features]), columns=features)
+    scaled_val_data = pd.DataFrame(scaler.transform(val_data[features]), columns=features)
 
-        # Prepare tensors for training and validation
-        t_train, S_train, I_train, R_train, D_train, H_train, C_train = prepare_tensors(scaled_train_data, device)
-        t_val, S_val, I_val, R_val, D_val, H_val, C_val = prepare_tensors(scaled_val_data, device)
-        
-        # Store tensors in dictionary for easy access
-        all_tensors[train_size] = {
-            'train': (t_train, S_train, I_train, R_train, D_train, H_train, C_train),
-            'val': (t_val, S_val, I_val, R_val, D_val, H_val, C_val)
-        }
+    # Prepare tensors for training and validation
+    t_train, S_train, I_train, R_train, D_train, H_train, C_train = prepare_tensors(scaled_train_data, device)
+    t_val, S_val, I_val, R_val, D_val, H_val, C_val = prepare_tensors(scaled_val_data, device)
+    
+    tensor_data = {
+        'train': (t_train, S_train, I_train, R_train, D_train, H_train, C_train),
+        'val': (t_val, S_val, I_val, R_val, D_val, H_val, C_val)
+    }
 
-    return all_tensors
+    return tensor_data, scaler
 
 features = ["S(t)", "active_cases", "hospitalCases", "covidOccupiedMVBeds", "recovered", "new_deceased"]
-training_sizes = [30, 60, 100]  # days
+train_size = 60  # days
 
-tensor_data = split_and_scale_data(data, training_sizes, features, device)
+tensor_data, scaler = split_and_scale_data(data, train_size, features, device)
 
 # Accessing the data for a specific training size
-train_tensors, val_tensors = tensor_data[30]['train'], tensor_data[30]['val']
+train_tensors, val_tensors = tensor_data['train'], tensor_data['val']
 
 # Unpack the training tensors
 t_train, S_train, I_train, R_train, D_train, H_train, C_train = train_tensors
@@ -189,9 +184,8 @@ plt.ylabel("Scaled values")
 plt.legend()
 plt.show()
 
-
 class EpiNet(nn.Module):
-    def __init__(self, num_layers=2, hidden_neurons=10, output_size=5):
+    def __init__(self, num_layers=2, hidden_neurons=10, output_size=6):
         super(EpiNet, self).__init__()
         self.retain_seed = 100
         torch.manual_seed(self.retain_seed)
@@ -226,7 +220,7 @@ class EpiNet(nn.Module):
         self.net.apply(init_weights)
 
 class BetaNet(nn.Module):
-    def __init__(self, num_layers=2, hidden_neurons=10, output_size=5):
+    def __init__(self, num_layers=2, hidden_neurons=10, output_size=8):
         super(BetaNet, self).__init__()
         self.retain_seed = 100
         torch.manual_seed(self.retain_seed)
@@ -275,8 +269,7 @@ class BetaNet(nn.Module):
         mu = torch.sigmoid(params[:, 6]) * 0.05 + 0.001
         # Xi (ξ) is a positive value between 0.001 and 0.01 using the sigmoid function
         xi = torch.sigmoid(params[:, 7]) * 0.01 + 0.001
-        return params
-
+        return torch.stack([beta, gamma, delta, rho, eta, kappa, mu, xi], dim=1)
 
 def pinn_loss(tensor_data, parameters, model_output, t, N, device):
     """
@@ -331,7 +324,6 @@ def pinn_loss(tensor_data, parameters, model_output, t, N, device):
     
     return loss
 
-
 class EarlyStopping:
     """Early stops the training if validation loss doesn't improve after a given patience."""
     def __init__(self, patience=7, verbose=False):
@@ -367,14 +359,6 @@ scheduler = StepLR(optimizer, step_size=5000, gamma=0.998)
 # Early stopping criteria
 early_stopping = EarlyStopping(patience=20, verbose=False)
 
-# Hyperparameters
-alpha_0 = 1000
-alpha_1 = 1000000
-alpha_2 = 500
-
-# Training sizes for different epochs
-training_sizes = [30, 60, 100]
-
 # Loss history
 loss_history = []
 
@@ -388,24 +372,23 @@ def train_model(tensor_data, model, beta_net, optimizer, scheduler, early_stoppi
         
         running_loss = 0.0
         
-        # Loop through each training size
-        for train_size in training_sizes:
-            train_tensors, val_tensors = tensor_data[train_size]['train'], tensor_data[train_size]['val']
-            t_train, S_train, I_train, R_train, D_train, H_train, C_train = train_tensors
+        # Access tensors for the specific training size
+        train_tensors, val_tensors = tensor_data['train'], tensor_data['val']
+        t_train, S_train, I_train, R_train, D_train, H_train, C_train = train_tensors
 
-            optimizer.zero_grad()
-            
-            # Forward pass
-            params = beta_net(t_train)
-            model_output = model(t_train)
-            
-            # Compute loss
-            loss = pinn_loss(tensor_data[train_size], params, model_output, t_train, N, device)
-            running_loss += loss.item()
-            
-            # Backward pass
-            loss.backward()
-            optimizer.step()
+        optimizer.zero_grad()
+        
+        # Forward pass
+        params = beta_net(t_train)
+        model_output = model(t_train)
+        
+        # Compute loss
+        loss = pinn_loss(tensor_data, params, model_output, t_train, N, device)
+        running_loss += loss.item()
+        
+        # Backward pass
+        loss.backward()
+        optimizer.step()
         
         scheduler.step()
         
@@ -419,9 +402,47 @@ def train_model(tensor_data, model, beta_net, optimizer, scheduler, early_stoppi
             print(f"Epoch {epoch}, Loss: {running_loss}")
 
     print('Finished Training')
+    return loss_history
 
-# Train the model
-train_model(tensor_data, model, beta_net, optimizer, scheduler, early_stopping)
+# Example usage for single training size
+loss_history = train_model(tensor_data, model, beta_net, optimizer, scheduler, early_stopping, num_epochs=10000)
+
+def evaluate_model(tensor_data, model, beta_net, device):
+    model.eval()
+    beta_net.eval()
+
+    evaluation_results = {}
+
+    train_tensors, val_tensors = tensor_data['train'], tensor_data['val']
+    t_val, S_val, I_val, R_val, D_val, H_val, C_val = val_tensors
+
+    with torch.no_grad():
+        params = beta_net(t_val)
+        model_output = model(t_val)
+    
+    S_pred, I_pred, H_pred, C_pred, R_pred, D_pred = model_output.unbind(1)
+    
+    mse_S = torch.mean((S_val - S_pred) ** 2).item()
+    mse_I = torch.mean((I_val - I_pred) ** 2).item()
+    mse_H = torch.mean((H_val - H_pred) ** 2).item()
+    mse_C = torch.mean((C_val - C_pred) ** 2).item()
+    mse_R = torch.mean((R_val - R_pred) ** 2).item()
+    mse_D = torch.mean((D_val - D_pred) ** 2).item()
+
+    evaluation_results = {
+        'MSE_S': mse_S,
+        'MSE_I': mse_I,
+        'MSE_H': mse_H,
+        'MSE_C': mse_C,
+        'MSE_R': mse_R,
+        'MSE_D': mse_D
+    }
+    
+    return evaluation_results
+
+# Evaluate the model
+evaluation_results = evaluate_model(tensor_data, model, beta_net, device)
+print(evaluation_results)
 
 def forecast(model, beta_net, start_day, forecast_days, device):
     model.eval()
@@ -442,3 +463,100 @@ params_forecast, model_output_forecast = forecast(model, beta_net, start_day, fo
 
 t_forecast = tensor(range(start_day, start_day + forecast_days), dtype=torch.float32).view(-1, 1).to(device)
 
+def plot_forecast(t_forecast, model_output_forecast, actual_data, start_day, forecast_days):
+    model_output_forecast_np = model_output_forecast.cpu().numpy()
+    t_forecast_np = t_forecast.cpu().numpy()
+
+    plt.figure(figsize=(15, 10))
+
+    # Plot S(t)
+    plt.subplot(3, 2, 1)
+    plt.plot(t_forecast_np, model_output_forecast_np[:, 0], label='Predicted S(t)', linestyle='--')
+    plt.plot(actual_data['t'], actual_data['S(t)'], label='Actual S(t)')
+    plt.xlabel('Days')
+    plt.ylabel('S(t)')
+    plt.title('Forecasted vs. Actual S(t)')
+    plt.legend()
+
+    # Plot I(t)
+    plt.subplot(3, 2, 2)
+    plt.plot(t_forecast_np, model_output_forecast_np[:, 1], label='Predicted I(t)', linestyle='--')
+    plt.plot(actual_data['t'], actual_data['active_cases'], label='Actual I(t)')
+    plt.xlabel('Days')
+    plt.ylabel('I(t)')
+    plt.title('Forecasted vs. Actual I(t)')
+    plt.legend()
+
+    # Plot H(t)
+    plt.subplot(3, 2, 3)
+    plt.plot(t_forecast_np, model_output_forecast_np[:, 2], label='Predicted H(t)', linestyle='--')
+    plt.plot(actual_data['t'], actual_data['hospitalCases'], label='Actual H(t)')
+    plt.xlabel('Days')
+    plt.ylabel('H(t)')
+    plt.title('Forecasted vs. Actual H(t)')
+    plt.legend()
+
+    # Plot C(t)
+    plt.subplot(3, 2, 4)
+    plt.plot(t_forecast_np, model_output_forecast_np[:, 3], label='Predicted C(t)', linestyle='--')
+    plt.plot(actual_data['t'], actual_data['covidOccupiedMVBeds'], label='Actual C(t)')
+    plt.xlabel('Days')
+    plt.ylabel('C(t)')
+    plt.title('Forecasted vs. Actual C(t)')
+    plt.legend()
+
+    # Plot R(t)
+    plt.subplot(3, 2, 5)
+    plt.plot(t_forecast_np, model_output_forecast_np[:, 4], label='Predicted R(t)', linestyle='--')
+    plt.plot(actual_data['t'], actual_data['recovered'], label='Actual R(t)')
+    plt.xlabel('Days')
+    plt.ylabel('R(t)')
+    plt.title('Forecasted vs. Actual R(t)')
+    plt.legend()
+
+    # Plot D(t)
+    plt.subplot(3, 2, 6)
+    plt.plot(t_forecast_np, model_output_forecast_np[:, 5], label='Predicted D(t)', linestyle='--')
+    plt.plot(actual_data['t'], actual_data['new_deceased'], label='Actual D(t)')
+    plt.xlabel('Days')
+    plt.ylabel('D(t)')
+    plt.title('Forecasted vs. Actual D(t)')
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
+
+# Plot the forecasted vs actual data
+actual_data = {
+    't': range(start_day, start_day + forecast_days),
+    'S(t)': S_val.cpu().numpy().flatten(),
+    'active_cases': I_val.cpu().numpy().flatten(),
+    'hospitalCases': H_val.cpu().numpy().flatten(),
+    'covidOccupiedMVBeds': C_val.cpu().numpy().flatten(),
+    'recovered': R_val.cpu().numpy().flatten(),
+    'new_deceased': D_val.cpu().numpy().flatten()
+}
+
+plot_forecast(t_forecast, model_output_forecast, actual_data, start_day, forecast_days)
+
+# Plot training loss
+plt.figure(figsize=(10, 5))
+plt.plot(loss_history, label='Training Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.title('Training Loss over Epochs')
+plt.legend()
+plt.show()
+
+# Plot parameter evolution
+params_names = ['beta', 'gamma', 'delta', 'rho', 'eta', 'kappa', 'mu', 'xi']
+params_forecast_np = params_forecast.cpu().numpy()
+
+plt.figure(figsize=(10, 5))
+for i, name in enumerate(params_names):
+    plt.plot(params_forecast_np[:, i], label=f'{name}')
+plt.xlabel('Days')
+plt.ylabel('Parameter value')
+plt.title('Parameter Evolution')
+plt.legend()
+plt.show()
