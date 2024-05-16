@@ -2,9 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import torch
-from torch import tensor
-import torch.nn as nn
-import torch.optim as optim
+from torch import tensor, nn, optim
 from torch.optim.lr_scheduler import StepLR
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_absolute_error, mean_squared_error, mean_absolute_percentage_error
@@ -106,17 +104,17 @@ data = load_and_preprocess_data("../../data/hos_data/merged_data.csv", areaname=
 
 
 class EpiNet(nn.Module):
-    def __init__(self, num_layers=2, hidden_neurons=10, output_size=6):
+    def __init__(self, num_layers=2, hidden_neurons=10, output_size=6, dropout_rate=0.2):
         super(EpiNet, self).__init__()
         self.retain_seed = 100
         torch.manual_seed(self.retain_seed)
 
         # Initialize layers array starting with input layer
-        layers = [nn.Linear(1, hidden_neurons), nn.Tanh()]
+        layers = [nn.Linear(1, hidden_neurons), nn.Tanh(), nn.Dropout(dropout_rate)]
 
         # Append hidden layers
         for _ in range(num_layers - 1):
-            layers.extend([nn.Linear(hidden_neurons, hidden_neurons), nn.Tanh()])
+            layers.extend([nn.Linear(hidden_neurons, hidden_neurons), nn.Tanh(), nn.Dropout(dropout_rate)])
 
         # Append output layer
         layers.append(nn.Linear(hidden_neurons, output_size))  # Epidemiological outputs
@@ -140,17 +138,17 @@ class EpiNet(nn.Module):
         self.net.apply(init_weights)
 
 class BetaNet(nn.Module):
-    def __init__(self, num_layers=2, hidden_neurons=10, output_size=8):
+    def __init__(self, num_layers=2, hidden_neurons=10, output_size=8, dropout_rate=0.2):
         super(BetaNet, self).__init__()
         self.retain_seed = 100
         torch.manual_seed(self.retain_seed)
 
         # Initialize layers array starting with the input layer
-        layers = [nn.Linear(1, hidden_neurons), nn.Tanh()]
+        layers = [nn.Linear(1, hidden_neurons), nn.Tanh(), nn.Dropout(dropout_rate)]
 
         # Append hidden layers
         for _ in range(num_layers - 1):
-            layers.extend([nn.Linear(hidden_neurons, hidden_neurons), nn.Tanh()])
+            layers.extend([nn.Linear(hidden_neurons, hidden_neurons), nn.Tanh(), nn.Dropout(dropout_rate)])
 
         # Append output layer
         layers.append(nn.Linear(hidden_neurons, output_size))  # Output layer for estimating parameters
@@ -308,12 +306,12 @@ class EarlyStopping:
             self.counter = 0
 
 # Initialize the models
-model = EpiNet(num_layers=10, hidden_neurons=32, output_size=6).to(device)
-beta_net = BetaNet(num_layers=10, hidden_neurons=32, output_size=8).to(device)
+model = EpiNet(num_layers=10, hidden_neurons=32, output_size=6, dropout_rate=0.2).to(device)
+beta_net = BetaNet(num_layers=10, hidden_neurons=32, output_size=8, dropout_rate=0.2).to(device)
 
 # Initialize the optimizers
-model_optimizer = optim.Adam(model.parameters(), lr=1e-4)
-params_optimizer = optim.Adam(beta_net.parameters(), lr=1e-4)
+model_optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-5)  # Added L2 regularization
+params_optimizer = optim.Adam(beta_net.parameters(), lr=1e-4, weight_decay=1e-5)  # Added L2 regularization
 
 # Define the learning rate scheduler
 model_scheduler = StepLR(model_optimizer, step_size=5000, gamma=0.998)
@@ -323,12 +321,13 @@ params_scheduler = StepLR(params_optimizer, step_size=5000, gamma=0.998)
 early_stopping = EarlyStopping(patience=20, verbose=False)
 
 # Loss history
+# Loss history
 loss_history = []
 
 # Total population
 N = data["population"].values[0]  # Assuming the population is constant and given in the data
 
-def train_model(tensor_data, model, beta_net, optimizer, scheduler, early_stopping, num_epochs=50000):
+def train_model(tensor_data, model, beta_net, optimizer, scheduler, early_stopping, num_epochs=1000):
     for epoch in tqdm(range(num_epochs)):
         model.train()
         beta_net.train()
@@ -366,91 +365,12 @@ def train_model(tensor_data, model, beta_net, optimizer, scheduler, early_stoppi
 # Train the model
 loss_history = train_model(tensor_data, model, beta_net, model_optimizer, model_scheduler, early_stopping, num_epochs=50000)
 
-# Plot training loss in log scale
+# Plot training and validation loss in log scale
 plt.figure(figsize=(10, 5))
-plt.plot(np.log10(loss_history), label="Training Loss", color="red")
+plt.plot(np.log10(loss_history), label="Training Loss")
 plt.xlabel("Epochs")
 plt.ylabel("Log Loss")
-plt.title("Training Loss over Epochs (Log Scale)")
+plt.title("Training and Validation Loss over Epochs (Log Scale)")
 plt.legend()
 plt.show()
 
-
-
-# initial_conditions for the SIHCRD model based on the data
-S0 = data["S(t)"].values[0]
-I0 = data["active_cases"].values[0]
-H0 = data["hospitalCases"].values[0]    
-C0 = data["covidOccupiedMVBeds"].values[0]  
-R0 = data["recovered"].values[0]
-D0 = data["new_deceased"].values[0]
-
-# simulation time points
-t = np.linspace(0, train_size, train_size+1)[:-1]
-
-u0 = [S0, I0, H0, C0, R0, D0]  # initial conditions vector
-
-# Extract the parameters from the trained model
-params = beta_net(tensor(t).to(device)).detach().cpu().numpy()
-
-beta = params[:, 0]
-gamma = params[:, 1]
-delta = params[:, 2]
-rho = params[:, 3]
-eta = params[:, 4]
-kappa = params[:, 5]
-mu = params[:, 6]
-xi = params[:, 7]
-
-
-# plot the beta parameter
-plt.figure(figsize=(16, 9))
-plt.plot(t, beta, label="Beta (β)")
-plt.xlabel("Time (days)")
-plt.ylabel("Value")
-plt.title("Beta (β) Parameter")
-plt.tight_layout()
-plt.legend()
-plt.show()
-
-
-# Integrate the SIHCRD equations over the time grid, t.
-res = odeint(SIHCRD_model, u0, t, args=(beta, gamma, delta, rho, eta, kappa, mu, xi, N))
-
-S_ode, I_ode, H_ode, C_ode, R_ode, D_ode = res.T
-
-# Plot the results versus the original data
-plt.figure(figsize=(16, 9))
-plt.plot(t, data["active_cases"].values, label="I(t) (Data)", color="red")
-plt.plot(t[:train_size], I_ode[:train_size], label="I(t) (ODE)", linestyle="--", color="red")
-plt.xlabel("Time (days)")
-plt.ylabel("Number of Active Cases")
-plt.title("Active Cases (I(t))")
-plt.tight_layout()
-plt.legend()
-plt.show()
-
-
-
-
-def plot_results_comparation(country, data_type, real_data, pre_data, ode_data, train_size,type):
-    if not os.path.exists(path_results):
-        os.makedirs(path_results)
-
-    plt.figure(figsize=(16,9))
-    t = np.linspace(0,len(pre_data),len(pre_data)+1)[:-1]
-
-    plt.plot(t, real_data, color ='black' ,label=f'{data_type}_real') 
-    plt.scatter(t[:train_size], real_data[:train_size], color ='black', marker='*', label=f'{data_type}_train')  # type: ignore
-    plt.plot(t, pre_data, color ='red' ,label=f'{data_type}_pinn') 
-    # plt.plot(t, ode_data, color ='green' ,label=f'{data_type}_sir') 
-
-    plt.xlabel('Time t (days)', fontsize=25)
-    plt.ylabel('Numbers of individuals', fontsize=25)
-
-    plt.xticks(fontsize=25)
-    plt.yticks(fontsize=25)
-    plt.legend(fontsize=25)
-
-    plt.savefig(path_results+f'{country}_{data_type}_results_{type}_comparation.pdf', dpi=600)
-    plt.close()
