@@ -90,6 +90,8 @@ end_date = "2020-08-31"
 mask = (df["date"] >= start_date) & (df["date"] <= end_date)
 training_data = df.loc[mask]
 
+N = df['population'].values[0]
+
 # Normalize the data using MinMaxScaler
 scaler = MinMaxScaler()
 columns_to_scale = ["active_cases", "recovered", "cumulative_deceased"]
@@ -307,7 +309,11 @@ model_inverse = SEIRNet(inverse=True, init_beta=0.1, init_gamma=0.01, init_delta
 model_inverse.to(device)
 losses = train(model_inverse, t_data, SIRD_tensor, epochs=50000, lr=0.001, N=N, sigma=1/5)
 
+
 plot_results(t_data, I_data, R_data, D_data, model_inverse, "Inverse Model Results", N)
+plot_results(t_data, I_data, R_data, D_data, model_forward, "Forward Model Results", N)
+
+
 plot_loss(losses, "Inverse Model Loss")
 
 def extract_parameters(model):
