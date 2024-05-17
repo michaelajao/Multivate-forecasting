@@ -1,15 +1,19 @@
+import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+
+from tqdm.notebook import tqdm
+from scipy.integrate import odeint
+
+
 import torch
-from torch import tensor
 import torch.nn as nn
+from torch.autograd import grad
 import torch.optim as optim
 from torch.optim.lr_scheduler import StepLR
 from sklearn.preprocessing import MinMaxScaler
-from tqdm.notebook import tqdm
-from scipy.integrate import odeint
-import os
+from torch import tensor
 
 # Set matplotlib style and parameters
 plt.style.use("seaborn-v0_8-poster")
@@ -104,89 +108,122 @@ def load_and_preprocess_data(filepath, areaname, recovery_period=16, rolling_win
     return df
 
 # Load and preprocess the data
-data = load_and_preprocess_data("../../data/hos_data/merged_data.csv", areaname="South West", recovery_period=21, start_date="2020-04-01").drop(columns=["Unnamed: 0"], axis=1)
+data = load_and_preprocess_data("../../data/hos_data/merged_data.csv", areaname="South West", recovery_period=21, start_date="2020-04-01", end_date="2021-12-31").drop(columns=["Unnamed: 0"], axis=1)
 
-class EpiNet(nn.Module):
-    """Epidemiological network for predicting model outputs."""
-    def __init__(self, num_layers=2, hidden_neurons=10, output_size=6):
-        super(EpiNet, self).__init__()
+# class EpiNet(nn.Module):
+#     """Epidemiological network for predicting model outputs."""
+#     def __init__(self, inverse=False, init_params=False, num_layers=2, hidden_neurons=10, output_size=6, retain_seed=10):
+#         super(EpiNet, self).__init__()
+#         self.retain_seed = retain_seed
+#         layers = [nn.Linear(1, hidden_neurons), nn.Tanh()]
+#         for _ in range(num_layers - 1):
+#             layers.extend([nn.Linear(hidden_neurons, hidden_neurons), nn.Tanh()])
+#         layers.append(nn.Linear(hidden_neurons, output_size))
+#         self.net = nn.Sequential(*layers)
+#         self.init_xavier()
+        
+#         # Adjustments for inverse model with customizable initial values for SEIRD model parameters
+#         self.inverse = inverse
+#         self.init_params_flag = init_params
+#         if inverse:
+#             self.sigmoid_activation = nn.Sigmoid()
+#             if init_params:
+#                 self.init_params()
+
+#     def init_xavier(self):
+#         """Initialize the weights using Xavier initialization."""
+#         for layer in self.net:
+#             if isinstance(layer, nn.Linear):
+#                 nn.init.xavier_normal_(layer.weight)
+#                 nn.init.zeros_(layer.bias)
+                
+#     def init_params(self):
+#         """Initialize the parameters for the inverse model."""
+#         for param in self.net.parameters():
+#             nn.init.uniform_(param, 0, 1)
+        
+#     def forward(self, x):
+#         out = self.net(x)
+#         if self.inverse:
+#             out = self.sigmoid_activation(out)
+#         return out
+
+class SEIRDNet(nn.Module):
+    """Epidemiological network for predicting SEIRD model outputs."""
+    def __init__(self, inverse=False, init_beta=None, init_gamma=None, init_delta=None, retain_seed=42, num_layers=4, hidden_neurons=20):
+        super(SEIRDNet, self).__init__()
+        self.retain_seed = retain_seed
         layers = [nn.Linear(1, hidden_neurons), nn.Tanh()]
         for _ in range(num_layers - 1):
             layers.extend([nn.Linear(hidden_neurons, hidden_neurons), nn.Tanh()])
-        layers.append(nn.Linear(hidden_neurons, output_size))
+        layers.append(nn.Linear(hidden_neurons, 6))  # Adjust the output size if needed
         self.net = nn.Sequential(*layers)
+        
+        if inverse:
+            self._beta = nn.Parameter(torch.tensor([init_beta if init_beta is not None else torch.rand(1)], device='cpu'), requires_grad=True)
+            self._gamma = nn.Parameter(torch.tensor([init_gamma if init_gamma is not None else torch.rand(1)], device='cpu'), requires_grad=True)
+            self._delta = nn.Parameter(torch.tensor([init_delta if init_delta is not None else torch.rand(1)], device='cpu'), requires_grad=True)
+        else:
+            self._beta = None
+            self._gamma = None
+            self._delta = None
+        
         self.init_xavier()
 
     def forward(self, t):
         return self.net(t)
 
+    @property
+    def beta(self):
+        return torch.sigmoid(self._beta) * 0.9 + 0.1 if self._beta is not None else None
+
+    @property
+    def gamma(self):
+        return torch.sigmoid(self._gamma) * 0.09 + 0.01 if self._gamma is not None else None
+    
+    @property
+    def delta(self):
+        return torch.sigmoid(self._delta) * 0.09 + 0.01 if self._delta is not None else None
+    
     def init_xavier(self):
-        """Initialize weights using Xavier initialization."""
-        def init_weights(layer):
-            if isinstance(layer, nn.Linear):
-                g = nn.init.calculate_gain("tanh")
-                nn.init.xavier_normal_(layer.weight, gain=g)
-                if layer.bias is not None:
-                    layer.bias.data.fill_(0)
-        self.net.apply(init_weights)
+        torch.manual_seed(self.retain_seed)
+        def init_weights(m):
+            if isinstance(m, nn.Linear):
+                g = nn.init.calculate_gain('tanh')
+                nn.init.xavier_uniform_(m.weight, gain=g)
+                if m.bias is not None:
+                    m.bias.data.fill_(0)
+        self.apply(init_weights)
+    
 
-class BetaNet(nn.Module):
-    """Network for predicting epidemiological parameters."""
-    def __init__(self, num_layers=2, hidden_neurons=10, output_size=8):
-        super(BetaNet, self).__init__()
-        layers = [nn.Linear(1, hidden_neurons), nn.Tanh()]
-        for _ in range(num_layers - 1):
-            layers.extend([nn.Linear(hidden_neurons, hidden_neurons), nn.Tanh()])
-        layers.append(nn.Linear(hidden_neurons, output_size))
-        self.net = nn.Sequential(*layers)
-        self.init_xavier()
+# \begin{align}
+# \frac{dS}{dt} &= -\beta \frac{SI}{N} \\
+# \frac{dE}{dt} &= \beta \frac{SI}{N} - \sigma E \\
+# \frac{dI}{dt} &= \sigma E - (\gamma + \delta) I \\
+# \frac{dR}{dt} &= \gamma I \\
+# \frac{dD}{dt} &= \delta I
+# \end{align}
 
-    def init_xavier(self):
-        """Initialize weights using Xavier initialization."""
-        def init_weights(layer):
-            if isinstance(layer, nn.Linear):
-                g = nn.init.calculate_gain("tanh")
-                nn.init.xavier_normal_(layer.weight, gain=g)
-                if layer.bias is not None:
-                    layer.bias.data.fill_(0)
-        self.net.apply(init_weights)
+def SEIRD_model(u, t, beta, sigma, gamma, delta, N):
+    S, E, I, R, D = u
+    dSdt = -beta * S * I / N
+    dEdt = beta * S * I / N - sigma * E
+    dIdt = sigma * E - (gamma + delta) * I
+    dRdt = gamma * I
+    dDdt = delta * I
+    return [dSdt, dEdt, dIdt, dRdt, dDdt]
 
-    def forward(self, t):
-        params = self.net(t)
-        beta = torch.sigmoid(params[:, 0]) * 0.9 + 0.1
-        gamma = torch.sigmoid(params[:, 1]) * 0.1 + 0.01
-        delta = torch.sigmoid(params[:, 2]) * 0.01 + 0.001
-        rho = torch.sigmoid(params[:, 3]) * 0.05 + 0.001
-        eta = torch.sigmoid(params[:, 4]) * 0.05 + 0.001
-        kappa = torch.sigmoid(params[:, 5]) * 0.05 + 0.001
-        mu = torch.sigmoid(params[:, 6]) * 0.05 + 0.001
-        xi = torch.sigmoid(params[:, 7]) * 0.01 + 0.001
-        return torch.stack([beta, gamma, delta, rho, eta, kappa, mu, xi], dim=1)
-
-def SIHCRD_model(y, t, beta, gamma, delta, rho, eta, kappa, mu, xi, N):
-    """SIHCRD model differential equations."""
-    S, I, H, C, R, D = y
-    dSdt = -(beta * I / N) * S
-    dIdt = (beta * S / N) * I - (gamma + rho + delta) * I
-    dHdt = rho * I - (eta + kappa) * H
-    dCdt = eta * H - (mu + xi) * C
-    dRdt = gamma * I + kappa * H + mu * C
-    dDdt = delta * I + xi * C
-    return np.array([dSdt, dIdt, dHdt, dCdt, dRdt, dDdt])
-
+# Prepare PyTorch tensors from the data
 def prepare_tensors(data, device):
-    """Prepare PyTorch tensors from the data."""
     t = tensor(range(1, len(data) + 1), dtype=torch.float32).view(-1, 1).to(device).requires_grad_(True)
     S = tensor(data["S(t)"].values, dtype=torch.float32).view(-1, 1).to(device)
     I = tensor(data["active_cases"].values, dtype=torch.float32).view(-1, 1).to(device)
     R = tensor(data["recovered"].values, dtype=torch.float32).view(-1, 1).to(device)
     D = tensor(data["new_deceased"].values, dtype=torch.float32).view(-1, 1).to(device)
-    H = tensor(data["hospitalCases"].values, dtype=torch.float32).view(-1, 1).to(device)
-    C = tensor(data["covidOccupiedMVBeds"].values, dtype=torch.float32).view(-1, 1).to(device)
-    return t, S, I, R, D, H, C
+    return t, S, I, R, D
 
+# Split and scale the data into training and validation sets
 def split_and_scale_data(data, train_size, features, device):
-    """Split and scale the data into training and validation sets."""
     scaler = MinMaxScaler()
     scaler.fit(data[features])
 
@@ -196,70 +233,60 @@ def split_and_scale_data(data, train_size, features, device):
     scaled_train_data = pd.DataFrame(scaler.transform(train_data[features]), columns=features)
     scaled_val_data = pd.DataFrame(scaler.transform(val_data[features]), columns=features)
 
-    t_train, S_train, I_train, R_train, D_train, H_train, C_train = prepare_tensors(scaled_train_data, device)
-    t_val, S_val, I_val, R_val, D_val, H_val, C_val = prepare_tensors(scaled_val_data, device)
+    t_train, S_train, I_train, R_train, D_train = prepare_tensors(scaled_train_data, device)
+    t_val, S_val, I_val, R_val, D_val = prepare_tensors(scaled_val_data, device)
 
     tensor_data = {
-        "train": (t_train, S_train, I_train, R_train, D_train, H_train, C_train),
-        "val": (t_val, S_val, I_val, R_val, D_val, H_val, C_val),
+        "train": (t_train, S_train, I_train, R_train, D_train),
+        "val": (t_val, S_val, I_val, R_val, D_val),
     }
 
     return tensor_data, scaler
 
-features = ["S(t)", "active_cases", "hospitalCases", "covidOccupiedMVBeds", "recovered", "new_deceased"]
+# Example features and data split
+features = ["S(t)", "active_cases", "recovered", "new_deceased"]
 train_size = 60  # days
 
+# Assuming 'data' is a DataFrame containing the relevant columns
 tensor_data, scaler = split_and_scale_data(data, train_size, features, device)
 
+# PINN loss function
 def pinn_loss(tensor_data, parameters, model_output, t, N, device):
     """Compute the PINN loss."""
-    t_train, S_train, I_train, R_train, D_train, H_train, C_train = tensor_data["train"]
-    t_val, S_val, I_val, R_val, D_val, H_val, C_val = tensor_data["val"]
+    t_train, S_train, I_train, R_train, D_train = tensor_data["train"]
+    t_val, S_val, I_val, R_val, D_val = tensor_data["val"]
 
     S = torch.cat([S_train, S_val], dim=0)
     I = torch.cat([I_train, I_val], dim=0)
     R = torch.cat([R_train, R_val], dim=0)
     D = torch.cat([D_train, D_val], dim=0)
-    H = torch.cat([H_train, H_val], dim=0)
-    C = torch.cat([C_train, C_val], dim=0)
 
     beta_pred = parameters[:, 0].squeeze()
     gamma_pred = parameters[:, 1].squeeze()
     delta_pred = parameters[:, 2].squeeze()
-    rho_pred = parameters[:, 3].squeeze()
-    eta_pred = parameters[:, 4].squeeze()
-    kappa_pred = parameters[:, 5].squeeze()
-    mu_pred = parameters[:, 6].squeeze()
-    xi_pred = parameters[:, 7].squeeze()
+    sigma = 1/5  # Fixed sigma value
 
-    S_pred, I_pred, H_pred, C_pred, R_pred, D_pred = model_output.unbind(1)
+    S_pred, I_pred, R_pred, D_pred = model_output.unbind(1)
 
-    s_t = torch.autograd.grad(outputs=S_pred, inputs=t, grad_outputs=torch.ones_like(S_pred), create_graph=True)[0]
-    i_t = torch.autograd.grad(outputs=I_pred, inputs=t, grad_outputs=torch.ones_like(I_pred), create_graph=True)[0]
-    h_t = torch.autograd.grad(outputs=H_pred, inputs=t, grad_outputs=torch.ones_like(H_pred), create_graph=True)[0]
-    c_t = torch.autograd.grad(outputs=C_pred, inputs=t, grad_outputs=torch.ones_like(C_pred), create_graph=True)[0]
-    r_t = torch.autograd.grad(outputs=R_pred, inputs=t, grad_outputs=torch.ones_like(R_pred), create_graph=True)[0]
-    d_t = torch.autograd.grad(outputs=D_pred, inputs=t, grad_outputs=torch.ones_like(D_pred), create_graph=True)[0]
+    s_t = grad(outputs=S_pred, inputs=t, grad_outputs=torch.ones_like(S_pred), create_graph=True)[0]
+    i_t = grad(outputs=I_pred, inputs=t, grad_outputs=torch.ones_like(I_pred), create_graph=True)[0]
+    r_t = grad(outputs=R_pred, inputs=t, grad_outputs=torch.ones_like(R_pred), create_graph=True)[0]
+    d_t = grad(outputs=D_pred, inputs=t, grad_outputs=torch.ones_like(D_pred), create_graph=True)[0]
 
-    with torch.no_grad():
-        dSdt_pred, dIdt_pred, dHdt_pred, dCdt_pred, dRdt_pred, dDdt_pred = SIHCRD_model(
-            [S_pred.cpu().numpy(), I_pred.cpu().numpy(), H_pred.cpu().numpy(), C_pred.cpu().numpy(), R_pred.cpu().numpy(), D_pred.cpu().numpy()], t.cpu().numpy(),
-            beta_pred.cpu().numpy(), gamma_pred.cpu().numpy(), delta_pred.cpu().numpy(), rho_pred.cpu().numpy(), eta_pred.cpu().numpy(), kappa_pred.cpu().numpy(), mu_pred.cpu().numpy(), xi_pred.cpu().numpy(), N
-        )
+    # Calculate the model derivatives based on the SEIRD model
+    dSdt_pred = -beta_pred * S_pred * I_pred / N
+    dIdt_pred = sigma * (N - S_pred - I_pred - R_pred - D_pred) - (gamma_pred + delta_pred) * I_pred
+    dRdt_pred = gamma_pred * I_pred
+    dDdt_pred = delta_pred * I_pred
 
-    dSdt_pred = tensor(dSdt_pred, dtype=torch.float32).to(device)
-    dIdt_pred = tensor(dIdt_pred, dtype=torch.float32).to(device)
-    dHdt_pred = tensor(dHdt_pred, dtype=torch.float32).to(device)
-    dCdt_pred = tensor(dCdt_pred, dtype=torch.float32).to(device)
-    dRdt_pred = tensor(dRdt_pred, dtype=torch.float32).to(device)
-    dDdt_pred = tensor(dDdt_pred, dtype=torch.float32).to(device)
+    # Calculate losses
+    data_loss = torch.mean((S - S_pred) ** 2 + (I - I_pred) ** 2 + (R - R_pred) ** 2 + (D - D_pred) ** 2)
+    physics_loss = torch.mean((s_t - dSdt_pred) ** 2 + (i_t - dIdt_pred) ** 2 + (r_t - dRdt_pred) ** 2 + (d_t - dDdt_pred) ** 2)
+    initial_condition_loss = torch.mean((S[0] - S_pred[0]) ** 2 + (I[0] - I_pred[0]) ** 2 + (R[0] - R_pred[0]) ** 2 + (D[0] - D_pred[0]) ** 2)
+    boundary_condition_loss = torch.mean((S[-1] - S_pred[-1]) ** 2 + (I[-1] - I_pred[-1]) ** 2 + (R[-1] - R_pred[-1]) ** 2 + (D[-1] - D_pred[-1]) ** 2)
+    reg_loss = torch.mean(beta_pred**2 + gamma_pred**2 + delta_pred**2)
 
-    data_loss = torch.mean((S - S_pred) ** 2 + (I - I_pred) ** 2 + (H - H_pred) ** 2 + (C - C_pred) ** 2 + (R - R_pred) ** 2 + (D - D_pred) ** 2)
-    physics_loss = torch.mean((s_t - dSdt_pred) ** 2 + (i_t - dIdt_pred) ** 2 + (h_t - dHdt_pred) ** 2 + (c_t - dCdt_pred) ** 2 + (r_t - dRdt_pred) ** 2 + (d_t - dDdt_pred) ** 2)
-    initial_condition_loss = torch.mean((S[0] - S_pred[0]) ** 2 + (I[0] - I_pred[0]) ** 2 + (H[0] - H_pred[0]) ** 2 + (C[0] - C_pred[0]) ** 2 + (R[0] - R_pred[0]) ** 2 + (D[0] - D_pred[0]) ** 2)
-    boundary_condition_loss = torch.mean((S[-1] - S_pred[-1]) ** 2 + (I[-1] - I_pred[-1]) ** 2 + (H[-1] - H_pred[-1]) ** 2 + (C[-1] - C_pred[-1]) ** 2 + (R[-1] - R_pred[-1]) ** 2 + (D[-1] - D_pred[-1]) ** 2)
-    reg_loss = torch.mean(beta_pred**2 + gamma_pred**2 + delta_pred**2 + rho_pred**2 + eta_pred**2 + kappa_pred**2 + mu_pred**2 + xi_pred**2)
-
+    # Total loss
     loss = data_loss + physics_loss + initial_condition_loss + boundary_condition_loss + reg_loss
 
     return loss
