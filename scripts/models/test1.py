@@ -30,8 +30,8 @@ plt.rcParams.update({
     "figure.figsize": (8, 5),
     "figure.facecolor": "white",
     "figure.autolayout": True,
-    "figure.dpi": 400,
-    "savefig.dpi": 400,
+    "figure.dpi": 600,
+    "savefig.dpi": 600,
     "savefig.format": "pdf",
     "savefig.bbox": "tight",
     "axes.labelsize": 14,
@@ -168,8 +168,18 @@ def seird_loss(model, model_output, SIRD_tensor, t_tensor, N, sigma=1/5, beta=No
     dRdt = gamma * I_pred
     dDdt = delta * I_pred
 
-    loss = torch.mean((I_t - dIdt) ** 2) + torch.mean((R_t - dRdt) ** 2) + torch.mean((D_t - dDdt) ** 2) + torch.mean((E_t - dEdt) ** 2)
-    loss += torch.mean((model_output[:, :3] - SIRD_tensor) ** 2)  # Data fitting loss for I, R, D
+
+    # Loss components
+    data_loss = torch.mean((I_pred - SIRD_tensor[:, 0]) ** 2 + (R_pred - SIRD_tensor[:, 1]) ** 2 + (D_pred - SIRD_tensor[:, 2]) ** 2)
+    
+    # Compute the derivatives
+    derivatives_loss = torch.mean((I_t - dIdt) ** 2 + (R_t - dRdt) ** 2 + (D_t - dDdt) ** 2 + (E_t - dEdt) ** 2)
+    
+    # Compute the boundary conditions
+    boundary_loss = torch.mean((S_pred[0] - N) ** 2 + (I_pred[0] - SIRD_tensor[0, 0]) ** 2 + (R_pred[0] - SIRD_tensor[0, 1]) ** 2 + (D_pred[0] - SIRD_tensor[0, 2]) ** 2 + (E_pred[0] - 0) ** 2)
+    
+    loss = data_loss + derivatives_loss + boundary_loss
+
     return loss
 
 class EarlyStopping:
@@ -196,6 +206,9 @@ class EarlyStopping:
         else:
             self.best_score = score
             self.counter = 0
+            
+shuffled_indices = torch.randperm(len(t_data))
+t_shuffled = t_data[shuffled_indices]
 
 def train(model, t_tensor, SIRD_tensor, epochs=1000, lr=0.001, N=None, sigma=1/5, beta=None, gamma=None, delta=None):
     optimizer = optim.Adam(model.parameters(), lr=lr)
@@ -241,6 +254,7 @@ def train(model, t_tensor, SIRD_tensor, epochs=1000, lr=0.001, N=None, sigma=1/5
     print("Training finished")
     return losses
 
+# plot the results of the model vs the data for infected
 def plot_results(t, I_data, R_data, D_data, model, title, N):
     model.eval()
     with torch.no_grad():

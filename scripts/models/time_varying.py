@@ -312,8 +312,8 @@ model = EpiNet(num_layers=10, hidden_neurons=32, output_size=6).to(device)
 beta_net = BetaNet(num_layers=10, hidden_neurons=32, output_size=8).to(device)
 
 # Initialize the optimizers
-model_optimizer = optim.Adam(model.parameters(), lr=1e-4)
-params_optimizer = optim.Adam(beta_net.parameters(), lr=1e-4)
+model_optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=0.1)
+params_optimizer = optim.Adam(beta_net.parameters(), lr=1e-4, weight_decay=0.1)
 
 # Define the learning rate scheduler
 model_scheduler = StepLR(model_optimizer, step_size=5000, gamma=0.998)
@@ -412,45 +412,3 @@ plt.title("Beta (β) Parameter")
 plt.tight_layout()
 plt.legend()
 plt.show()
-
-
-# Integrate the SIHCRD equations over the time grid, t.
-res = odeint(SIHCRD_model, u0, t, args=(beta, gamma, delta, rho, eta, kappa, mu, xi, N))
-
-S_ode, I_ode, H_ode, C_ode, R_ode, D_ode = res.T
-
-# Plot the results versus the original data
-plt.figure(figsize=(16, 9))
-plt.plot(t, data["active_cases"].values, label="I(t) (Data)", color="red")
-plt.plot(t[:train_size], I_ode[:train_size], label="I(t) (ODE)", linestyle="--", color="red")
-plt.xlabel("Time (days)")
-plt.ylabel("Number of Active Cases")
-plt.title("Active Cases (I(t))")
-plt.tight_layout()
-plt.legend()
-plt.show()
-
-
-
-
-def plot_results_comparation(country, data_type, real_data, pre_data, ode_data, train_size,type):
-    if not os.path.exists(path_results):
-        os.makedirs(path_results)
-
-    plt.figure(figsize=(16,9))
-    t = np.linspace(0,len(pre_data),len(pre_data)+1)[:-1]
-
-    plt.plot(t, real_data, color ='black' ,label=f'{data_type}_real') 
-    plt.scatter(t[:train_size], real_data[:train_size], color ='black', marker='*', label=f'{data_type}_train')  # type: ignore
-    plt.plot(t, pre_data, color ='red' ,label=f'{data_type}_pinn') 
-    # plt.plot(t, ode_data, color ='green' ,label=f'{data_type}_sir') 
-
-    plt.xlabel('Time t (days)', fontsize=25)
-    plt.ylabel('Numbers of individuals', fontsize=25)
-
-    plt.xticks(fontsize=25)
-    plt.yticks(fontsize=25)
-    plt.legend(fontsize=25)
-
-    plt.savefig(path_results+f'{country}_{data_type}_results_{type}_comparation.pdf', dpi=600)
-    plt.close()

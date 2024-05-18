@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 from tqdm.notebook import tqdm
 from scipy.integrate import odeint
 
-
 import torch
 import torch.nn as nn
 from torch.autograd import grad
@@ -110,44 +109,6 @@ def load_and_preprocess_data(filepath, areaname, recovery_period=16, rolling_win
 # Load and preprocess the data
 data = load_and_preprocess_data("../../data/hos_data/merged_data.csv", areaname="South West", recovery_period=21, start_date="2020-04-01", end_date="2021-12-31").drop(columns=["Unnamed: 0"], axis=1)
 
-# class EpiNet(nn.Module):
-#     """Epidemiological network for predicting model outputs."""
-#     def __init__(self, inverse=False, init_params=False, num_layers=2, hidden_neurons=10, output_size=6, retain_seed=10):
-#         super(EpiNet, self).__init__()
-#         self.retain_seed = retain_seed
-#         layers = [nn.Linear(1, hidden_neurons), nn.Tanh()]
-#         for _ in range(num_layers - 1):
-#             layers.extend([nn.Linear(hidden_neurons, hidden_neurons), nn.Tanh()])
-#         layers.append(nn.Linear(hidden_neurons, output_size))
-#         self.net = nn.Sequential(*layers)
-#         self.init_xavier()
-        
-#         # Adjustments for inverse model with customizable initial values for SEIRD model parameters
-#         self.inverse = inverse
-#         self.init_params_flag = init_params
-#         if inverse:
-#             self.sigmoid_activation = nn.Sigmoid()
-#             if init_params:
-#                 self.init_params()
-
-#     def init_xavier(self):
-#         """Initialize the weights using Xavier initialization."""
-#         for layer in self.net:
-#             if isinstance(layer, nn.Linear):
-#                 nn.init.xavier_normal_(layer.weight)
-#                 nn.init.zeros_(layer.bias)
-                
-#     def init_params(self):
-#         """Initialize the parameters for the inverse model."""
-#         for param in self.net.parameters():
-#             nn.init.uniform_(param, 0, 1)
-        
-#     def forward(self, x):
-#         out = self.net(x)
-#         if self.inverse:
-#             out = self.sigmoid_activation(out)
-#         return out
-
 class SEIRDNet(nn.Module):
     """Epidemiological network for predicting SEIRD model outputs."""
     def __init__(self, inverse=False, init_beta=None, init_gamma=None, init_delta=None, retain_seed=42, num_layers=4, hidden_neurons=20):
@@ -156,7 +117,7 @@ class SEIRDNet(nn.Module):
         layers = [nn.Linear(1, hidden_neurons), nn.Tanh()]
         for _ in range(num_layers - 1):
             layers.extend([nn.Linear(hidden_neurons, hidden_neurons), nn.Tanh()])
-        layers.append(nn.Linear(hidden_neurons, 6))  # Adjust the output size if needed
+        layers.append(nn.Linear(hidden_neurons, 5))  # Adjust the output size to 5 (S, E, I, R, D)
         self.net = nn.Sequential(*layers)
         
         if inverse:
@@ -194,15 +155,6 @@ class SEIRDNet(nn.Module):
                 if m.bias is not None:
                     m.bias.data.fill_(0)
         self.apply(init_weights)
-    
-
-# \begin{align}
-# \frac{dS}{dt} &= -\beta \frac{SI}{N} \\
-# \frac{dE}{dt} &= \beta \frac{SI}{N} - \sigma E \\
-# \frac{dI}{dt} &= \sigma E - (\gamma + \delta) I \\
-# \frac{dR}{dt} &= \gamma I \\
-# \frac{dD}{dt} &= \delta I
-# \end{align}
 
 def SEIRD_model(u, t, beta, sigma, gamma, delta, N):
     S, E, I, R, D = u
@@ -266,7 +218,7 @@ def pinn_loss(tensor_data, parameters, model_output, t, N, device):
     delta_pred = parameters[:, 2].squeeze()
     sigma = 1/5  # Fixed sigma value
 
-    S_pred, I_pred, R_pred, D_pred = model_output.unbind(1)
+    S_pred, E_pred, I_pred, R_pred, D_pred = model_output.unbind(1)
 
     s_t = grad(outputs=S_pred, inputs=t, grad_outputs=torch.ones_like(S_pred), create_graph=True)[0]
     i_t = grad(outputs=I_pred, inputs=t, grad_outputs=torch.ones_like(I_pred), create_graph=True)[0]
@@ -275,7 +227,7 @@ def pinn_loss(tensor_data, parameters, model_output, t, N, device):
 
     # Calculate the model derivatives based on the SEIRD model
     dSdt_pred = -beta_pred * S_pred * I_pred / N
-    dIdt_pred = sigma * (N - S_pred - I_pred - R_pred - D_pred) - (gamma_pred + delta_pred) * I_pred
+    dIdt_pred = sigma * E_pred - (gamma_pred + delta_pred) * I_pred
     dRdt_pred = gamma_pred * I_pred
     dDdt_pred = delta_pred * I_pred
 
@@ -315,7 +267,7 @@ class EarlyStopping:
             self.best_score = score
             self.counter = 0
 
-def train_model(tensor_data, model, beta_net, model_optimizer, params_optimizer, model_scheduler, params_scheduler, N, early_stopping, num_epochs=50000):
+def train_model(tensor_data, model, beta_net, model_optimizer, params_optimizer, model_scheduler, params_scheduler, N, early_stopping, num_epochs=5000):
     """Train the model."""
     loss_history = []
 
@@ -326,7 +278,7 @@ def train_model(tensor_data, model, beta_net, model_optimizer, params_optimizer,
         running_loss = 0.0
 
         train_tensors, val_tensors = tensor_data["train"], tensor_data["val"]
-        t_train, S_train, I_train, R_train, D_train, H_train, C_train = train_tensors
+        t_train, S_train, I_train, R_train, D_train = train_tensors
 
         model_optimizer.zero_grad()
         params_optimizer.zero_grad()
@@ -359,8 +311,8 @@ def train_model(tensor_data, model, beta_net, model_optimizer, params_optimizer,
     return loss_history
 
 # Initialize the models
-model = EpiNet(num_layers=10, hidden_neurons=32, output_size=6).to(device)
-beta_net = BetaNet(num_layers=10, hidden_neurons=32, output_size=8).to(device)
+model = SEIRDNet(num_layers=10, hidden_neurons=20).to(device)
+beta_net = SEIRDNet(inverse=True, init_beta=0.1, init_gamma=0.01, init_delta=0.01, num_layers=6, hidden_neurons=32).to(device)
 
 # Initialize the optimizers
 model_optimizer = optim.Adam(model.parameters(), lr=1e-3)
@@ -388,18 +340,17 @@ plt.title("Training Loss over Epochs (Log Scale)")
 plt.legend()
 plt.show()
 
-# Initial conditions for the SIHCRD model based on the data
+# Initial conditions for the SEIRD model based on the data
 S0 = data["S(t)"].values[0]
 I0 = data["active_cases"].values[0]
-H0 = data["hospitalCases"].values[0]
-C0 = data["covidOccupiedMVBeds"].values[0]
 R0 = data["recovered"].values[0]
 D0 = data["new_deceased"].values[0]
+E0 = 0  # Initial exposed cases assumed to be zero
 
 # Simulation time points
-t = np.linspace(0, train_size, train_size+1)[:-1]
+t = np.linspace(0, train_size, train_size + 1)[:-1]
 
-u0 = [S0, I0, H0, C0, R0, D0]  # initial conditions vector
+u0 = [S0, E0, I0, R0, D0]  # initial conditions vector
 
 # Extract the parameters from the trained model
 params = beta_net(tensor(t, dtype=torch.float32).view(-1, 1).to(device)).detach().cpu().numpy()
@@ -407,11 +358,7 @@ params = beta_net(tensor(t, dtype=torch.float32).view(-1, 1).to(device)).detach(
 beta = params[:, 0]
 gamma = params[:, 1]
 delta = params[:, 2]
-rho = params[:, 3]
-eta = params[:, 4]
-kappa = params[:, 5]
-mu = params[:, 6]
-xi = params[:, 7]
+sigma = 1 / 5  # Fixed sigma value
 
 def integrate_step_by_step(u0, t, params, N):
     """Integrate the ODE step by step to update initial conditions at each step."""
@@ -419,15 +366,15 @@ def integrate_step_by_step(u0, t, params, N):
     u = u0
     for i in range(len(t) - 1):
         t_span = [t[i], t[i + 1]]
-        beta, gamma, delta, rho, eta, kappa, mu, xi = params[i]
-        sol = odeint(SIHCRD_model, u, t_span, args=(beta, gamma, delta, rho, eta, kappa, mu, xi, N))
+        beta, gamma, delta = params[i]
+        sol = odeint(SEIRD_model, u, t_span, args=(beta, sigma, gamma, delta, N))
         u = sol[-1]  # Update the initial condition for the next step
         res.append(u)
     return np.array(res)
 
-# Integrate the SIHCRD equations over the time grid, t.
+# Integrate the SEIRD equations over the time grid, t.
 res = integrate_step_by_step(u0, t, params, N)
-S_ode, I_ode, H_ode, C_ode, R_ode, D_ode = res.T
+S_ode, E_ode, I_ode, R_ode, D_ode = res.T
 
 # Plot the results versus the original data
 plt.figure(figsize=(16, 9))
@@ -440,16 +387,16 @@ plt.tight_layout()
 plt.legend()
 plt.show()
 
-def plot_results_comparation(country, data_type, real_data, pre_data, ode_data, train_size, plot_type, path_results):
+def plot_results_comparison(country, data_type, real_data, pre_data, ode_data, train_size, plot_type, path_results):
     """Plot the comparison of real data, predicted data and ODE model data."""
     if not os.path.exists(path_results):
         os.makedirs(path_results)
 
     plt.figure(figsize=(16, 9))
-    t = np.linspace(0, len(pre_data), len(pre_data)+1)[:-1]
+    t = np.linspace(0, len(pre_data), len(pre_data) + 1)[:-1]
 
     plt.plot(t, real_data, color='black', label=f'{data_type}_real')
-    plt.scatter(t[:train_size], real_data[:train_size], color='black', marker='*', label=f'{data_type}_train')  # type: ignore
+    plt.scatter(t[:train_size], real_data[:train_size], color='black', marker='*', label=f'{data_type}_train')
     plt.plot(t, pre_data, color='red', label=f'{data_type}_pinn')
     plt.plot(t, ode_data, color='green', label=f'{data_type}_ode')
     
@@ -459,18 +406,17 @@ def plot_results_comparation(country, data_type, real_data, pre_data, ode_data, 
     plt.legend()
     plt.tight_layout()
     
-
-    plt.savefig(os.path.join(path_results, f'{country}_{data_type}_results_{plot_type}_comparation.pdf'), dpi=600)
+    plt.savefig(os.path.join(path_results, f'{country}_{data_type}_results_{plot_type}_comparison.pdf'), dpi=600)
     plt.close()
 
-# Example usage of plot_results_comparation
-plot_results_comparation(
+# Example usage of plot_results_comparison
+plot_results_comparison(
     country="South West",
     data_type="Active Cases",
     real_data=data["active_cases"].values,
     pre_data=I_ode,
-    ode_data=I_ode,  # Assuming ode_data is available and correct
+    ode_data=I_ode,
     train_size=train_size,
-    plot_type="SIHCRD",
+    plot_type="SEIRD",
     path_results="./results"
 )
