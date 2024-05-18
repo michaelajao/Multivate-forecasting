@@ -305,7 +305,7 @@ def train_model(tensor_data, model, beta_net, model_optimizer, params_optimizer,
             break
 
         if epoch % 500 == 0:
-            print(f"Epoch {epoch}, Loss: {running_loss}")
+            print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {running_loss:.6f}")  # Print every 500 epochs
 
     print("Finished Training")
     return loss_history
