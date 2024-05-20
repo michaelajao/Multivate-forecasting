@@ -185,7 +185,7 @@ class StateNN(nn.Module):
                 nn.init.zeros_(m.bias)
 
     def forward(self, t):
-        return torch.sigmoid(self.net(t))
+        return self.net(t)
 
 class ParamNN(nn.Module):
     """Neural network for predicting time-varying parameters."""
@@ -239,17 +239,32 @@ def pinn_loss(t, data, state_nn, param_nn, N, sigma, alpha, epsilon):
     dSdt, dEdt, dIdt, dRdt, dDdt = SEIRD_model(t, [S_pred, E_pred, I_pred, R_pred, D_pred], beta_pred, gamma_pred, mu_pred, sigma, e, alpha, N)
     
     # Compute data loss (MSE_u)
+    # data loss
     S_data, I_data, R_data, D_data = data
-    loss_data = torch.mean((S_pred - S_data)**2) + torch.mean((I_pred - I_data)**2) + torch.mean((R_pred - R_data)**2) + torch.mean((D_pred - D_data)**2)
+    data_loss = torch.mean((S_pred - S_data) ** 2) + torch.mean((I_pred - I_data) ** 2) + torch.mean((R_pred - R_data) ** 2) + torch.mean((D_pred - D_data) ** 2)
     
-    # Compute physics loss (MSE_f)
-    loss_physics = torch.mean((S_t - dSdt)**2) + torch.mean((E_t - dEdt)**2) + torch.mean((I_t - dIdt)**2) + torch.mean((R_t - dRdt)**2) + torch.mean((D_t - dDdt)**2)
+    # derivatives loss
+    derivatives_loss = torch.mean((S_t - dSdt) ** 2) + torch.mean((I_t - dIdt) ** 2) + torch.mean((R_t - dRdt) ** 2) + torch.mean((D_t - dDdt) ** 2)
     
     # initial condition loss
-    loss_initial = torch.mean((S_pred[0] - S_data[0])**2) + torch.mean((I_pred[0] - I_data[0])**2) + torch.mean((R_pred[0] - R_data[0])**2) + torch.mean((D_pred[0] - D_data[0])**2)
+    S0_loss = torch.mean((S_pred[0] - S_data[0]) ** 2)
     
-    # Total loss    
-    total_loss = loss_data + loss_physics + loss_initial
+    # boundary condition loss
+    t_boundary = t[-1]
+    S_boundary = S_pred[-1]
+    I_boundary = I_pred[-1]
+    R_boundary = R_pred[-1]
+    D_boundary = D_pred[-1]
+    
+    S_boundary_loss = torch.mean((S_boundary - S_data[-1]) ** 2)
+    I_boundary_loss = torch.mean((I_boundary - I_data[-1]) ** 2)
+    R_boundary_loss = torch.mean((R_boundary - R_data[-1]) ** 2)
+    D_boundary_loss = torch.mean((D_boundary - D_data[-1]) ** 2)
+    
+    boundary_loss = S_boundary_loss + I_boundary_loss + R_boundary_loss + D_boundary_loss
+    
+    # total loss
+    total_loss = data_loss + derivatives_loss + S0_loss + boundary_loss
     
     return total_loss
 
@@ -342,40 +357,60 @@ plt.show()
 # Predict and plot the results
 state_nn.eval()
 param_nn.eval()
-
 with torch.no_grad():
-    t = torch.linspace(0, 1, steps=len(t_data)).view(-1, 1).to(device)
-    states_pred = state_nn(t).cpu().numpy()
-    S_pred, E_pred, I_pred, R_pred, D_pred = states_pred[:, 0], states_pred[:, 1], states_pred[:, 2], states_pred[:, 3], states_pred[:, 4]
+    S_pred, E_pred, I_pred, R_pred, D_pred = state_nn(t_data).cpu().numpy().T
+    beta_pred, gamma_pred, mu_pred = param_nn(t_data)
+    beta_pred, gamma_pred, mu_pred = beta_pred.cpu().numpy(), gamma_pred.cpu().numpy(), mu_pred.cpu().numpy()
+    
+    # plot the predictions 
+    fig, ax = plt.subplots(4, 1, figsize=(10, 20), sharex=True)
+    
+    ax[0].plot(S_pred, label='S(t) (Predicted)', color='blue')
+    ax[0].plot(S_data.cpu().numpy(), label='S(t) (Actual)', color='red', linestyle='dashed')
+    ax[0].set_ylabel('S(t)')
+    ax[0].legend()
+    
+    ax[1].plot(I_pred, label='I(t) (Predicted)', color='blue')
+    ax[1].plot(I_data.cpu().numpy(), label='I(t) (Actual)', color='red', linestyle='dashed')
+    ax[1].set_ylabel('I(t)')
+    ax[1].legend()
+    
+    ax[2].plot(R_pred, label='R(t) (Predicted)', color='blue')
+    ax[2].plot(R_data.cpu().numpy(), label='R(t) (Actual)', color='red', linestyle='dashed')
+    ax[2].set_ylabel('R(t)')
+    ax[2].legend()
 
-    # Inverse transform to get back to original scale for each variable separately
-    I_pred = scaler.inverse_transform(np.concatenate([I_pred.reshape(-1, 1)] * len(features), axis=1))[:, 0]
-    R_pred = scaler.inverse_transform(np.concatenate([R_pred.reshape(-1, 1)] * len(features), axis=1))[:, 0]
-    D_pred = scaler.inverse_transform(np.concatenate([D_pred.reshape(-1, 1)] * len(features), axis=1))[:, 0]
+    ax[3].plot(D_pred, label='D(t) (Predicted)', color='blue')
+    ax[3].plot(D_data.cpu().numpy(), label='D(t) (Actual)', color='red', linestyle='dashed')
+    ax[3].set_ylabel('D(t)')
+    ax[3].legend()
+    
+    plt.xlabel('Time (days)')
+    plt.tight_layout()
+    plt.show()
+    
+    # plot the parameters
+    fig, ax = plt.subplots(3, 1, figsize=(10, 15), sharex=True)
+    
+    ax[0].plot(beta_pred, label='beta(t) (Predicted)', color='blue')
+    ax[0].set_ylabel('beta(t)')
+    ax[0].legend()
+    
+    ax[1].plot(gamma_pred, label='gamma(t) (Predicted)', color='blue')
+    ax[1].set_ylabel('gamma(t)')
+    ax[1].legend()
+    
+    ax[2].plot(mu_pred, label='mu(t) (Predicted)', color='blue')
+    ax[2].set_ylabel('mu(t)')
+    ax[2].legend()
+    
+    plt.xlabel('Time (days)')
+    plt.tight_layout()
+    plt.show()
+    
+    
 
-# Plot infected predicted vs real data
-plt.figure(figsize=(10, 5))
-plt.plot(data["date"], I_pred, label='Infected (Predicted)')
-plt.plot(data["date"], data["active_cases"], label='Infected (Actual)', linestyle='dashed')
-plt.xlabel('Date')
-plt.ylabel('Infected Population')
-plt.legend()
-plt.show()
-
-# Plot recovered predicted vs real data
-plt.figure(figsize=(10, 5))
-plt.plot(data["date"], R_pred, label='Recovered (Predicted)')
-plt.plot(data["date"], data["recovered"], label='Recovered (Actual)', linestyle='dashed')
-plt.xlabel('Date')
-plt.ylabel('Recovered Population')
-plt.legend()
-plt.show()
-
-# Plot deceased predicted vs real data
-plt.figure(figsize=(10, 5))
-plt.plot(data["date"], D_pred, label='Deceased (Predicted)')
-plt.plot(data["date"], data["new_deceased"], label='Deceased (Actual)', linestyle='dashed')
-plt.xlabel('Date')
-plt.ylabel('Deceased Population')
-plt.legend()
-plt.show()
+    
+    
+    
+    
