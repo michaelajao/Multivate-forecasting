@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import torch.nn as nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import StepLR
-from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.preprocessing import MinMaxScaler
 from collections import deque
 from tqdm.notebook import tqdm
@@ -72,148 +71,45 @@ plt.rcParams.update(
 # Device configuration
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def load_and_preprocess_data(filepath, recovery_period=21, rolling_window=7, start_date="2020-04-01"):
+def load_and_preprocess_data(filepath, areaname, recovery_period=21, rolling_window=7, start_date="2020-04-01", end_date="2020-12-31"):
     df = pd.read_csv(filepath)
-    required_columns = [
-        "date", "cumulative_confirmed", "cumulative_deceased",
-        "population", "new_confirmed", "new_deceased",
-    ]
-    for col in required_columns:
-        if col not in df.columns:
-            raise ValueError(f"Missing required column: {col}")
+    df = df[df["areaName"] == areaname].reset_index(drop=True)
+    df = df[::-1].reset_index(drop=True)  # Reverse dataset if needed
 
     df["date"] = pd.to_datetime(df["date"])
-    df["days_since_start"] = (df["date"] - pd.to_datetime(start_date)).dt.days
-
-    for col in ["new_confirmed", "new_deceased", "cumulative_confirmed", "cumulative_deceased"]:
-        df[col] = df[col].rolling(window=rolling_window, min_periods=1).mean().fillna(0)
+    df = df[(df["date"] >= pd.to_datetime(start_date)) & (df["date"] <= pd.to_datetime(end_date))]
 
     df["recovered"] = df["cumulative_confirmed"].shift(recovery_period) - df["cumulative_deceased"].shift(recovery_period)
     df["recovered"] = df["recovered"].fillna(0).clip(lower=0)
-
     df["active_cases"] = df["cumulative_confirmed"] - df["recovered"] - df["cumulative_deceased"]
+    df["S(t)"] = df["population"] - df["cumulative_confirmed"] - df["cumulative_deceased"] - df["recovered"]
 
-    df = df[df["date"] >= pd.to_datetime(start_date)].reset_index(drop=True)
-    df[["recovered", "active_cases"]] = df[["recovered", "active_cases"]].clip(lower=0)
+    cols_to_smooth = ["S(t)", "cumulative_confirmed", "cumulative_deceased", "hospitalCases", "covidOccupiedMVBeds", "recovered", "active_cases", "new_deceased", "new_confirmed"]
+    for col in cols_to_smooth:
+        df[col] = df[col].rolling(window=rolling_window, min_periods=1).mean().fillna(0)
 
     return df
 
-def get_region_name_from_filepath(filepath):
-    base = os.path.basename(filepath)
-    return os.path.splitext(base)[0]
+def prepare_tensors(data, device):
+    t = torch.tensor(np.arange(1, len(data) + 1), dtype=torch.float32).view(-1, 1).to(device).requires_grad_(True)
+    I = torch.tensor(data["active_cases"].values, dtype=torch.float32).view(-1, 1).to(device)
+    R = torch.tensor(data["recovered"].values, dtype=torch.float32).view(-1, 1).to(device)
+    D = torch.tensor(data["cumulative_deceased"].values, dtype=torch.float32).view(-1, 1).to(device)
+    return t, I, R, D
 
-def plot_results(t, I_data, R_data, D_data, model, title, N):
-    model.eval()
-    with torch.no_grad():
-        predictions = model(t).cpu().numpy()
+# Load and preprocess the data
+data = load_and_preprocess_data("../../data/hos_data/merged_data.csv", areaname="South West", recovery_period=21, rolling_window=7, start_date="2020-04-01", end_date="2020-12-31").drop(columns=["Unnamed: 0"], axis=1)
 
-    t_np = t.cpu().detach().numpy().flatten()
-    S_pred, E_pred, I_pred, R_pred, D_pred = predictions[:, 0], predictions[:, 1], predictions[:, 2], predictions[:, 3], predictions[:, 4]
+# Normalize the data using MinMaxScaler
+scaler = MinMaxScaler()
+columns_to_scale = ["active_cases", "recovered", "cumulative_deceased"]
+data[columns_to_scale] = scaler.fit_transform(data[columns_to_scale])
 
-    fig, axs = plt.subplots(1, 5, figsize=(30, 6))
+# Prepare PyTorch tensors
+t_data, I_data, R_data, D_data = prepare_tensors(data, device)
+SIRD_tensor = torch.cat([I_data, R_data, D_data], dim=1).to(device)
 
-    # Plotting S (Susceptible)
-    axs[0].plot(t_np, S_pred, 'r-', label='$S_{PINN}$')
-    axs[0].set_title('S')
-    axs[0].set_xlabel('Time t (days)')
-    axs[0].legend()
-
-    # Plotting E (Exposed)
-    axs[1].plot(t_np, E_pred, 'r-', label='$E_{PINN}$')
-    axs[1].set_title('E')
-    axs[1].set_xlabel('Time t (days)')
-    axs[1].legend()
-
-    # Plotting I (Infected)
-    axs[2].scatter(t_np, I_data.cpu().detach().numpy().flatten(), color='black', label='$I_{Data}$', s=10)
-    axs[2].plot(t_np, I_pred, 'r-', label='$I_{PINN}$')
-    axs[2].set_title('I')
-    axs[2].set_xlabel('Time t (days)')
-    axs[2].legend()
-
-    # Plotting R (Recovered)
-    axs[3].scatter(t_np, R_data.cpu().detach().numpy().flatten(), color='black', label='$R_{Data}$', s=10)
-    axs[3].plot(t_np, R_pred, 'r-', label='$R_{PINN}$')
-    axs[3].set_title('R')
-    axs[3].set_xlabel('Time t (days)')
-    axs[3].legend()
-
-    # Plotting D (Deceased)
-    axs[4].scatter(t_np, D_data.cpu().detach().numpy().flatten(), color='black', label='$D_{Data}$', s=10)
-    axs[4].plot(t_np, D_pred, 'r-', label='$D_{PINN}$')
-    axs[4].set_title('D')
-    axs[4].set_xlabel('Time t (days)')
-    axs[4].legend()
-
-    plt.tight_layout()
-    plt.savefig(f"../../reports/figures/{title}.pdf")
-    plt.show()
-
-def plot_loss(losses, title):
-    plt.plot(np.log10(losses))
-    plt.title(title)
-    plt.xlabel("Epoch")
-    plt.ylabel("Log10 Loss")
-    plt.show()
-
-def solve_seird_ode(beta, gamma, delta, N, I0, R0, D0, E0, t):
-    S0 = N - I0 - R0 - D0 - E0
-    sigma = 1/5
-    def seird_model(t, y):
-        S, I, R, D, E = y
-        dSdt = -(beta * S * I) / N
-        dEdt = (beta * S * I) / N - sigma * E
-        dIdt = sigma * E - gamma * I - delta * I
-        dRdt = gamma * I
-        dDdt = delta * I
-        return [dSdt, dEdt, dIdt, dRdt, dDdt]
-
-    y0 = [S0, I0, R0, D0, E0]
-    sol = solve_ivp(seird_model, [t[0], t[-1]], y0, t_eval=t, vectorized=True)
-    return sol.y
-
-def plot_ode_solution(t, sol, title):
-    S, E, I, R, D = sol
-    fig, axs = plt.subplots(1, 5, figsize=(30, 6))
-
-    axs[0].plot(t, S, 'r-', label='$S_{ODE}$')
-    axs[0].set_title('S')
-    axs[0].set_xlabel('Time t (days)')
-    axs[0].legend()
-
-    axs[1].plot(t, E, 'r-', label='$E_{ODE}$')
-    axs[1].set_title('E')
-    axs[1].set_xlabel('Time t (days)')
-    axs[1].legend()
-
-    axs[2].plot(t, I, 'r-', label='$I_{ODE}$')
-    axs[2].set_title('I')
-    axs[2].set_xlabel('Time t (days)')
-    axs[2].legend()
-
-    axs[3].plot(t, R, 'r-', label='$R_{ODE}$')
-    axs[3].set_title('R')
-    axs[3].set_xlabel('Time t (days)')
-    axs[3].legend()
-
-    axs[4].plot(t, D, 'r-', label='$D_{ODE}$')
-    axs[4].set_title('D')
-    axs[4].set_xlabel('Time t (days)')
-    axs[4].legend()
-
-    plt.tight_layout()
-    plt.savefig(f"../../reports/figures/{title}.pdf")
-    plt.show()
-
-def extract_parameters(model):
-    try:
-        beta_predicted = model.beta.item()
-        gamma_predicted = model.gamma.item()
-        delta_predicted = model.delta.item()
-        return beta_predicted, gamma_predicted, delta_predicted
-    except AttributeError:
-        print("Model does not have the requested parameters.")
-        return None, None, None
+N = data["population"].values[0]
 
 class SEIRNet(nn.Module):
     def __init__(self, inverse=False, init_beta=None, init_gamma=None, init_delta=None, retrain_seed=42, num_layers=4, hidden_neurons=20):
@@ -237,7 +133,7 @@ class SEIRNet(nn.Module):
         self.init_xavier()
 
     def forward(self, t):
-        return self.net(t)
+        return torch.sigmoid(self.net(t))
 
     @property
     def beta(self):
@@ -344,29 +240,121 @@ def train(model, t_tensor, SIRD_tensor, epochs=1000, lr=0.001, N=None, sigma=1/5
     print("Training finished")
     return losses
 
-# Load data
-path = "../../data/region_daily_data/Yorkshire and the Humber.csv"
-region_name = get_region_name_from_filepath(path)
-df = load_and_preprocess_data(f"../../data/region_daily_data/{region_name}.csv")
+# Plot results
+def plot_results(t, I_data, R_data, D_data, model, title, N):
+    model.eval()
+    with torch.no_grad():
+        predictions = model(t).cpu().numpy()
 
-start_date = "2020-04-01"
-end_date = "2020-12-31"
-mask = (df["date"] >= start_date) & (df["date"] <= end_date)
-training_data = df.loc[mask]
+    t_np = t.cpu().detach().numpy().flatten()
+    S_pred, E_pred, I_pred, R_pred, D_pred = predictions[:, 0], predictions[:, 1], predictions[:, 2], predictions[:, 3], predictions[:, 4]
+    
+    fig, axs = plt.subplots(5, 1, figsize=(20, 30))
+    
+    axs[0].plot(t_np, N - I_pred - R_pred - D_pred, 'r-', label='$S_{pred}$')
+    axs[0].plot(t_np, N - I_data.cpu().detach().numpy().flatten() - R_data.cpu().detach().numpy().flatten() - D_data.cpu().detach().numpy().flatten(), 'b-', label='$S_{true}$')
+    axs[0].set_title('S')
+    axs[0].set_xlabel('Time t (days)')
+    axs[0].legend()
+    
+    axs[1].plot(t_np, E_pred, 'r-', label='$E_{pred}$')
+    axs[1].set_title('E')
+    axs[1].set_xlabel('Time t (days)')
+    axs[1].legend()
+    
+    axs[2].plot(t_np, I_pred, 'r-', label='$I_{pred}$')
+    axs[2].plot(t_np, I_data.cpu().detach().numpy().flatten(), 'b-', label='$I_{true}$')
+    axs[2].set_title('I')
+    axs[2].set_xlabel('Time t (days)')
+    axs[2].legend()
+    
+    axs[3].plot(t_np, R_pred, 'r-', label='$R_{pred}$')
+    axs[3].plot(t_np, R_data.cpu().detach().numpy().flatten(), 'b-', label='$R_{true}$')
+    axs[3].set_title('R')
+    axs[3].set_xlabel('Time t (days)')
+    axs[3].legend()
+    
+    axs[4].plot(t_np, D_pred, 'r-', label='$D_{pred}$')
+    axs[4].plot(t_np, D_data.cpu().detach().numpy().flatten(), 'b-', label='$D_{true}$')
+    axs[4].set_title('D')
+    axs[4].set_xlabel('Time t (days)')
+    axs[4].legend()
+    
+    plt.tight_layout()
+    plt.savefig(f"../../reports/figures/{title}.pdf")
+    plt.show()
+    
+    
 
-N = df['population'].values[0]
+# Plot the log10 of the loss
+def plot_loss(losses, title):
+    plt.plot(np.log10(losses))
+    plt.title(title)
+    plt.xlabel("Epoch")
+    plt.ylabel("Log10 Loss")
+    plt.show()
 
-# Normalize the data using MinMaxScaler
-scaler = MinMaxScaler()
-columns_to_scale = ["active_cases", "recovered", "cumulative_deceased"]
-training_data[columns_to_scale] = scaler.fit_transform(training_data[columns_to_scale])
+# Solve SEIRD ODE
+def solve_seird_ode(beta, gamma, delta, N, I0, R0, D0, E0, t):
+    S0 = N - I0 - R0 - D0 - E0
+    sigma = 1/5
+    def seird_model(t, y):
+        S, I, R, D, E = y
+        dSdt = -(beta * S * I) / N
+        dEdt = (beta * S * I) / N - sigma * E
+        dIdt = sigma * E - gamma * I - delta * I
+        dRdt = gamma * I
+        dDdt = delta * I
+        return [dSdt, dEdt, dIdt, dRdt, dDdt]
 
-# Convert columns to tensors
-t_data = torch.tensor(range(len(training_data)), dtype=torch.float32).view(-1, 1).requires_grad_(True).to(device)
-I_data = torch.tensor(training_data["active_cases"].values, dtype=torch.float32).view(-1, 1).to(device)
-R_data = torch.tensor(training_data["recovered"].values, dtype=torch.float32).view(-1, 1).to(device)
-D_data = torch.tensor(training_data["cumulative_deceased"].values, dtype=torch.float32).view(-1, 1).to(device)
-SIRD_tensor = torch.cat([I_data, R_data, D_data], dim=1).to(device)
+    y0 = [S0, I0, R0, D0, E0]
+    sol = solve_ivp(seird_model, [t[0], t[-1]], y0, t_eval=t, vectorized=True)
+    return sol.y
+
+# Plot the ODE solution
+def plot_ode_solution(t, sol, title):
+    S, E, I, R, D = sol
+    fig, axs = plt.subplots(5, 1, figsize=(20, 30))
+
+    axs[0].plot(t, S, 'r-', label='$S_{ODE}$')
+    axs[0].set_title('S')
+    axs[0].set_xlabel('Time t (days)')
+    axs[0].legend()
+
+    axs[1].plot(t, E, 'r-', label='$E_{ODE}$')
+    axs[1].set_title('E')
+    axs[1].set_xlabel('Time t (days)')
+    axs[1].legend()
+
+    axs[2].plot(t, I, 'r-', label='$I_{ODE}$')
+    axs[2].set_title('I')
+    axs[2].set_xlabel('Time t (days)')
+    axs[2].legend()
+
+    axs[3].plot(t, R, 'r-', label='$R_{ODE}$')
+    axs[3].set_title('R')
+    axs[3].set_xlabel('Time t (days)')
+    axs[3].legend()
+
+    axs[4].plot(t, D, 'r-', label='$D_{ODE}$')
+    axs[4].set_title('D')
+    axs[4].set_xlabel('Time t (days)')
+    axs[4].legend()
+
+    plt.tight_layout()
+    plt.savefig(f"../../reports/figures/{title}.pdf")
+    plt.show()
+
+# Extract parameters
+def extract_parameters(model):
+    try:
+        beta_predicted = model.beta.item()
+        gamma_predicted = model.gamma.item()
+        delta_predicted = model.delta.item()
+        return beta_predicted, gamma_predicted, delta_predicted
+    except AttributeError:
+        print("Model does not have the requested parameters.")
+        return None, None, None
 
 # Train forward model
 model_forward = SEIRNet(num_layers=6, hidden_neurons=32)
@@ -397,4 +385,19 @@ t_np = t_data.cpu().detach().numpy().flatten()
 sol = solve_seird_ode(beta_predicted, gamma_predicted, delta_predicted, N, I0, R0, D0, E0, t_np)
 
 # Plot the ODE solution
-plot_ode_solution(t_np[:len(sol[0])], sol, "SEIRD ODE Solution")
+plot_ode_solution(t_np, sol, "SEIRD ODE Solution")
+
+# Save predictions to CSV
+def save_predictions_to_csv(dates, predictions, filename):
+    df = pd.DataFrame({
+        'date': dates,
+        'S_pred': predictions[:, 0],
+        'E_pred': predictions[:, 1],
+        'I_pred': predictions[:, 2],
+        'R_pred': predictions[:, 3],
+        'D_pred': predictions[:, 4]
+    })
+    df.to_csv(filename, index=False)
+
+dates = data['date'].values
+save_predictions_to_csv(dates, model_inverse(t_data).cpu().detach().numpy(), "../../reports/predictions.csv")
