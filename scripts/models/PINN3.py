@@ -125,10 +125,10 @@ def prepare_tensors(data, device):
     return t, S, I, R, D
 
 def scale_data(data, features):
-    """Scale the data using MinMaxScaler."""
+    """Scale the data using StandardScaler."""
     scaler = MinMaxScaler()
     scaled_data = pd.DataFrame(scaler.fit_transform(data[features]), columns=features)
-    return scaled_data, scaler  
+    return scaled_data, scaler
 
 # Define features and data split
 features = ["S(t)", "active_cases", "recovered", "new_deceased"]
@@ -356,36 +356,86 @@ plt.legend()
 plt.show()
 
 # Predict using the trained model
-state_nn.eval()
-with torch.no_grad():
-    states_pred = state_nn(t_data)
-    S_pred, E_pred, I_pred, R_pred, D_pred = states_pred[:, 0], states_pred[:, 1], states_pred[:, 2], states_pred[:, 3], states_pred[:, 4]
+def plot_results(t, S_data, I_data, R_data, D_data, model, title, N):
+    state_nn.eval()
+    with torch.no_grad():
+        predictions = state_nn(t).cpu().numpy()
 
-# Scale back the data to the original range
-S_pred = scaler.inverse_transform(S_pred.cpu().numpy().reshape(-1, 1))
-I_pred = scaler.inverse_transform(I_pred.cpu().numpy().reshape(-1, 1))
-R_pred = scaler.inverse_transform(R_pred.cpu().numpy().reshape(-1, 1))
-D_pred = scaler.inverse_transform(D_pred.cpu().numpy().reshape(-1, 1))
-
-# Plot the results
-def plot_results(t, real_data, predicted_data, train_size, data_type):
-    plt.figure(figsize=(10, 5))
-    plt.plot(t, real_data, color='black', label=f'{data_type}_Real')
-    plt.scatter(t[:train_size], real_data[:train_size], color='black', marker='*', label=f'{data_type}_Train')  # type: ignore
-    plt.plot(t, predicted_data, color='red', label=f'{data_type}_PINNs')
-    plt.xlabel('Time')
-    plt.ylabel(data_type)
-    plt.legend()
+    t_np = t.cpu().detach().numpy().flatten()
+    S_pred, E_pred, I_pred, R_pred, D_pred = predictions[:, 0], predictions[:, 1], predictions[:, 2], predictions[:, 3], predictions[:, 4]
+    
+    fig, axs = plt.subplots(5, 1, figsize=(20, 30))
+    
+    axs[0].plot(t_np, S_pred, 'r-', label='$S_{pred}$')
+    axs[0].plot(t_np, S_data.cpu().detach().numpy().flatten(), 'b-', label='$S_{true}$')
+    axs[0].set_title('S')
+    axs[0].set_xlabel('Time t (days)')
+    axs[0].legend()
+    
+    axs[1].plot(t_np, E_pred, 'r-', label='$E_{pred}$')
+    axs[1].set_title('E')
+    axs[1].set_xlabel('Time t (days)')
+    axs[1].legend()
+    
+    axs[2].plot(t_np, I_pred, 'r-', label='$I_{pred}$')
+    axs[2].plot(t_np, I_data.cpu().detach().numpy().flatten(), 'b-', label='$I_{true}$')
+    axs[2].set_title('I')
+    axs[2].set_xlabel('Time t (days)')
+    axs[2].legend()
+    
+    axs[3].plot(t_np, R_pred, 'r-', label='$R_{pred}$')
+    axs[3].plot(t_np, R_data.cpu().detach().numpy().flatten(), 'b-', label='$R_{true}$')
+    axs[3].set_title('R')
+    axs[3].set_xlabel('Time t (days)')
+    axs[3].legend()
+    
+    axs[4].plot(t_np, D_pred, 'r-', label='$D_{pred}$')
+    axs[4].plot(t_np, D_data.cpu().detach().numpy().flatten(), 'b-', label='$D_{true}$')
+    axs[4].set_title('D')
+    axs[4].set_xlabel('Time t (days)')
+    axs[4].legend()
+    
+    plt.tight_layout()
+    # plt.savefig(f"{title}.pdf")
     plt.show()
-
-# Get the real data for plotting
-S_real = data["S(t)"].values
-I_real = data["active_cases"].values
-R_real = data["recovered"].values
-D_real = data["new_deceased"].values
+    
+    return fig
 
 # Plot the results
-plot_results(t_points, S_real, S_pred, train_size, 'S')
-plot_results(t_points, I_real, I_pred, train_size, 'I')
-plot_results(t_points, R_real, R_pred, train_size, 'R')
-plot_results(t_points, D_real, D_pred, train_size, 'D')
+title = "SEIRD Model Predictions"
+fig = plot_results(t_data, S_data, I_data, R_data, D_data, state_nn, title, N)
+
+# Plot the parameter estimates over time
+def plot_params(t, param_nn, title):
+    param_nn.eval()
+    with torch.no_grad():
+        beta_pred, gamma_pred, mu_pred = param_nn(t).cpu().numpy()
+
+    t_np = t.cpu().detach().numpy().flatten()
+    
+    fig, axs = plt.subplots(3, 1, figsize=(20, 15))
+    
+    axs[0].plot(t_np, beta_pred, 'r-', label='$\\beta_{pred}$')
+    axs[0].set_title('Estimated $\\beta$ over Time')
+    axs[0].set_xlabel('Time t (days)')
+    axs[0].legend()
+    
+    axs[1].plot(t_np, gamma_pred, 'g-', label='$\\gamma_{pred}$')
+    axs[1].set_title('Estimated $\\gamma$ over Time')
+    axs[1].set_xlabel('Time t (days)')
+    axs[1].legend()
+    
+    axs[2].plot(t_np, mu_pred, 'b-', label='$\\mu_{pred}$')
+    axs[2].set_title('Estimated $\\mu$ over Time')
+    axs[2].set_xlabel('Time t (days)')
+    axs[2].legend()
+    
+    plt.tight_layout()
+    # plt.savefig(f"{title}_parameters.pdf")
+    plt.show()
+    
+    return fig
+
+# Plot the parameter estimates
+title = "SEIRD Model Parameter Estimates"
+fig = plot_params(t_data, param_nn, title)

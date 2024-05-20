@@ -57,7 +57,7 @@ plt.rcParams.update({
 })
 
 # Device setup for CUDA or CPU
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
 # Set random seed for reproducibility
@@ -196,21 +196,6 @@ epochs = 100
 
 train_lstm(lstm_model, train_inout_seq, train_labels, epochs, device)
 
+# predict and plot for the next 30 days
 
-def lstm_forecast(model, data_seq, future_days, device):
-    model.eval()
-    predictions = []
-    current_seq = data_seq[-train_window:].to(device)
-    for _ in range(future_days):
-        with torch.no_grad():
-            y_pred = model(current_seq)
-            predictions.append(y_pred.item())
-            new_seq = torch.cat((current_seq[1:], y_pred.unsqueeze(0)))
-            current_seq = new_seq
-    return predictions
 
-short_term_days = 14
-lstm_predictions = lstm_forecast(lstm_model, train_inout_seq, short_term_days, device)
-
-# Convert predictions back to original scale
-lstm_predictions_scaled = scaler.inverse_transform(np.array(lstm_predictions).reshape(-1, 1))

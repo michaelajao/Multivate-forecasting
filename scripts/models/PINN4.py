@@ -207,9 +207,9 @@ class ParamNN(nn.Module):
     def forward(self, t):
         params = self.net(t)
         # Ensure beta, gamma, and mu are in a valid range
-        beta = torch.sigmoid(params[:, 0]) * 0.5  # range: [0, 0.5]
-        gamma = torch.sigmoid(params[:, 1]) * 0.1  # range: [0, 0.1]
-        mu = torch.sigmoid(params[:, 2]) * 0.1  # range: [0, 0.1]
+        beta = nn.Parameter(torch.sigmoid(params[:, 0]))
+        gamma = nn.Parameter(torch.sigmoid(params[:, 1]))
+        mu = nn.Parameter(torch.sigmoid(params[:, 2]))
         return beta, gamma, mu
 
 def pinn_loss(t, data, state_nn, param_nn, N, sigma, alpha, epsilon):
