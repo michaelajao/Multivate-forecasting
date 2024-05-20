@@ -14,22 +14,64 @@ torch.manual_seed(42)
 
 # Set the default style
 # plt.style.use("fivethirtyeight")
-plt.style.use("seaborn-v0_8-poster")
-plt.rcParams.update(
-    {
-        "lines.linewidth": 2,
-        "font.family": "serif",
-        "axes.titlesize": 20,
-        "axes.labelsize": 14,
-        "figure.figsize": [15, 8],
-        "figure.autolayout": True,
-        "axes.spines.top": False,
-        "axes.spines.right": False,
-        "axes.grid": True,
-        "grid.color": "0.75",
-        "legend.fontsize": "medium",
-    }
-)
+# plt.style.use("seaborn-v0_8-poster")
+# plt.rcParams.update(
+#     {
+#         "lines.linewidth": 2,
+#         "font.family": "serif",
+#         "axes.titlesize": 20,
+#         "axes.labelsize": 14,
+#         "figure.figsize": [15, 8],
+#         "figure.autolayout": True,
+#         "axes.spines.top": False,
+#         "axes.spines.right": False,
+#         "axes.grid": True,
+#         "grid.color": "0.75",
+#         "legend.fontsize": "medium",
+#     }
+# )
+
+plt.rcParams.update({
+    "font.size": 20,
+    "figure.figsize": [10, 5],
+    "figure.facecolor": "white",
+    "figure.autolayout": True,
+    "figure.dpi": 600,
+    "savefig.dpi": 600,
+    "savefig.format": "pdf",
+    "savefig.bbox": "tight",
+    "axes.labelweight": "bold",
+    "axes.titleweight": "bold",
+    "axes.labelsize": 14,
+    "axes.titlesize": 18,
+    "axes.facecolor": "white",
+    "axes.grid": True,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.formatter.limits": (0, 5),
+    "axes.formatter.use_mathtext": True,
+    "axes.formatter.useoffset": False,
+    "axes.xmargin": 0,
+    "axes.ymargin": 0,
+    "legend.fontsize": 14,
+    "legend.frameon": False,
+    "legend.loc": "best",
+    "lines.linewidth": 2,
+    "lines.markersize": 8,
+    "xtick.labelsize": 14,
+    "xtick.direction": "in",
+    "xtick.top": False,
+    "ytick.labelsize": 14,
+    "ytick.direction": "in",
+    "ytick.right": False,
+    "grid.color": "grey",
+    "grid.linestyle": "--",
+    "grid.linewidth": 0.5,
+    "errorbar.capsize": 4,
+    "figure.subplot.wspace": 0.4,
+    "figure.subplot.hspace": 0.4,
+    "image.cmap": "viridis",
+})
 
 # Device configuration
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

@@ -204,7 +204,7 @@ tensor_data, scaler = split_and_scale_data(data, train_size, features, device)
 # PINN loss function
 def pinn_loss(tensor_data, parameters, model_output, t, N, sigma=1/5, beta=None, gamma=None, delta=None):
     """Physics-Informed Neural Network loss function."""
-    I_pred, R_pred, D_pred, E_pred, S_pred = model_output[:, 0], model_output[:, 1], model_output[:, 2], model_output[:, 3], model_output[:, 4]
+    S_pred, E_pred, I_pred, R_pred, D_pred = torch.split(model_output, 1, dim=1)
     
     s_t = grad(S_pred, t, grad_outputs=torch.ones_like(S_pred), create_graph=True)[0]
     e_t = grad(E_pred, t, grad_outputs=torch.ones_like(E_pred), create_graph=True)[0]
@@ -232,7 +232,7 @@ def pinn_loss(tensor_data, parameters, model_output, t, N, sigma=1/5, beta=None,
     differential_loss = torch.mean((s_t - dSdt) ** 2) + torch.mean((e_t - dEdt) ** 2) + torch.mean((i_t - dIdt) ** 2) + torch.mean((r_t - dRdt) ** 2) + torch.mean((d_t - dDdt) ** 2)
     
     # Initial condition loss
-    initial_condition_loss = torch.mean((S_pred[0] - N) ** 2) + torch.mean((E_pred[0]) ** 2) + torch.mean((I_pred[0]) ** 2) + torch.mean((R_pred[0]) ** 2) + torch.mean((D_pred[0]) ** 2)
+    initial_condition_loss = torch.mean((S_pred[0] - 1) ** 2) + torch.mean(E_pred[0] ** 2) + torch.mean((I_pred[0] - tensor_data["train"][1][0]) ** 2) + torch.mean((R_pred[0] - tensor_data["train"][2][0]) ** 2) + torch.mean((D_pred[0] - tensor_data["train"][3][0]) ** 2)
     
     return data_fitting_loss + differential_loss + initial_condition_loss
 
@@ -267,11 +267,11 @@ N = data["population"].values[0]
 model = SEIRDNet(inverse=True, init_beta=0.3, init_gamma=0.1, init_delta=0.1, num_layers=10, hidden_neurons=32, retain_seed=100).to(device)
 
 # Initialize optimizer and scheduler
-optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=0.1)
+optimizer = optim.Adam(model.parameters(), lr=0.0001)
 scheduler = StepLR(optimizer, step_size=2000, gamma=0.9)
 
 # Initialize early stopping
-earlystopping = EarlyStopping(patience=100, verbose=True)
+earlystopping = EarlyStopping(patience=100, verbose=False)
 
 # Set the number of epochs for training
 epochs = 50000
@@ -315,3 +315,46 @@ plt.xlabel("Epoch")
 plt.ylabel("Loss")
 plt.title("Training Loss History")
 plt.show()
+
+# Switch the model to evaluation mode
+model.eval()
+with torch.no_grad():
+    t_val, I_val, R_val, D_val = tensor_data["val"]
+    model_output = model(t_val)
+    S_pred, E_pred, I_pred, R_pred, D_pred = torch.split(model_output, 1, dim=1)
+
+    # Inverse transform the scaled data
+    S_pred = scaler.inverse_transform(S_pred.cpu().numpy())
+    E_pred = scaler.inverse_transform(E_pred.cpu().numpy())
+    I_pred = scaler.inverse_transform(I_pred.cpu().numpy())
+    R_pred = scaler.inverse_transform(R_pred.cpu().numpy())
+    D_pred = scaler.inverse_transform(D_pred.cpu().numpy())
+
+    # Plot the predicted vs. true data
+    plt.figure()
+    plt.plot(data["active_cases"], label="True Active Cases", color="blue", linestyle="--")
+    plt.plot(np.arange(train_size, len(data)), I_pred, label="Predicted Active Cases", color="red")
+    plt.xlabel("Days")
+    plt.ylabel("Active Cases")
+    plt.title("Predicted vs. True Active Cases")
+    plt.legend()
+    plt.show()
+
+    plt.figure()
+    plt.plot(data["recovered"], label="True Recovered", color="blue", linestyle="--")
+    plt.plot(np.arange(train_size, len(data)), R_pred, label="Predicted Recovered", color="red")
+    plt.xlabel("Days")
+    plt.ylabel("Recovered")
+    plt.title("Predicted vs. True Recovered")
+    plt.legend()
+    plt.show()
+
+    plt.figure()
+    plt.plot(data["cumulative_deceased"], label="True Deceased", color="blue", linestyle="--")
+    plt.plot(np.arange(train_size, len(data)), D_pred, label="Predicted Deceased", color="red")
+    plt.xlabel("Days")
+    plt.ylabel("Deceased")
+    plt.title("Predicted vs. True Deceased")
+    plt.legend()
+    plt.show()
+

@@ -9,6 +9,7 @@ from torch.optim.lr_scheduler import StepLR
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.preprocessing import MinMaxScaler
 from collections import deque
+from tqdm.notebook import tqdm
 from scipy.integrate import solve_ivp
 
 # Ensure the folders exist
@@ -22,31 +23,51 @@ if torch.cuda.is_available():
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
-# Set the default style
-plt.rcParams.update({
-    "font.family": "serif",
-    "font.size": 14,
-    "text.usetex": False,
-    "figure.figsize": (8, 5),
-    "figure.facecolor": "white",
-    "figure.autolayout": True,
-    "figure.dpi": 600,
-    "savefig.dpi": 600,
-    "savefig.format": "pdf",
-    "savefig.bbox": "tight",
-    "axes.labelsize": 14,
-    "axes.titlesize": 20,
-    "axes.facecolor": "white",
-    "legend.fontsize": 12,
-    "legend.frameon": False,
-    "legend.loc": "best",
-    "lines.linewidth": 2,
-    "lines.markersize": 8,
-    "xtick.labelsize": 12,
-    "ytick.labelsize": 12,
-    "xtick.direction": "in",
-    "ytick.direction": "in",
-})
+# Set matplotlib style and parameters
+plt.style.use("seaborn-v0_8-poster")
+plt.rcParams.update(
+    {
+        "font.size": 20,
+        "figure.figsize": [10, 5],
+        "figure.facecolor": "white",
+        "figure.autolayout": True,
+        "figure.dpi": 600,
+        "savefig.dpi": 600,
+        "savefig.format": "pdf",
+        "savefig.bbox": "tight",
+        "axes.labelweight": "bold",
+        "axes.titleweight": "bold",
+        "axes.labelsize": 14,
+        "axes.titlesize": 18,
+        "axes.facecolor": "white",
+        "axes.grid": True,
+        "axes.spines.top": False,
+        "axes.spines.right": False,
+        "axes.formatter.limits": (0, 5),
+        "axes.formatter.use_mathtext": True,
+        "axes.formatter.useoffset": False,
+        "axes.xmargin": 0,
+        "axes.ymargin": 0,
+        "legend.fontsize": 14,
+        "legend.frameon": False,
+        "legend.loc": "best",
+        "lines.linewidth": 2,
+        "lines.markersize": 8,
+        "xtick.labelsize": 14,
+        "xtick.direction": "in",
+        "xtick.top": False,
+        "ytick.labelsize": 14,
+        "ytick.direction": "in",
+        "ytick.right": False,
+        "grid.color": "grey",
+        "grid.linestyle": "--",
+        "grid.linewidth": 0.5,
+        "errorbar.capsize": 4,
+        "figure.subplot.wspace": 0.4,
+        "figure.subplot.hspace": 0.4,
+        "image.cmap": "viridis",
+    }
+)
 
 # Device configuration
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -86,7 +107,7 @@ region_name = get_region_name_from_filepath(path)
 df = load_and_preprocess_data(f"../../data/region_daily_data/{region_name}.csv")
 
 start_date = "2020-04-01"
-end_date = "2020-08-31"
+end_date = "2020-12-31"  # Corrected end date
 mask = (df["date"] >= start_date) & (df["date"] <= end_date)
 training_data = df.loc[mask]
 
@@ -111,13 +132,13 @@ class SEIRNet(nn.Module):
         layers = [nn.Linear(1, hidden_neurons), nn.Tanh()]
         for _ in range(num_layers - 1):
             layers.extend([nn.Linear(hidden_neurons, hidden_neurons), nn.Tanh()])
-        layers.append(nn.Linear(hidden_neurons, 4))
+        layers.append(nn.Linear(hidden_neurons, 5))
         self.net = nn.Sequential(*layers)
 
         if inverse:
-            self._beta = nn.Parameter(torch.tensor([init_beta if init_beta is not None else torch.rand(1)], device=device), requires_grad=True)
-            self._gamma = nn.Parameter(torch.tensor([init_gamma if init_gamma is not None else torch.rand(1)], device=device), requires_grad=True)
-            self._delta = nn.Parameter(torch.tensor([init_delta if init_delta is not None else torch.rand(1)], device=device), requires_grad=True)
+            self._beta = nn.Variable(torch.tensor(init_beta, dtype=torch.float32).to(device), requires_grad=True)
+            self._gamma = nn.Variable(torch.tensor(init_gamma, dtype=torch.float32).to(device), requires_grad=True)
+            self._delta = nn.Variable(torch.tensor(init_delta, dtype=torch.float32).to(device), requires_grad=True)
         else:
             self._beta = None
             self._gamma = None
@@ -130,15 +151,15 @@ class SEIRNet(nn.Module):
 
     @property
     def beta(self):
-        return torch.sigmoid(self._beta) * 0.9 + 0.1 if self._beta is not None else None
+        return torch.sigmoid(self._beta)
 
     @property
     def gamma(self):
-        return torch.sigmoid(self._gamma) * 0.09 + 0.01 if self._gamma is not None else None
+        return torch.sigmoid(self._gamma)
 
     @property
     def delta(self):
-        return torch.sigmoid(self._delta) * 0.09 + 0.01 if self._delta is not None else None
+        return torch.sigmoid(self._delta) 
 
     def init_xavier(self):
         torch.manual_seed(self.retrain_seed)
@@ -151,13 +172,17 @@ class SEIRNet(nn.Module):
         self.apply(init_weights)
 
 def seird_loss(model, model_output, SIRD_tensor, t_tensor, N, sigma=1/5, beta=None, gamma=None, delta=None):
-    I_pred, R_pred, D_pred, E_pred = model_output[:, 0], model_output[:, 1], model_output[:, 2], model_output[:, 3]
+    S_pred, E_pred, I_pred, R_pred, D_pred = model_output[:, 0], model_output[:, 1], model_output[:, 2], model_output[:, 3], model_output[:, 4]
     S_pred = N - I_pred - R_pred - D_pred - E_pred
-
+    
+    I_data, R_data, D_data = SIRD_tensor[:, 0], SIRD_tensor[:, 1], SIRD_tensor[:, 2]
+    S_data = N - I_data - R_data - D_data
+    
+    S_t = torch.autograd.grad(S_pred, t_tensor, torch.ones_like(S_pred), create_graph=True)[0]
+    E_t = torch.autograd.grad(E_pred, t_tensor, torch.ones_like(E_pred), create_graph=True)[0]
     I_t = torch.autograd.grad(I_pred, t_tensor, torch.ones_like(I_pred), create_graph=True)[0]
     R_t = torch.autograd.grad(R_pred, t_tensor, torch.ones_like(R_pred), create_graph=True)[0]
     D_t = torch.autograd.grad(D_pred, t_tensor, torch.ones_like(D_pred), create_graph=True)[0]
-    E_t = torch.autograd.grad(E_pred, t_tensor, torch.ones_like(E_pred), create_graph=True)[0]
 
     if beta is None:
         beta, gamma, delta = model.beta, model.gamma, model.delta
@@ -168,19 +193,21 @@ def seird_loss(model, model_output, SIRD_tensor, t_tensor, N, sigma=1/5, beta=No
     dRdt = gamma * I_pred
     dDdt = delta * I_pred
 
-
     # Loss components
-    data_loss = torch.mean((I_pred - SIRD_tensor[:, 0]) ** 2 + (R_pred - SIRD_tensor[:, 1]) ** 2 + (D_pred - SIRD_tensor[:, 2]) ** 2)
+    # data loss component
+    loss_data = torch.mean((S_pred - S_data) ** 2 + (I_pred - I_data) ** 2 + (R_pred - R_data) ** 2 + (D_pred - D_data) ** 2)
     
-    # Compute the derivatives
-    derivatives_loss = torch.mean((I_t - dIdt) ** 2 + (R_t - dRdt) ** 2 + (D_t - dDdt) ** 2 + (E_t - dEdt) ** 2)
+    # residual loss component
+    loss_residual = torch.mean((S_t + dSdt) ** 2 + (E_t + dEdt) ** 2 + (I_t + dIdt) ** 2 + (R_t + dRdt) ** 2 + (D_t + dDdt) ** 2)
     
-    # Compute the boundary conditions
-    boundary_loss = torch.mean((S_pred[0] - N) ** 2 + (I_pred[0] - SIRD_tensor[0, 0]) ** 2 + (R_pred[0] - SIRD_tensor[0, 1]) ** 2 + (D_pred[0] - SIRD_tensor[0, 2]) ** 2 + (E_pred[0] - 0) ** 2)
+    # initial condition loss component
+    loss_initial = torch.mean((S_pred[0] - S_data[0]) ** 2 + (I_pred[0] - I_data[0]) ** 2 + (R_pred[0] - R_data[0]) ** 2 + (D_pred[0] - D_data[0]) ** 2)
     
-    loss = data_loss + derivatives_loss + boundary_loss
-
+    loss = loss_data + loss_residual + loss_initial
+    
+    
     return loss
+    
 
 class EarlyStopping:
     def __init__(self, patience=10, verbose=False, delta=0):
@@ -192,11 +219,13 @@ class EarlyStopping:
         self.val_loss_min = np.Inf
         self.counter = 0
         self.loss_history = deque(maxlen=patience + 1)
+        self.best_model = None
 
-    def __call__(self, val_loss):
+    def __call__(self, val_loss, model):
         score = -val_loss
         if self.best_score is None:
             self.best_score = score
+            self.best_model = model.state_dict()
         elif score < self.best_score + self.delta:
             self.counter += 1
             if self.verbose:
@@ -206,50 +235,29 @@ class EarlyStopping:
         else:
             self.best_score = score
             self.counter = 0
-            
-shuffled_indices = torch.randperm(len(t_data))
-t_shuffled = t_data[shuffled_indices]
+            self.best_model = model.state_dict()
 
 def train(model, t_tensor, SIRD_tensor, epochs=1000, lr=0.001, N=None, sigma=1/5, beta=None, gamma=None, delta=None):
     optimizer = optim.Adam(model.parameters(), lr=lr)
     scheduler = StepLR(optimizer, step_size=5000, gamma=0.9)
-    early_stopping = EarlyStopping(patience=100, verbose=True)
+    early_stopping = EarlyStopping(patience=20, verbose=False)
 
     losses = []
 
-    for epoch in range(epochs):
-        model.train()
+    for epoch in tqdm(range(epochs)):
         optimizer.zero_grad()
-
-        shuffled_indices = torch.randperm(len(t_tensor))
-        t_shuffled = t_tensor[shuffled_indices]
-        SIRD_shuffled = SIRD_tensor[shuffled_indices]
-
-        model_output = model(t_shuffled)
-
-        loss = seird_loss(model, model_output, SIRD_shuffled, t_shuffled, N, sigma, beta, gamma, delta)
-
+        model_output = model(t_tensor)
+        loss = seird_loss(model, model_output, SIRD_tensor, t_tensor, N, sigma, beta, gamma, delta)
+        
         loss.backward()
         optimizer.step()
-        scheduler.step()
-
+        
         losses.append(loss.item())
-
+        scheduler.step()
         if epoch % 1000 == 0:
             print(f"Epoch {epoch + 1}/{epochs}, Loss: {loss.item():.6f}")
 
-        early_stopping(loss)
-        if early_stopping.early_stop:
-            print("Early stopping")
-            torch.save({
-                'epoch': epoch,
-                'model_state_dict': model.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(),
-                'scheduler_state_dict': scheduler.state_dict(),
-                'loss': loss,
-            }, f"../../models/{model.__class__.__name__}.pt")
-            print("Model saved")
-            break
+        early_stopping(loss, model)
 
     print("Training finished")
     return losses
@@ -261,28 +269,29 @@ def plot_results(t, I_data, R_data, D_data, model, title, N):
         predictions = model(t).cpu().numpy()
 
     t_np = t.cpu().detach().numpy().flatten()
-    I_pred, R_pred, D_pred, E_pred = predictions[:, 0], predictions[:, 1], predictions[:, 2], predictions[:, 3]
-    S_pred = N - I_pred - R_pred - D_pred - E_pred
+    S_pred, E_pred, I_pred, R_pred, D_pred = predictions[:, 0], predictions[:, 1], predictions[:, 2], predictions[:, 3], predictions[:, 4]
+    
+    
 
     fig, axs = plt.subplots(1, 5, figsize=(30, 6))
 
-    # Plotting I (Infected)
-    axs[0].scatter(t_np, I_data.cpu().detach().numpy().flatten(), color='black', label='$I_{Data}$', s=10)
-    axs[0].plot(t_np, I_pred, 'r-', label='$I_{PINN}$')
-    axs[0].set_title('I')
-    axs[0].set_xlabel('Time t (days)')
-    axs[0].set_ylabel('Number of individuals')
-    axs[0].legend()
 
     # Plotting S (Susceptible)
-    axs[1].plot(t_np, S_pred, 'r-', label='$S_{PINN}$')
-    axs[1].set_title('S')
-    axs[1].set_xlabel('Time t (days)')
-    axs[1].legend()
+    axs[0].plot(t_np, S_pred, 'r-', label='$S_{PINN}$')
+    axs[0].set_title('S')
+    axs[0].set_xlabel('Time t (days)')
+    axs[0].legend()
 
     # Plotting E (Exposed)
-    axs[2].plot(t_np, E_pred, 'r-', label='$E_{PINN}$')
-    axs[2].set_title('E')
+    axs[1].plot(t_np, E_pred, 'r-', label='$E_{PINN}$')
+    axs[1].set_title('E')
+    axs[1].set_xlabel('Time t (days)')
+    axs[1].legend()
+    
+    # Plotting I (Infected)
+    axs[2].scatter(t_np, I_data.cpu().detach().numpy().flatten(), color='black', label='$I_{Data}$', s=10)
+    axs[2].plot(t_np, I_pred, 'r-', label='$I_{PINN}$')
+    axs[2].set_title('I')
     axs[2].set_xlabel('Time t (days)')
     axs[2].legend()
 
@@ -312,22 +321,18 @@ def plot_loss(losses, title):
     plt.ylabel("Log10 Loss")
     plt.show()
 
-model_forward = SEIRNet(num_layers=5, hidden_neurons=32)
+model_forward = SEIRNet(num_layers=6, hidden_neurons=32)
 model_forward.to(device)
-losses = train(model_forward, t_data, SIRD_tensor, epochs=50000, lr=0.001, N=N, sigma=1/5, beta=0.2, gamma=0.05, delta=0.01)
+losses = train(model_forward, t_data, SIRD_tensor, epochs=50000, lr=0.0001, N=N, sigma=1/5, beta=0.1, gamma=0.01, delta=0.01)
 
 plot_results(t_data, I_data, R_data, D_data, model_forward, "Forward Model Results", N)
 plot_loss(losses, "Forward Model Loss")
 
-model_inverse = SEIRNet(inverse=True, init_beta=0.1, init_gamma=0.01, init_delta=0.01, num_layers=5, hidden_neurons=32)
+model_inverse = SEIRNet(inverse=True, init_beta=0.1, init_gamma=0.01, init_delta=0.01, num_layers=6, hidden_neurons=32)
 model_inverse.to(device)
-losses = train(model_inverse, t_data, SIRD_tensor, epochs=50000, lr=0.001, N=N, sigma=1/5)
-
+losses = train(model_inverse, t_data, SIRD_tensor, epochs=50000, lr=0.0001, N=N, sigma=1/5)
 
 plot_results(t_data, I_data, R_data, D_data, model_inverse, "Inverse Model Results", N)
-plot_results(t_data, I_data, R_data, D_data, model_forward, "Forward Model Results", N)
-
-
 plot_loss(losses, "Inverse Model Loss")
 
 def extract_parameters(model):
@@ -365,29 +370,28 @@ D0 = D_data[-1].item()
 E0 = (beta_predicted * I0) / (1/5)  # Initial guess for E0
 
 t_np = t_data.cpu().detach().numpy().flatten()
-sol = solve_seird_ode(beta_predicted, gamma_predicted, delta_predicted, 1.0, I0, R0, D0, E0, t_np)
+sol = solve_seird_ode(beta_predicted, gamma_predicted, delta_predicted, N, I0, R0, D0, E0, t_np[:len(sol[0])])  # Adjust length
 
 # Plot the ODE solution
 def plot_ode_solution(t, sol, title):
     S, E, I, R, D = sol
     fig, axs = plt.subplots(1, 5, figsize=(30, 6))
 
-    axs[0].plot(t, I, 'r-', label='$I_{ODE}$')
-    axs[0].set_title('I')
+    axs[0].plot(t, S, 'r-', label='$S_{ODE}$')
+    axs[0].set_title('S')
     axs[0].set_xlabel('Time t (days)')
-    axs[0].set_ylabel('Number of individuals')
     axs[0].legend()
 
-    axs[1].plot(t, S, 'r-', label='$S_{ODE}$')
-    axs[1].set_title('S')
+    axs[1].plot(t, E, 'r-', label='$E_{ODE}$')
+    axs[1].set_title('E')
     axs[1].set_xlabel('Time t (days)')
     axs[1].legend()
-
-    axs[2].plot(t, E, 'r-', label='$E_{ODE}$')
-    axs[2].set_title('E')
+    
+    axs[2].plot(t, I, 'r-', label='$I_{ODE}$')
+    axs[2].set_title('I')
     axs[2].set_xlabel('Time t (days)')
     axs[2].legend()
-
+    
     axs[3].plot(t, R, 'r-', label='$R_{ODE}$')
     axs[3].set_title('R')
     axs[3].set_xlabel('Time t (days)')
@@ -402,4 +406,4 @@ def plot_ode_solution(t, sol, title):
     plt.savefig(f"../../reports/figures/{title}.pdf")
     plt.show()
 
-plot_ode_solution(t_np, sol, "SEIRD ODE Solution")
+plot_ode_solution(t_np[:len(sol[0])], sol, "SEIRD ODE Solution")

@@ -61,6 +61,8 @@ plt.rcParams.update({
 # Device setup for CUDA or CPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+data = pd.read_csv("../../data/hos_data/merged_data.csv").drop(columns=["Unnamed: 0"], axis=1)
+
 # Set random seed for reproducibility
 seed = 42
 torch.manual_seed(seed)
