@@ -409,7 +409,9 @@ fig = plot_results(t_data, S_data, I_data, R_data, D_data, state_nn, title, N)
 def plot_params(t, param_nn, title):
     param_nn.eval()
     with torch.no_grad():
-        beta_pred, gamma_pred, mu_pred = param_nn(t).cpu().numpy()
+        predictions = param_nn(t).cpu().numpy()
+        
+    beta_pred, gamma_pred, mu_pred = predictions[:, 0], predictions[:, 1], predictions[:, 2]
 
     t_np = t.cpu().detach().numpy().flatten()
     
