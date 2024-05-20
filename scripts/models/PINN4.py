@@ -185,7 +185,7 @@ class StateNN(nn.Module):
                 nn.init.zeros_(m.bias)
 
     def forward(self, t):
-        return self.net(t)
+        return torch.sigmoid(self.net(t))
 
 class ParamNN(nn.Module):
     """Neural network for predicting time-varying parameters."""

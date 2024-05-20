@@ -251,11 +251,11 @@ seird_data = seird_data.set_index("date")
 merged_data = pd.merge(data_filtered, seird_data, left_index=True, right_index=True, how="inner")
 
 # Set the target variable and make it stationary
-target = "covidOccupiedMVBeds"
-seasonal_period = 7
-auto_stationary = AutoStationaryTransformer(seasonal_period=seasonal_period)
-data_stat = auto_stationary.fit_transform(merged_data[[target]], freq="D")
-merged_data[target] = data_stat.values
+# target = "covidOccupiedMVBeds"
+# seasonal_period = 7
+# auto_stationary = AutoStationaryTransformer(seasonal_period=seasonal_period)
+# data_stat = auto_stationary.fit_transform(merged_data[[target]], freq="D")
+# merged_data[target] = data_stat.values
 
 # %%
 # Filter data between the specified dates
