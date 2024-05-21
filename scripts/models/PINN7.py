@@ -428,7 +428,7 @@ plt.show()
 t_values = np.arange(len(data))
 predictions = network_prediction(t_values, model, device, scaler, N)
 
-dates = data["date"].dt.strftime("%Y-%m-%d")
+dates = data["date"]
 
 # Extract predictions for each compartment
 S_pred = predictions[:, 0]
@@ -453,35 +453,41 @@ fig, ax = plt.subplots(5, 1, figsize=(10, 15), sharex=True)
 # Plot the susceptible compartment
 ax[0].plot(dates, S_actual, label="True Susceptible", color="blue")
 ax[0].plot(dates, S_pred, label="Predicted Susceptible", color="red", linestyle="--")
-ax[0].scatter(dates[:train_index_size], S_actual[:train_index_size], color="black", label="Train-Val Split", marker="x")
+# ax[0].scatter(dates[:train_index_size], S_actual[:train_index_size], color="green", label="Train-Val Split")
+# dotted line for the training-validation split
+ax[0].axvline(x=dates[train_index_size], color="black", linestyle="--", linewidth=1, label="Train-Val Split")
 ax[0].set_ylabel("Susceptible")
 ax[0].legend()
 
 # Plot the exposed compartment
 ax[1].plot(dates, E_actual, label="True Exposed", color="blue")
 ax[1].plot(dates, E_pred, label="Predicted Exposed", color="red", linestyle="--")
-ax[1].scatter(dates[:train_index_size], E_actual[:train_index_size], color="black", label="Train-Val Split", marker="x")
+# ax[1].scatter(dates[:train_index_size], E_actual[:train_index_size], color="green", label="Train-Val Split")
+ax[1].axvline(x=dates[train_index_size], color="black", linestyle="--", linewidth=1, label="Train-Val Split")
 ax[1].set_ylabel("Exposed")
 ax[1].legend()
 
 # Plot the active cases compartment
 ax[2].plot(dates, I_actual, label="True Active Cases", color="blue")
 ax[2].plot(dates, I_pred, label="Predicted Active Cases", color="red", linestyle="--")
-ax[2].scatter(dates[:train_index_size], I_actual[:train_index_size], color="black", label="Train-Val Split", marker="x")
+# ax[2].scatter(dates[:train_index_size], I_actual[:train_index_size], color="green", label="Train-Val Split")
+ax[2].axvline(x=dates[train_index_size], color="black", linestyle="--", linewidth=1, label="Train-Val Split")
 ax[2].set_ylabel("Active Cases")
 ax[2].legend()
 
 # Plot the recovered compartment
 ax[3].plot(dates, R_actual, label="True Recovered", color="blue")
 ax[3].plot(dates, R_pred, label="Predicted Recovered", color="red", linestyle="--")
-ax[3].scatter(dates[:train_index_size], R_actual[:train_index_size], color="black", label="Train-Val Split", marker="x")
+# ax[3].scatter(dates[:train_index_size], R_actual[:train_index_size], color="green", label="Train-Val Split")
+ax[3].axvline(x=dates[train_index_size], color="black", linestyle="--", linewidth=1, label="Train-Val Split")
 ax[3].set_ylabel("Recovered")
 ax[3].legend()
 
 # Plot the deceased compartment
 ax[4].plot(dates, D_actual, label="True Deceased", color="blue")
 ax[4].plot(dates, D_pred, label="Predicted Deceased", color="red", linestyle="--")
-ax[4].scatter(dates[:train_index_size], D_actual[:train_index_size], color="black", label="Train-Val Split", marker="x")
+# ax[4].scatter(dates[:train_index_size], D_actual[:train_index_size], color="green", label="Train-Val Split")
+ax[4].axvline(x=dates[train_index_size], color="black", linestyle="--", linewidth=1, label="Train-Val Split")
 ax[4].set_ylabel("Deceased")
 ax[4].legend()
 
@@ -491,38 +497,26 @@ plt.tight_layout()
 plt.show()
 
 
-# generate predictions for the parameters beta, gamma, and delta
-t_values = np.arange(len(data))
-parameters = model
-predictions = network_prediction(t_values, parameters, device, scaler, N)
+# Extract the parameter values
+beta = model.beta.item()
+gamma = model.gamma.item()
+delta = model.delta.item()
 
-# Extract predictions for each parameter
-beta_pred = predictions[:, 0]
-gamma_pred = predictions[:, 1]
-delta_pred = predictions[:, 2]
+# Print the parameter values
+print(f"Estimated beta: {beta:.4f}")
+print(f"Estimated gamma: {gamma:.4f}")
+print(f"Estimated delta: {delta:.4f}")
 
-# plot the parameter predictions
-fig, ax = plt.subplots(3, 1, figsize=(10, 15), sharex=True)
+# save the output
+output = pd.DataFrame({
+    "date": dates,
+    "susceptible": S_pred,
+    "exposed": E_pred,
+    "active_cases": I_pred,
+    "recovered": R_pred,
+    "cumulative_deceased": D_pred
+})
 
-# plot the beta parameter
-ax[0].plot(dates, beta_pred, label="Predicted Beta", color="red", linestyle="--")
-ax[0].set_ylabel("Beta")
-ax[0].legend()
-
-# plot the gamma parameter
-ax[1].plot(dates, gamma_pred, label="Predicted Gamma", color="red", linestyle="--")
-ax[1].set_ylabel("Gamma")
-ax[1].legend()
-
-# plot the delta parameter
-ax[2].plot(dates, delta_pred, label="Predicted Delta", color="red", linestyle="--")
-ax[2].set_ylabel("Delta")
-ax[2].legend()
-
-plt.xlabel("Date")
-plt.xticks(rotation=45)
-plt.tight_layout()
-plt.show()
-
+output.to_csv("../../reports/output/pinn7_output.csv", index=False)
 
 

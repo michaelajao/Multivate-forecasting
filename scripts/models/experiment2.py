@@ -51,8 +51,13 @@ pio.templates.default = "plotly_white"
 # Ignore warnings
 import warnings
 warnings.filterwarnings("ignore")
+import logging
+
+# Set logging configuration
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Utility Functions
+
 def format_plot(fig, legends=None, xlabel="Time", ylabel="Value", title="", font_size=15):
     """
     Formats the plot with given parameters.
@@ -194,41 +199,6 @@ def highlight_abs_min(s, props=""):
     """
     return np.where(s == np.nanmin(np.abs(s.values)), props, "")
 
-def create_and_save_forecast_plot(df, algorithm_name, experiment_type, start_date, end_date):
-    """
-    Creates and saves the forecast plot.
-
-    Parameters:
-        df (pd.DataFrame): DataFrame containing the predictions and actual values.
-        algorithm_name (str): Name of the algorithm.
-        experiment_type (str): Type of the experiment.
-        start_date (str): Start date for the plot range.
-        end_date (str): End date for the plot range.
-    """
-    forecast_column = f"{experiment_type} {algorithm_name}"
-    forecast_display_name = forecast_column
-    
-    fig = plot_forecast(
-        df,
-        forecast_columns=[forecast_column],
-        forecast_display_names=[forecast_display_name]
-    )
-    
-    title = f"Forecasting COVID-19 MVBeds with {experiment_type} {algorithm_name}"
-    fig = format_plot(fig, title=title)
-    
-    fig.update_xaxes(
-        type="date",
-        range=[start_date, end_date],
-        dtick="M1",
-        tickformat="%b %Y"
-    )
-
-    # Save as PDF
-    save_path = f"reports/images/forecast_multivariate_{experiment_type}_{algorithm_name}.pdf"
-    pio.write_image(fig, save_path)
-    fig.show()
-
 # Load and Prepare Data
 data_path = Path("data/processed/merged_nhs_covid_data.csv")
 data = pd.read_csv(data_path).drop("Unnamed: 0", axis=1)
@@ -292,9 +262,8 @@ agg_funcs = ["mean", "std"]
 
 data_filtered, added_features = add_rolling_features(data_filtered, window_size, columns_to_roll, agg_funcs)
 
-# Print added features for each column
 for column, features in added_features.items():
-    print(f"{column}: {', '.join(features)}")
+    logging.info(f"{column}: {', '.join(features)}")
 
 # Add time-lagged features
 def add_lags(data, lags, features):
@@ -367,7 +336,7 @@ max_date = merged_data.index.max()
 
 # Calculate the range of dates
 date_range = max_date - min_date
-print(f"Data ranges from {min_date} to {max_date} ({date_range.days} days)")
+logging.info(f"Data ranges from {min_date} to {max_date} ({date_range.days} days)")
 
 # Split the data into training, validation, and testing sets
 train_end = min_date + pd.Timedelta(days=date_range.days * 0.45)
@@ -375,7 +344,7 @@ val_end = train_end + pd.Timedelta(days=date_range.days * 0.15)
 
 train = merged_data[merged_data.index <= train_end]
 val = merged_data[(merged_data.index > train_end) & (merged_data.index < val_end)]
-test = merged_data[merged_data.index > val_end]
+test = merged_data[merged_data.index >= val_end]
 
 # Concatenate the DataFrames
 sample_df = pd.concat([train, val, test])
@@ -473,20 +442,7 @@ pred_df_ = pd.DataFrame({f"Vanilla {algorithm_name}": predictions}, index=test.i
 pred_df = test.join(pred_df_)
 
 metric_record.append(metrics)
-print(metrics)
-
-# Plot the forecast
-create_and_save_forecast_plot(pred_df, algorithm_name, "Vanilla", "2020-09-24", "2020-12-30")
-
-# Save model and metrics
-model_path = Path("models")
-model_path.mkdir(exist_ok=True)
-model_file = model_path / f"{algorithm_name}_model.pt"
-torch.save(model.state_dict(), model_file)
-
-metric_df = pd.DataFrame(metric_record)
-metric_file = model_path / f"{algorithm_name}_metrics.csv"
-metric_df.to_csv(metric_file, index=False)
+logging.info(metrics)
 
 # Simulated Annealing Hyperparameter Tuning
 
@@ -499,11 +455,20 @@ param_bounds = {
 }
 
 # Initial hyperparameters and temperature
-initial_params = ["RNN", 64, 10, True]  # Updated for a realistic hidden size initialization
+initial_params = ["RNN", 32, 5, True]
 initial_temp = 10
 
 # Define the objective function
 def objective(params):
+    """
+    Objective function for Simulated Annealing.
+
+    Parameters:
+        params (list): List of parameters [rnn_type, hidden_size, num_layers, bidirectional].
+
+    Returns:
+        float: Mean Absolute Error (MAE) of the model predictions.
+    """
     rnn_type, hidden_size, num_layers, bidirectional = params
     rnn_config = SingleStepRNNConfig(
         rnn_type=rnn_type,
@@ -535,20 +500,43 @@ def objective(params):
 
     assert actuals.shape == predictions.shape, "Mismatch in shapes between actuals and predictions"
 
-    return np.mean(np.abs(actuals - predictions))  # Return the MAE
+    return np.mean(np.abs(actuals - predictions))
 
 def neighbor(params):
+    """
+    Generates a neighboring solution by perturbing the parameters.
+
+    Parameters:
+        params (list): Current list of parameters.
+
+    Returns:
+        list: New list of perturbed parameters.
+    """
     rnn_type, hidden_size, num_layers, bidirectional = params
 
-    # Perturbations
     hidden_size = np.random.randint(*param_bounds["hidden_size"])
     num_layers = np.random.randint(*param_bounds["num_layers"])
     rnn_type = np.random.choice(param_bounds["rnn_type"])
-    bidirectional = bool(np.random.choice(param_bounds["bidirectional"]))  # Convert to native boolean
+    bidirectional = bool(np.random.choice(param_bounds["bidirectional"]))
 
     return [rnn_type, hidden_size, num_layers, bidirectional]
 
 def simulated_annealing(objective, initial_params, initial_temp, neighbor, n_iter, cooling_rate=0.20, verbose=True):
+    """
+    Simulated Annealing optimization algorithm.
+
+    Parameters:
+        objective (function): The objective function to minimize.
+        initial_params (list): Initial list of parameters.
+        initial_temp (float): Initial temperature.
+        neighbor (function): Function to generate neighboring solutions.
+        n_iter (int): Number of iterations.
+        cooling_rate (float): Cooling rate for the temperature.
+        verbose (bool): If True, print iteration details.
+
+    Returns:
+        tuple: Best cost, best parameters, and cost history.
+    """
     current_params = initial_params
     current_cost = objective(current_params)
     best_params = current_params
@@ -560,45 +548,38 @@ def simulated_annealing(objective, initial_params, initial_temp, neighbor, n_ite
         candidate_params = neighbor(current_params)
         candidate_cost = objective(candidate_params)
 
-        # Calculate the probability of accepting the new solution
         acceptance_probability = np.exp(-abs(candidate_cost - current_cost) / temp)
 
-        # Decision to accept the new candidate
         if candidate_cost < current_cost or np.random.uniform() < acceptance_probability:
             current_params = candidate_params
             current_cost = candidate_cost
 
-            # Update the best found solution
             if current_cost < best_cost:
                 best_params = current_params
                 best_cost = current_cost
 
-        # Cooling down the temperature
         temp *= cooling_rate
         cost_history.append(best_cost)
 
-        # Output current iteration details
-        if verbose:
-            print(f"Iteration: {i+1}, Best Cost: {best_cost:.4f}, Current Cost: {current_cost:.4f}, Temperature: {temp:.4f}")
+        logging.info(f"Iteration: {i+1}, Best Cost: {best_cost:.4f}, Current Cost: {current_cost:.4f}, Temperature: {temp:.4f}")
 
-        # Break early if the minimum cost has been constant for over 10 iterations
         if i > 10 and np.all(np.isclose(cost_history[-10:], cost_history[-1])):
+            logging.info(f"Early stopping at iteration {i+1} due to convergence.")
             break
 
     return best_cost, best_params, cost_history
 
 # Run Simulated Annealing for 100 iterations
-initial_params = ["RNN", 64, 10, True]  # Initial parameters
+initial_params = ["RNN", 32, 5, True]
 initial_temp = 10
 n_iter = 100
-cooling_rate = 0.95  # More gradual cooling
+cooling_rate = 0.95
 
 best_cost, best_params, cost_history = simulated_annealing(
     objective, initial_params, initial_temp, neighbor, n_iter, cooling_rate
 )
 
-# Print the best parameters and best cost
-print(f"Best Parameters: {best_params}, Best Cost: {best_cost}")
+logging.info(f"Best Parameters: {best_params}, Best Cost: {best_cost}")
 
 # Plot the MAEs gotten from the SA
 fig = go.Figure()
@@ -609,6 +590,9 @@ fig.update_layout(
     yaxis_title="Best Cost",
     template="plotly_white",
 )
+
+save_path = f"reports/figures/{selected_area}_sa_optimization.pdf"
+pio.write_image(fig, save_path)
 fig.show()
 
 # Prediction using the best parameters
@@ -660,62 +644,29 @@ pred_df_ = pd.DataFrame({f"Optimized {algorithm_name} (SA)": predictions}, index
 pred_df = test.join(pred_df_)
 metric_record.append(metrics)
 
-print(metrics)
+logging.info(metrics)
 
-fig = plot_forecast(
-    pred_df,
-    forecast_columns=[f"Optimized {algorithm_name} (SA)"],
-    forecast_display_names=[f"Optimized {algorithm_name} (SA)"],
-)
+# Seq2Seq Model Training and Evaluation 
 
-title = f"Forecasting COVID-11 MVBeds with {algorithm_name} (SA)"
-fig = format_plot(fig, title=title)
-fig.update_xaxes(
-    rangeslider_visible=True,
-    rangeselector=dict(
-        buttons=list(
-            [
-                dict(count=1, label="1m", step="month", stepmode="backward"),
-                dict(count=6, label="6m", step="month", stepmode="backward"),
-                dict(count=1, label="YTD", step="year", stepmode="todate"),
-                dict(count=1, label="1y", step="year", stepmode="backward"),
-                dict(step="all"),
-            ]
-        )
-    ),
-)
-
-fig.show()
-
-# Save optimized model and metrics
-model_file = model_path / f"{algorithm_name}_sa_model.pt"
-torch.save(model.state_dict(), model_file)
-
-metric_file = model_path / f"{algorithm_name}_sa_metrics.csv"
-metric_df.to_csv(metric_file, index=False)
-
-# Seq2Seq Model Training and Evaluation (if needed)
-
-# Define and configure Seq2Seq model
 HORIZON = 1
 WINDOW = 7
 
 encoder_config = RNNConfig(
-    input_size=len(columns_to_select),  # Replace with actual number of input features
-    hidden_size=32,  # Example size
+    input_size=len(columns_to_select),
+    hidden_size=32,
     num_layers=5,
     bidirectional=True
 )
 
 decoder_config = RNNConfig(
-    input_size=len(columns_to_select),  # Should align with the encoder's output dimension
-    hidden_size=32,  # Example size
+    input_size=len(columns_to_select),
+    hidden_size=32,
     num_layers=5,
     bidirectional=True
 )
 
 rnn2fc_config = Seq2SeqConfig(
-    encoder_type="GRU",
+    encoder_type="LSTM",
     decoder_type="FC",
     encoder_params=encoder_config,
     decoder_params={"window_size": WINDOW, "horizon": HORIZON},
@@ -765,32 +716,7 @@ pred_df_ = pd.DataFrame({f"Seq2Seq {algorithm_name}": predictions}, index=test.i
 pred_df = test.join(pred_df_)
 
 metric_record.append(metrics)
-print(metrics)
-
-fig = plot_forecast(
-    pred_df,
-    forecast_columns=[f"Seq2Seq {algorithm_name}"],
-    forecast_display_names=[f"Seq2Seq {algorithm_name}"],
-)
-
-title = f"Forecasting COVID-11 MVBeds with Seq2Seq {algorithm_name}"
-fig = format_plot(fig, title=title)
-fig.update_xaxes(
-    rangeslider_visible=True,
-    rangeselector=dict(
-        buttons=list(
-            [
-                dict(count=1, label="1m", step="month", stepmode="backward"),
-                dict(count=6, label="6m", step="month", stepmode="backward"),
-                dict(count=1, label="YTD", step="year", stepmode="todate"),
-                dict(count=1, label="1y", step="year", stepmode="backward"),
-                dict(step="all"),
-            ]
-        )
-    ),
-)
-
-fig.show()
+logging.info(metrics)
 
 # Simulated Annealing for Seq2Seq model hyperparameter tuning
 param_bounds = {
@@ -802,13 +728,22 @@ param_bounds = {
     "decoder_use_all_hidden": [True, False],
 }
 
-initial_params = ["GRU", "FC", 64, 10, True, True]
+initial_params = ["RNN", "FC", 32, 5, True, True]
 
 initial_temp = 10
 n_iter = 100
 cooling_rate = 0.95
 
 def objective(params):
+    """
+    Objective function for Seq2Seq Simulated Annealing.
+
+    Parameters:
+        params (list): List of parameters [encoder_type, decoder_type, hidden_size, num_layers, bidirectional, decoder_use_all_hidden].
+
+    Returns:
+        float: Mean Absolute Error (MAE) of the model predictions.
+    """
     encoder_type, decoder_type, hidden_size, num_layers, bidirectional, decoder_use_all_hidden = params
 
     encoder_config = RNNConfig(
@@ -854,9 +789,18 @@ def objective(params):
 
     assert actuals.shape == predictions.shape, "Mismatch in shapes between actuals and predictions"
 
-    return np.mean(np.abs(actuals - predictions))  # Return the MAE
+    return np.mean(np.abs(actuals - predictions))
 
 def neighbor(params):
+    """
+    Generates a neighboring solution by perturbing the parameters for Seq2Seq.
+
+    Parameters:
+        params (list): Current list of parameters.
+
+    Returns:
+        list: New list of perturbed parameters.
+    """
     encoder_type, decoder_type, hidden_size, num_layers, bidirectional, decoder_use_all_hidden = params
 
     hidden_size = np.random.randint(*param_bounds["hidden_size"])
@@ -872,16 +816,19 @@ best_cost, best_params, cost_history = simulated_annealing(
     objective, initial_params, initial_temp, neighbor, n_iter, cooling_rate
 )
 
-print(f"Best Parameters: {best_params}, Best Cost: {best_cost}")
+logging.info(f"Best Parameters: {best_params}, Best Cost: {best_cost}")
 
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=np.arange(1, len(cost_history) + 1), y=cost_history, mode="lines"))
 fig.update_layout(
-    title="Simulated Annealing Optimization SeqSeq for Hyperparameter Tuning",
+    title="Simulated Annealing Optimization Seq2Seq for Hyperparameter Tuning",
     xaxis_title="Iteration",
     yaxis_title="Best Cost",
     template="plotly_white",
 )
+
+save_path = f"reports/figures/{selected_area}_sa_seq2seq_optimization.pdf"
+pio.write_image(fig, save_path)
 fig.show()
 
 # Prediction using the best parameters
@@ -949,33 +896,9 @@ pred_df_ = pd.DataFrame({f"Optimized Seq2Seq {algorithm_name} (SA)": predictions
 pred_df = test.join(pred_df_)
 metric_record.append(metrics)
 
-print(metrics)
+logging.info(metrics)
 
-fig = plot_forecast(
-    pred_df,
-    forecast_columns=[f"Optimized Seq2Seq {algorithm_name} (SA)"],
-    forecast_display_names=[f"Optimized Seq2Seq {algorithm_name} (SA)"],
-)
-
-title = f"Forecasting COVID-19 MVBeds with Seq2Seq {algorithm_name} (SA)"
-fig = format_plot(fig, title=title)
-
-fig.update_xaxes(
-    rangeslider_visible=True,
-    rangeselector=dict(
-        buttons=list(
-            [
-                dict(count=1, label="1m", step="month", stepmode="backward"),
-                dict(count=6, label="6m", step="month", stepmode="backward"),
-                dict(count=1, label="YTD", step="year", stepmode="todate"),
-                dict(count=1, label="1y", step="year", stepmode="backward"),
-                dict(step="all"),
-            ]
-        )
-    ),
-)
-
-fig.show()
+shutil.rmtree("lightning_logs")
 
 # Save final metrics
 metric_df = pd.DataFrame(metric_record)
@@ -983,20 +906,91 @@ metric_df[["MAE", "MSE", "MASE", "Forecast Bias"]] = metric_df[
     ["MAE", "MSE", "MASE", "Forecast Bias"]
 ].astype("float32")
 
-formatted = metric_df.style.format(
-    {
-        "MAE": "{:.4f}",
-        "MSE": "{:.4f}",
-        "MASE": "{:.4f}",
-        "Forecast Bias": "{:.2f}%",
-    }
-).highlight_min(
-    color="lightgreen", subset=["MAE", "MSE", "MASE"]
-).apply(
-    highlight_abs_min,
-    props="color:black;background-color:lightgreen",
-    axis=0,
-    subset=["Forecast Bias"],
-)
+final_metric_file = f"reports/results/{selected_area}_final_metrics.csv"
+metric_df.to_csv(final_metric_file, index=False)
 
-formatted
+# Plot all the forecasts together vs actuals for comparison
+def plot_all_forecasts(pred_df, actual_col, forecast_columns, forecast_display_names=None, save_path=None):
+    """
+    Plots all forecasts together vs actuals for comparison.
+
+    Parameters:
+        pred_df (pd.DataFrame): DataFrame containing the predictions and actual values.
+        actual_col (str): Column name of the actual values.
+        forecast_columns (list): List of column names containing forecast values.
+        forecast_display_names (list): List of display names for the forecast columns.
+        save_path (str): Path to save the plot. Default is None.
+
+    Returns:
+        plotly.graph_objs._figure.Figure: Plotly figure object with the comparison plot.
+    """
+    if forecast_display_names is None:
+        forecast_display_names = forecast_columns
+    else:
+        assert len(forecast_columns) == len(forecast_display_names)
+
+    mask = ~pred_df[forecast_columns[0]].isnull()
+    colors = px.colors.qualitative.Set2
+    act_color = colors[0]
+    colors = cycle(colors[1:])
+
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Scatter(
+            x=pred_df[mask].index,
+            y=pred_df[mask][actual_col],
+            mode="lines",
+            marker=dict(size=6, opacity=0.5),
+            line=dict(color=act_color, width=2),
+            name="Actual COVID-19 MVBeds trends",
+        )
+    )
+
+    for col, display_col in zip(forecast_columns, forecast_display_names):
+        fig.add_trace(
+            go.Scatter(
+                x=pred_df[mask].index,
+                y=pred_df.loc[mask, col],
+                mode="lines+markers",
+                marker=dict(size=4),
+                line=dict(color=next(colors), width=2),
+                name=display_col,
+            )
+        )
+
+    fig.update_layout(
+        title="Comparison of COVID-19 MVBeds Forecasts vs Actuals",
+        xaxis_title="Date",
+        yaxis_title="COVID-19 MVBeds",
+        template="plotly_white",
+    )
+
+    if save_path:
+        pio.write_image(fig, save_path)
+        logging.info(f"Plot saved to {save_path}")
+    
+    fig.show()
+
+# Example usage
+forecast_columns = [
+    f"Vanilla {algorithm_name}", 
+    f"Optimized {algorithm_name} (SA)", 
+    f"Seq2Seq {algorithm_name}", 
+    f"Optimized Seq2Seq {algorithm_name} (SA)"
+]
+
+forecast_display_names = [
+    f"Vanilla {algorithm_name}", 
+    f"Optimized {algorithm_name} (SA)", 
+    f"Seq2Seq {algorithm_name}", 
+    f"Optimized Seq2Seq {algorithm_name} (SA)"
+]
+
+plot_all_forecasts(
+    pred_df, 
+    actual_col="covidOccupiedMVBeds", 
+    forecast_columns=forecast_columns, 
+    forecast_display_names=forecast_display_names, 
+    save_path=f"reports/figures/{selected_area}_forecast_multivariate_comparison.pdf"
+)
