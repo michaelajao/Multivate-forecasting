@@ -1,10 +1,12 @@
-# %%
-# Path to source code
-%cd ../../
-
-# %%
-# Imports for handling data
+# Experiment 2 Script for COVID-19 Forecasting
+# change path to the root directory of the project
 import os
+os.chdir("../../")
+
+# Description: This script contains the code for the second experiment in the project, 
+# forecasting COVID-19 MVBeds using various RNN models and hyperparameter tuning with Simulated Annealing.
+
+# Imports for handling data
 import shutil
 import numpy as np
 import pandas as pd
@@ -50,10 +52,22 @@ pio.templates.default = "plotly_white"
 import warnings
 warnings.filterwarnings("ignore")
 
-# %% 
 # Utility Functions
-
 def format_plot(fig, legends=None, xlabel="Time", ylabel="Value", title="", font_size=15):
+    """
+    Formats the plot with given parameters.
+
+    Parameters:
+        fig (plotly.graph_objs._figure.Figure): The plotly figure object.
+        legends (list): List of legends for the plot.
+        xlabel (str): Label for x-axis.
+        ylabel (str): Label for y-axis.
+        title (str): Title of the plot.
+        font_size (int): Font size for labels and title.
+
+    Returns:
+        plotly.graph_objs._figure.Figure: Formatted plotly figure object.
+    """
     if legends:
         names = cycle(legends)
         fig.for_each_trace(lambda t: t.update(name=next(names)))
@@ -87,14 +101,47 @@ def format_plot(fig, legends=None, xlabel="Time", ylabel="Value", title="", font
     return fig
 
 def mase(actual, predicted, insample_actual):
+    """
+    Calculates the Mean Absolute Scaled Error (MASE).
+
+    Parameters:
+        actual (array-like): Array of actual values.
+        predicted (array-like): Array of predicted values.
+        insample_actual (array-like): Array of in-sample actual values for scaling.
+
+    Returns:
+        float: MASE value.
+    """
     mae_insample = np.mean(np.abs(np.diff(insample_actual)))
     mae_outsample = np.mean(np.abs(actual - predicted))
     return mae_outsample / mae_insample
 
 def forecast_bias(actual, predicted):
+    """
+    Calculates the forecast bias.
+
+    Parameters:
+        actual (array-like): Array of actual values.
+        predicted (array-like): Array of predicted values.
+
+    Returns:
+        float: Forecast bias value.
+    """
     return np.mean(predicted - actual)
 
 def plot_forecast(pred_df, forecast_columns, forecast_display_names=None, save_path=None):
+    """
+    Plots the forecast and actual values.
+
+    Parameters:
+        pred_df (pd.DataFrame): DataFrame containing the predictions and actual values.
+        forecast_columns (list): List of column names containing forecast values.
+        forecast_display_names (list): List of display names for the forecast columns.
+        save_path (str): Path to save the plot. Default is None.
+
+    Returns:
+        plotly.graph_objs._figure.Figure: Plotly figure object with the forecast plot.
+    """
     if forecast_display_names is None:
         forecast_display_names = forecast_columns
     else:
@@ -135,9 +182,29 @@ def plot_forecast(pred_df, forecast_columns, forecast_display_names=None, save_p
     return fig
 
 def highlight_abs_min(s, props=""):
+    """
+    Highlights the absolute minimum value in a Series.
+
+    Parameters:
+        s (pd.Series): Series of values.
+        props (str): CSS properties for highlighting. Default is "".
+
+    Returns:
+        np.array: Array with highlighting properties.
+    """
     return np.where(s == np.nanmin(np.abs(s.values)), props, "")
 
 def create_and_save_forecast_plot(df, algorithm_name, experiment_type, start_date, end_date):
+    """
+    Creates and saves the forecast plot.
+
+    Parameters:
+        df (pd.DataFrame): DataFrame containing the predictions and actual values.
+        algorithm_name (str): Name of the algorithm.
+        experiment_type (str): Type of the experiment.
+        start_date (str): Start date for the plot range.
+        end_date (str): End date for the plot range.
+    """
     forecast_column = f"{experiment_type} {algorithm_name}"
     forecast_display_name = forecast_column
     
@@ -157,18 +224,16 @@ def create_and_save_forecast_plot(df, algorithm_name, experiment_type, start_dat
         tickformat="%b %Y"
     )
 
-    # save as PDF
+    # Save as PDF
     save_path = f"reports/images/forecast_multivariate_{experiment_type}_{algorithm_name}.pdf"
     pio.write_image(fig, save_path)
     fig.show()
 
-# %%
 # Load and Prepare Data
 data_path = Path("data/processed/merged_nhs_covid_data.csv")
 data = pd.read_csv(data_path).drop("Unnamed: 0", axis=1)
 data["date"] = pd.to_datetime(data["date"])
 
-# %%
 # Select and Process Data
 selected_area = "South West"
 data_filtered = data[data["areaName"] == selected_area]
@@ -194,6 +259,19 @@ data_filtered.drop(
 
 # Add rolling features
 def add_rolling_features(df, window_size, columns, agg_funcs=None):
+    """
+    Adds rolling window features to the DataFrame.
+
+    Parameters:
+        df (pd.DataFrame): DataFrame containing the data.
+        window_size (int): Window size for the rolling calculation.
+        columns (list): List of columns to apply the rolling calculation.
+        agg_funcs (list): List of aggregation functions. Default is ["mean"].
+
+    Returns:
+        pd.DataFrame: DataFrame with added rolling features.
+        dict: Dictionary of added rolling features.
+    """
     if agg_funcs is None:
         agg_funcs = ["mean"]
     added_features = {}
@@ -220,6 +298,18 @@ for column, features in added_features.items():
 
 # Add time-lagged features
 def add_lags(data, lags, features):
+    """
+    Adds lagged features to the DataFrame.
+
+    Parameters:
+        data (pd.DataFrame): DataFrame containing the data.
+        lags (list): List of lag periods.
+        features (list): List of features to apply the lag.
+
+    Returns:
+        pd.DataFrame: DataFrame with added lagged features.
+        list: List of added lagged features.
+    """
     added_features = []
     for feature in features:
         for lag in lags:
@@ -234,6 +324,16 @@ data_filtered.dropna(inplace=True)
 
 # Create temporal features
 def create_temporal_features(df, date_column):
+    """
+    Creates temporal features from the date column.
+
+    Parameters:
+        df (pd.DataFrame): DataFrame containing the data.
+        date_column (str): Name of the date column.
+
+    Returns:
+        pd.DataFrame: DataFrame with added temporal features.
+    """
     df["month"] = df[date_column].dt.month
     df["day"] = df[date_column].dt.day
     df["day_of_week"] = df[date_column].dt.dayofweek
@@ -251,13 +351,12 @@ seird_data = seird_data.set_index("date")
 merged_data = pd.merge(data_filtered, seird_data, left_index=True, right_index=True, how="inner")
 
 # Set the target variable and make it stationary
-# target = "covidOccupiedMVBeds"
-# seasonal_period = 7
-# auto_stationary = AutoStationaryTransformer(seasonal_period=seasonal_period)
-# data_stat = auto_stationary.fit_transform(merged_data[[target]], freq="D")
-# merged_data[target] = data_stat.values
+target = "covidOccupiedMVBeds"
+seasonal_period = 7
+auto_stationary = AutoStationaryTransformer(seasonal_period=seasonal_period)
+data_stat = auto_stationary.fit_transform(merged_data[[target]], freq="D")
+merged_data[target] = data_stat.values
 
-# %%
 # Filter data between the specified dates
 start_date = "2020-04-14"
 end_date = "2020-12-30"
@@ -265,6 +364,7 @@ merged_data = merged_data[start_date:end_date]
 
 min_date = merged_data.index.min()
 max_date = merged_data.index.max()
+
 # Calculate the range of dates
 date_range = max_date - min_date
 print(f"Data ranges from {min_date} to {max_date} ({date_range.days} days)")
@@ -286,14 +386,14 @@ for col in sample_df.columns:
 
 columns_to_select = [
     "covidOccupiedMVBeds",
-    # "hospitalCases_rolling_7_mean",
-    # "hospitalCases_rolling_7_std",
-    # "newAdmissions_rolling_7_mean",
-    # "newAdmissions_rolling_7_std",
-    # "new_confirmed_rolling_7_mean",
-    # "new_confirmed_rolling_7_std",
-    # "new_deceased_rolling_7_mean",
-    # "new_deceased_rolling_7_std",
+    "hospitalCases_rolling_7_mean",
+    "hospitalCases_rolling_7_std",
+    "newAdmissions_rolling_7_mean",
+    "newAdmissions_rolling_7_std",
+    "new_confirmed_rolling_7_mean",
+    "new_confirmed_rolling_7_std",
+    "new_deceased_rolling_7_mean",
+    "new_deceased_rolling_7_std",
     "covidOccupiedMVBeds_lag_1",
     "covidOccupiedMVBeds_lag_2",
     "covidOccupiedMVBeds_lag_3",
@@ -303,7 +403,7 @@ columns_to_select = [
     "covidOccupiedMVBeds_lag_21",
     "month",
     "day",
-    "day_of_week"
+    "day_of_week",
 ]
 
 sample_df = sample_df[columns_to_select]
@@ -311,7 +411,6 @@ cols = list(sample_df.columns)
 cols.remove("covidOccupiedMVBeds")
 sample_df = sample_df[cols + ["covidOccupiedMVBeds"]]
 
-# %%
 # Prepare DataModule for PyTorch Lightning
 datamodule = TimeSeriesDataModule(
     data=sample_df,
@@ -325,11 +424,10 @@ datamodule = TimeSeriesDataModule(
 )
 datamodule.setup()
 
-# %%
 # Train Vanilla Model
 rnn_config = SingleStepRNNConfig(
     rnn_type="RNN",
-    input_size=11,  # 25 for multivariate time series
+    input_size=len(columns_to_select),  # number of features
     hidden_size=32,  # hidden size of the RNN
     num_layers=5,  # number of layers
     bidirectional=False,  # bidirectional RNN
@@ -346,7 +444,6 @@ trainer = pl.Trainer(
 )
 trainer.fit(model, datamodule)
 
-# %%
 # Evaluate Vanilla Model
 metric_record = []
 predictions = trainer.predict(model, datamodule.test_dataloader())
@@ -391,10 +488,8 @@ metric_df = pd.DataFrame(metric_record)
 metric_file = model_path / f"{algorithm_name}_metrics.csv"
 metric_df.to_csv(metric_file, index=False)
 
-# %% [markdown]
-# ## Simulated Annealing Hyperparameter Tuning
+# Simulated Annealing Hyperparameter Tuning
 
-# %%
 # Define the bounds for parameters
 param_bounds = {
     "rnn_type": ["RNN", "GRU", "LSTM"],
@@ -412,7 +507,7 @@ def objective(params):
     rnn_type, hidden_size, num_layers, bidirectional = params
     rnn_config = SingleStepRNNConfig(
         rnn_type=rnn_type,
-        input_size=11,
+        input_size=len(columns_to_select),
         hidden_size=hidden_size,
         num_layers=num_layers,
         bidirectional=bidirectional,
@@ -486,9 +581,8 @@ def simulated_annealing(objective, initial_params, initial_temp, neighbor, n_ite
         if verbose:
             print(f"Iteration: {i+1}, Best Cost: {best_cost:.4f}, Current Cost: {current_cost:.4f}, Temperature: {temp:.4f}")
 
-        # Break early if the minimum cost has been constant for 5 iterations
-        if i >= 5 and all(x == best_cost for x in cost_history[-5:]):
-            print("Early stopping as there is no improvement in the last 5 iterations.")
+        # Break early if the minimum cost has been constant for over 10 iterations
+        if i > 10 and np.all(np.isclose(cost_history[-10:], cost_history[-1])):
             break
 
     return best_cost, best_params, cost_history
@@ -520,7 +614,7 @@ fig.show()
 # Prediction using the best parameters
 rnn_config = SingleStepRNNConfig(
     rnn_type=best_params[0],
-    input_size=11,
+    input_size=len(columns_to_select),
     hidden_size=best_params[1],
     num_layers=best_params[2],
     bidirectional=best_params[3],
@@ -600,7 +694,6 @@ torch.save(model.state_dict(), model_file)
 metric_file = model_path / f"{algorithm_name}_sa_metrics.csv"
 metric_df.to_csv(metric_file, index=False)
 
-# %%
 # Seq2Seq Model Training and Evaluation (if needed)
 
 # Define and configure Seq2Seq model
@@ -608,14 +701,14 @@ HORIZON = 1
 WINDOW = 7
 
 encoder_config = RNNConfig(
-    input_size=11,  # Replace with actual number of input features
+    input_size=len(columns_to_select),  # Replace with actual number of input features
     hidden_size=32,  # Example size
     num_layers=5,
     bidirectional=True
 )
 
 decoder_config = RNNConfig(
-    input_size=11,  # Should align with the encoder's output dimension
+    input_size=len(columns_to_select),  # Should align with the encoder's output dimension
     hidden_size=32,  # Example size
     num_layers=5,
     bidirectional=True
@@ -642,7 +735,6 @@ trainer = pl.Trainer(
 
 trainer.fit(model, datamodule)
 
-# %%
 # Evaluate Seq2Seq Model
 tag = f"{rnn2fc_config.encoder_type}_{rnn2fc_config.decoder_type}_{'all_hidden' if rnn2fc_config.decoder_use_all_hidden else 'last_hidden'}"
 
@@ -700,10 +792,6 @@ fig.update_xaxes(
 
 fig.show()
 
-# Save final metrics
-metric_df = pd.DataFrame(metric_record)
-metric_df.info()
-
 # Simulated Annealing for Seq2Seq model hyperparameter tuning
 param_bounds = {
     "encoder_type": ["RNN", "GRU", "LSTM"],
@@ -724,14 +812,14 @@ def objective(params):
     encoder_type, decoder_type, hidden_size, num_layers, bidirectional, decoder_use_all_hidden = params
 
     encoder_config = RNNConfig(
-        input_size=11,
+        input_size=len(columns_to_select),
         hidden_size=hidden_size,
         num_layers=num_layers,
         bidirectional=bidirectional
     )
 
     decoder_config = RNNConfig(
-        input_size=11,
+        input_size=len(columns_to_select),
         hidden_size=hidden_size,
         num_layers=num_layers,
         bidirectional=bidirectional
@@ -800,14 +888,14 @@ fig.show()
 encoder_type, decoder_type, hidden_size, num_layers, bidirectional, decoder_use_all_hidden = best_params
 
 encoder_config = RNNConfig(
-    input_size=11,
+    input_size=len(columns_to_select),
     hidden_size=hidden_size,
     num_layers=num_layers,
     bidirectional=bidirectional
 )
 
 decoder_config = RNNConfig(
-    input_size=11,
+    input_size=len(columns_to_select),
     hidden_size=hidden_size,
     num_layers=num_layers,
     bidirectional=bidirectional
@@ -901,7 +989,6 @@ formatted = metric_df.style.format(
         "MSE": "{:.4f}",
         "MASE": "{:.4f}",
         "Forecast Bias": "{:.2f}%",
-        "Time Elapsed": "{:.6f}",
     }
 ).highlight_min(
     color="lightgreen", subset=["MAE", "MSE", "MASE"]

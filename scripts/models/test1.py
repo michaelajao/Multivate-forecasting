@@ -92,6 +92,9 @@ def load_and_preprocess_data(filepath, recovery_period=21, rolling_window=7, sta
     df["recovered"] = df["recovered"].fillna(0).clip(lower=0)
 
     df["active_cases"] = df["cumulative_confirmed"] - df["recovered"] - df["cumulative_deceased"]
+    
+    # compute the number of susceptible individuals
+    df["susceptible"] = df["population"] - (df["recovered"] + df["cumulative_deceased"] + df["active_cases"])
 
     df = df[df["date"] >= pd.to_datetime(start_date)].reset_index(drop=True)
     df[["recovered", "active_cases"]] = df[["recovered", "active_cases"]].clip(lower=0)
@@ -170,6 +173,27 @@ class SEIRNet(nn.Module):
                 if m.bias is not None:
                     m.bias.data.fill_(0)
         self.apply(init_weights)
+        
+        
+def network_prediction(model, t, N, device):
+    """
+    Generate predictions from the SEIRNet model.
+    
+    Parameters:
+    - model: SEIRNet instance
+    - t: Time inputs as a NumPy array
+    - N: Total population for scaling the output
+    - device: Torch device (CPU or GPU)
+    
+    Returns:
+    - Predicted values for S, E, I, R, D compartments
+    """
+    t_tensor = torch.from_numpy(t).float().view(-1, 1).to(device)
+    with torch.no_grad():
+        predictions = model(t_tensor) * N
+    return predictions.cpu().numpy()
+
+
 
 def seird_loss(model, model_output, SIRD_tensor, t_tensor, N, sigma=1/5, beta=None, gamma=None, delta=None):
     S_pred, E_pred, I_pred, R_pred, D_pred = model_output[:, 0], model_output[:, 1], model_output[:, 2], model_output[:, 3], model_output[:, 4]

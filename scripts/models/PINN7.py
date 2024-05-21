@@ -110,7 +110,7 @@ def load_and_preprocess_data(filepath, areaname, recovery_period=16, rolling_win
     return df
 
 # Load and preprocess the data
-data = load_and_preprocess_data("../../data/hos_data/merged_data.csv", areaname="South West", recovery_period=21, start_date="2020-04-01", end_date="2021-12-31").drop(columns=["Unnamed: 0"], axis=1)
+data = load_and_preprocess_data("../../data/hos_data/merged_data.csv", areaname="South West", recovery_period=21, start_date="2020-04-01", end_date="2020-08-31").drop(columns=["Unnamed: 0"], axis=1)
 
 class SEIRDNet(nn.Module):
     """Epidemiological network for predicting SEIRD model outputs."""
@@ -135,7 +135,7 @@ class SEIRDNet(nn.Module):
         self.init_xavier()
 
     def forward(self, t):
-        return torch.sigmoid(self.net(t))
+        return self.net(t)
 
     @property
     def beta(self):
@@ -156,7 +156,7 @@ class SEIRDNet(nn.Module):
                 g = nn.init.calculate_gain('tanh')
                 nn.init.xavier_uniform_(m.weight, gain=g)
                 if m.bias is not None:
-                    m.bias.data.fill_(0)
+                    m.bias.data.fill_(0.001)
         self.apply(init_weights)
 
 def network_prediction(t, model, device, scaler, N):
@@ -217,32 +217,32 @@ def split_and_scale_data(data, train_size, features, device):
     
     # Select the first train_size days for training
     train_data = data.iloc[:train_size]
-    # Select the next 5 days for validation
-    val_data = data.iloc[train_size:train_size + 5]
-    # Select the rest of the data
-    remaining_data = data.iloc[train_size + 5:]
+    
+    # Select the remaining days for validation
+    val_data = data.iloc[train_size:]
 
     # Scale the data
     scaled_train_data = pd.DataFrame(scaler.transform(train_data[features]), columns=features)
     scaled_val_data = pd.DataFrame(scaler.transform(val_data[features]), columns=features)
-    scaled_remaining_data = pd.DataFrame(scaler.transform(remaining_data[features]), columns=features)
+
 
     # Prepare tensors for each segment
     t_train, S_train, E_train, I_train, R_train, D_train = prepare_tensors(scaled_train_data, device)
     t_val, S_val, E_val, I_val, R_val, D_val = prepare_tensors(scaled_val_data, device)
-    t_remaining, S_remaining, E_remaining, I_remaining, R_remaining, D_remaining = prepare_tensors(scaled_remaining_data, device)
+
     
     tensor_data = {
         "train": (t_train, S_train, E_train, I_train, R_train, D_train),
         "val": (t_val, S_val, E_val, I_val, R_val, D_val),
-        "remaining": (t_remaining, S_remaining, E_remaining, I_remaining, R_remaining, D_remaining)
     }
 
     return tensor_data, scaler
 
 # Example features and data split
 features = ["susceptible", "exposed", "active_cases", "recovered", "cumulative_deceased"]
-train_size = 60  # days
+
+# Set the training size to 90% of the data
+train_size = int(0.9 * len(data))
 
 tensor_data, scaler = split_and_scale_data(data, train_size, features, device)
 
@@ -253,12 +253,12 @@ def pinn_loss(tensor_data, parameters, model_output, t, N, sigma=1/5, beta=None,
     
     S_train, E_train, I_train, R_train, D_train = tensor_data["train"][1:]
     S_val, E_val, I_val, R_val, D_val = tensor_data["val"][1:]
-    S_remaining, E_remaining, I_remaining, R_remaining, D_remaining = tensor_data["remaining"][1:]
-    S_total = torch.cat([S_train, S_val, S_remaining])
-    E_total = torch.cat([E_train, E_val, E_remaining])
-    I_total = torch.cat([I_train, I_val, I_remaining])
-    R_total = torch.cat([R_train, R_val, R_remaining])
-    D_total = torch.cat([D_train, D_val, D_remaining])
+
+    S_total = torch.cat([S_train, S_val])
+    E_total = torch.cat([E_train, E_val])
+    I_total = torch.cat([I_train, I_val])
+    R_total = torch.cat([R_train, R_val])
+    D_total = torch.cat([D_train, D_val])
     
     s_t = grad(S_pred, t, grad_outputs=torch.ones_like(S_pred), create_graph=True)[0]
     e_t = grad(E_pred, t, grad_outputs=torch.ones_like(E_pred), create_graph=True)[0]
@@ -313,10 +313,10 @@ def pinn_loss(tensor_data, parameters, model_output, t, N, sigma=1/5, beta=None,
         (D_pred[0] - D0) ** 2
     )
 
-    # weights for the loss terms
-    lambda_data = 100.0
-    lambda_residual = 10000.0
-    lambda_initial = 10.0
+    # Weights for the loss terms
+    lambda_data = 1.0
+    lambda_residual = 1.0
+    lambda_initial = 1.0
     
     # Total loss
     total_loss = (
@@ -324,7 +324,6 @@ def pinn_loss(tensor_data, parameters, model_output, t, N, sigma=1/5, beta=None,
         lambda_residual * residual_loss +
         lambda_initial * initial_condition_loss
     )
-    
 
     return total_loss
 
@@ -359,14 +358,14 @@ N = data["population"].values[0]
 model = SEIRDNet(inverse=True, init_beta=0.3, init_gamma=0.1, init_delta=0.1, num_layers=10, hidden_neurons=32, retain_seed=100).to(device)
 
 # Initialize optimizer and scheduler
-optimizer = optim.Adam(model.parameters(), lr=2e-4, weight_decay=1e-5)
+optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-5)
 scheduler = StepLR(optimizer, step_size=5000, gamma=0.9)
 
 # Initialize early stopping
 earlystopping = EarlyStopping(patience=100, verbose=False)
 
 # Set the number of epochs for training
-epochs = 50000
+epochs = 100000
 
 # Full time input for the entire dataset
 t = torch.tensor(np.arange(len(data)), dtype=torch.float32).view(-1, 1).to(device).requires_grad_(True)
@@ -429,6 +428,8 @@ plt.show()
 t_values = np.arange(len(data))
 predictions = network_prediction(t_values, model, device, scaler, N)
 
+dates = data["date"].dt.strftime("%Y-%m-%d")
+
 # Extract predictions for each compartment
 S_pred = predictions[:, 0]
 E_pred = predictions[:, 1]
@@ -447,75 +448,81 @@ D_actual = data["cumulative_deceased"].values
 train_index_size = len(tensor_data["train"][0])
 
 # Plot the results
-fig, ax = plt.subplots(3, 1, figsize=(10, 15), sharex=True)
+fig, ax = plt.subplots(5, 1, figsize=(10, 15), sharex=True)
 
 # Plot the susceptible compartment
-ax[0].plot(t_values, S_actual, label="True Susceptible", color="blue", linestyle="--")
-ax[0].plot(t_values, S_pred, label="Predicted Susceptible", color="red")
-ax[0].scatter(t_values[:train_index_size], I_actual[:train_index_size], color="black", label="Train-Val Split")
+ax[0].plot(dates, S_actual, label="True Susceptible", color="blue")
+ax[0].plot(dates, S_pred, label="Predicted Susceptible", color="red", linestyle="--")
+ax[0].scatter(dates[:train_index_size], S_actual[:train_index_size], color="black", label="Train-Val Split", marker="x")
 ax[0].set_ylabel("Susceptible")
 ax[0].legend()
 
-# Plot the infected compartment
-ax[1].plot(t_values, I_actual, label="True Active Cases", color="blue", linestyle="--")
-ax[1].plot(t_values, I_pred, label="Predicted Active Cases", color="red")
-ax[1].scatter(t_values[:train_index_size], I_actual[:train_index_size], color="black", label="Train-Val Split")
-ax[1].set_ylabel("Active Cases")
+# Plot the exposed compartment
+ax[1].plot(dates, E_actual, label="True Exposed", color="blue")
+ax[1].plot(dates, E_pred, label="Predicted Exposed", color="red", linestyle="--")
+ax[1].scatter(dates[:train_index_size], E_actual[:train_index_size], color="black", label="Train-Val Split", marker="x")
+ax[1].set_ylabel("Exposed")
 ax[1].legend()
 
-# Plot the recovered compartment
-ax[2].plot(t_values, R_actual, label="True Recovered", color="blue", linestyle="--")
-ax[2].plot(t_values, R_pred, label="Predicted Recovered", color="red")
-ax[2].scatter(t_values[:train_index_size], I_actual[:train_index_size], color="black", label="Train-Val Split")
-ax[2].set_ylabel("Recovered")
+# Plot the active cases compartment
+ax[2].plot(dates, I_actual, label="True Active Cases", color="blue")
+ax[2].plot(dates, I_pred, label="Predicted Active Cases", color="red", linestyle="--")
+ax[2].scatter(dates[:train_index_size], I_actual[:train_index_size], color="black", label="Train-Val Split", marker="x")
+ax[2].set_ylabel("Active Cases")
 ax[2].legend()
 
-plt.xlabel("Days")
-plt.suptitle("Predicted vs. True SEIRD Model Outputs")
+# Plot the recovered compartment
+ax[3].plot(dates, R_actual, label="True Recovered", color="blue")
+ax[3].plot(dates, R_pred, label="Predicted Recovered", color="red", linestyle="--")
+ax[3].scatter(dates[:train_index_size], R_actual[:train_index_size], color="black", label="Train-Val Split", marker="x")
+ax[3].set_ylabel("Recovered")
+ax[3].legend()
+
+# Plot the deceased compartment
+ax[4].plot(dates, D_actual, label="True Deceased", color="blue")
+ax[4].plot(dates, D_pred, label="Predicted Deceased", color="red", linestyle="--")
+ax[4].scatter(dates[:train_index_size], D_actual[:train_index_size], color="black", label="Train-Val Split", marker="x")
+ax[4].set_ylabel("Deceased")
+ax[4].legend()
+
+plt.xlabel("Date")
+plt.xticks(rotation=45)
+plt.tight_layout()
 plt.show()
 
 
+# generate predictions for the parameters beta, gamma, and delta
+t_values = np.arange(len(data))
+parameters = model
+predictions = network_prediction(t_values, parameters, device, scaler, N)
+
+# Extract predictions for each parameter
+beta_pred = predictions[:, 0]
+gamma_pred = predictions[:, 1]
+delta_pred = predictions[:, 2]
+
+# plot the parameter predictions
+fig, ax = plt.subplots(3, 1, figsize=(10, 15), sharex=True)
+
+# plot the beta parameter
+ax[0].plot(dates, beta_pred, label="Predicted Beta", color="red", linestyle="--")
+ax[0].set_ylabel("Beta")
+ax[0].legend()
+
+# plot the gamma parameter
+ax[1].plot(dates, gamma_pred, label="Predicted Gamma", color="red", linestyle="--")
+ax[1].set_ylabel("Gamma")
+ax[1].legend()
+
+# plot the delta parameter
+ax[2].plot(dates, delta_pred, label="Predicted Delta", color="red", linestyle="--")
+ax[2].set_ylabel("Delta")
+ax[2].legend()
+
+plt.xlabel("Date")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
 
 
-# # Switch the model to evaluation mode
-# model.eval()
-# with torch.no_grad():
-#     t_val, I_val, R_val, D_val = tensor_data["val"]
-#     model_output = model(t_val)
-#     S_pred, E_pred, I_pred, R_pred, D_pred = torch.split(model_output, 1, dim=1)
-
-#     # Inverse transform the scaled data
-#     S_pred = scaler.inverse_transform(S_pred.cpu().numpy())
-#     E_pred = scaler.inverse_transform(E_pred.cpu().numpy())
-#     I_pred = scaler.inverse_transform(I_pred.cpu().numpy())
-#     R_pred = scaler.inverse_transform(R_pred.cpu().numpy())
-#     D_pred = scaler.inverse_transform(D_pred.cpu().numpy())
-
-#     # Plot the predicted vs. true data
-#     plt.figure()
-#     plt.plot(data["active_cases"], label="True Active Cases", color="blue", linestyle="--")
-#     plt.plot(np.arange(train_size, len(data)), I_pred, label="Predicted Active Cases", color="red")
-#     plt.xlabel("Days")
-#     plt.ylabel("Active Cases")
-#     plt.title("Predicted vs. True Active Cases")
-#     plt.legend()
-#     plt.show()
-
-#     plt.figure()
-#     plt.plot(data["recovered"], label="True Recovered", color="blue", linestyle="--")
-#     plt.plot(np.arange(train_size, len(data)), R_pred, label="Predicted Recovered", color="red")
-#     plt.xlabel("Days")
-#     plt.ylabel("Recovered")
-#     plt.title("Predicted vs. True Recovered")
-#     plt.legend()
-#     plt.show()
-
-#     plt.figure()
-#     plt.plot(data["cumulative_deceased"], label="True Deceased", color="blue", linestyle="--")
-#     plt.plot(np.arange(train_size, len(data)), D_pred, label="Predicted Deceased", color="red")
-#     plt.xlabel("Days")
-#     plt.ylabel("Deceased")
-#     plt.title("Predicted vs. True Deceased")
-#     plt.legend()
-#     plt.show()
 
