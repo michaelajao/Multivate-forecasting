@@ -1,5 +1,5 @@
 # Experiment 2 Script for COVID-19 Forecasting
-# change path to the root directory of the project
+# Change path to the root directory of the project
 import os
 os.chdir("../../")
 
@@ -562,10 +562,6 @@ def simulated_annealing(objective, initial_params, initial_temp, neighbor, n_ite
         cost_history.append(best_cost)
 
         logging.info(f"Iteration: {i+1}, Best Cost: {best_cost:.4f}, Current Cost: {current_cost:.4f}, Temperature: {temp:.4f}")
-
-        if i > 10 and np.all(np.isclose(cost_history[-10:], cost_history[-1])):
-            logging.info(f"Early stopping at iteration {i+1} due to convergence.")
-            break
 
     return best_cost, best_params, cost_history
 

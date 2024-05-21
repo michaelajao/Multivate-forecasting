@@ -496,6 +496,38 @@ plt.xticks(rotation=45)
 plt.tight_layout()
 plt.show()
 
+import matplotlib.dates as mdates
+fig, ax = plt.subplots(5, 1, figsize=(14, 18), sharex=True)
+# Define plot details
+plot_details = [
+    ("Susceptible", S_actual, S_pred),
+    ("Exposed", E_actual, E_pred),
+    ("Active Cases", I_actual, I_pred),
+    ("Recovered", R_actual, R_pred),
+    ("Deceased", D_actual, D_pred)
+]
+
+for i, (title, actual, pred) in enumerate(plot_details):
+    ax[i].plot(dates, actual, label="True", color="blue", linewidth=2)
+    ax[i].plot(dates, pred, label="Predicted", color="red", linestyle="--", linewidth=2)
+    ax[i].axvline(x=dates[train_index_size], color="black", linestyle="--", linewidth=1, label="Train-Val Split")
+    ax[i].set_ylabel(title, fontsize=14)
+    ax[i].grid(True)
+    ax[i].set_title(title + " Over Time", fontsize=16)
+    ax[i].tick_params(axis='both', which='major', labelsize=12)
+
+# Only add the legend to the first subplot
+handles, labels = ax[0].get_legend_handles_labels()
+fig.legend(handles, labels, loc='upper center', fontsize=12, ncol=3, bbox_to_anchor=(0.5, 1.05))
+
+ax[-1].set_xlabel("Date", fontsize=14)
+ax[-1].xaxis.set_major_locator(mdates.MonthLocator())
+ax[-1].xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))
+plt.xticks(rotation=45, ha='right')
+plt.tight_layout(rect=[0, 0, 1, 0.95])  # Adjust layout to accommodate the legend
+plt.subplots_adjust(top=0.9)
+
+plt.show()
 
 # Extract the parameter values
 beta = model.beta.item()
