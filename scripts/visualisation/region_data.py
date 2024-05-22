@@ -156,8 +156,8 @@ unique_regions_merged_data = merged_data['region'].unique()
 print(f"Unique regions in merged_data: {unique_regions_merged_data}")
 
 # Save the merged data as CSV and pickle
-merged_data.to_csv('merged_data.csv', index=False)
-merged_data.to_pickle('merged_data.pkl')
+merged_data.to_csv(os.path.join(data_path, "merged_data.csv"), index=False)
+merged_data.to_pickle(os.path.join(data_path, "merged_data.pkl"))
 
 # Create a new dataset called "England data" by aggregating the data from all regions
 england_data = merged_data.groupby('date').sum(numeric_only=True).reset_index()
@@ -166,8 +166,8 @@ england_data = merged_data.groupby('date').sum(numeric_only=True).reset_index()
 england_data['region'] = 'England'
 
 # Save the England data as CSV and pickle
-england_data.to_csv(data_path + 'england_data.csv', index=False)
-england_data.to_pickle(data_path + 'england_data.pkl')
+england_data.to_csv(os.path.join(data_path, "england_data.csv"), index=False)
+england_data.to_pickle(os.path.join(data_path, "england_data.pkl"))
 
 # Trend Analysis for England
 plt.figure(figsize=(14, 8))
@@ -217,8 +217,7 @@ plt.savefig('heatmap_correlation_matrix_england.png')
 plt.show()
 
 # Saving merged data
-# merged_data.to_csv(os.path.join(data_path, "merged_data.csv"))
-# merged_data.to_pickle(os.path.join(data_path, "merged_data.pkl"))
+
 
 # Convert date to datetime if not already done
 merged_data["date"] = pd.to_datetime(merged_data["date"])
