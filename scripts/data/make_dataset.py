@@ -143,7 +143,7 @@ final_df.loc[:, "epi_week"] = final_df["date"].apply(get_cdc_epiweek)
 # Data Cleaning and Adjusting
 final_df = clean_and_adjust_df(final_df)
 
-
+final_df.head()
 # Filtering Data
 start_date = datetime(2020, 4, 1)
 filtered_df = filter_data(final_df, start_date)
