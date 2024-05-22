@@ -19,6 +19,34 @@ from pytorch_lightning.callbacks import EarlyStopping
 
 from sklearn.metrics import mean_absolute_error as mae, mean_squared_error as mse
 
+from tqdm.autonotebook import tqdm
+tqdm.pandas()
+
+# Local imports for data loaders and models
+from src.utils import plotting_utils
+from src.transforms.target_transformations import AutoStationaryTransformer
+
+# Set seeds for reproducibility
+pl.seed_everything(42)
+torch.manual_seed(42)
+np.random.seed(42)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed_all(42)
+
+torch.set_float32_matmul_precision('high')
+
+# Set default plotly template
+import plotly.io as pio
+pio.templates.default = "plotly_white"
+
+# Ignore warnings
+import warnings
+warnings.filterwarnings("ignore")
+import logging
+
+# Set logging configuration
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 def highlight_abs_min(s, props=""):
     return np.where(s == np.nanmin(np.abs(s.values)), props, "")
 
