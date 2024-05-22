@@ -145,13 +145,13 @@ def load_and_preprocess_data(
 # Load and preprocess the data
 data = load_and_preprocess_data(
     "../../data/processed/merged_nhs_covid_data.csv",
-    areaname="London",
+    areaname="Midlands",
     recovery_period=21,
     start_date="2020-05-01",
     end_date="2021-05-31",
 ).drop(columns=["Unnamed: 0"], axis=1)
 
-areaname="London"
+areaname="Midlands"
 
 # plot suscepitble data over time to check for any trends
 plt.figure()
@@ -349,8 +349,8 @@ features = [
     "cumulative_deceased",
 ]
 
-# Set the training size to 90% of the data
-train_size = int(0.9 * len(data))
+# Set the training size to 95% of the data
+train_size = int(0.95 * len(data))
 
 tensor_data, scaler = split_and_scale_data(data, train_size, features, device)
 

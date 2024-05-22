@@ -1,4 +1,0 @@
-Algorithm,MAE,MSE,MASE,Forecast Bias
-RNN (Vanilla),2.1727,5.1202,9.4039,-2.17
-LSTM (Vanilla),2.2742,5.5270,9.8430,-2.27
-GRU (Bidirectional),2.0253,4.3635,8.7659,-2.03
