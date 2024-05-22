@@ -159,6 +159,8 @@ print(f"Unique regions in merged_data: {unique_regions_merged_data}")
 merged_data.to_csv(os.path.join(data_path, "merged_data.csv"), index=False)
 merged_data.to_pickle(os.path.join(data_path, "merged_data.pkl"))
 
+merged_data["date"] = pd.to_datetime(merged_data["date"])
+
 # Create a new dataset called "England data" by aggregating the data from all regions
 england_data = merged_data.groupby('date').sum(numeric_only=True).reset_index()
 
@@ -168,6 +170,8 @@ england_data['region'] = 'England'
 # Save the England data as CSV and pickle
 england_data.to_csv(os.path.join(data_path, "england_data.csv"), index=False)
 england_data.to_pickle(os.path.join(data_path, "england_data.pkl"))
+
+england_data["date"] = pd.to_datetime(england_data["date"])
 
 # Trend Analysis for England
 plt.figure(figsize=(14, 8))
@@ -179,7 +183,7 @@ plt.legend()
 plt.grid(True)
 plt.xticks(rotation=45)
 plt.tight_layout()
-plt.savefig('trend_new_confirmed_cases_england.png')
+plt.savefig('../../reports/images/trend_new_confirmed_cases_england.pdf')
 plt.show()
 
 # Detailed Summary Statistics
@@ -194,7 +198,7 @@ plt.ylabel('Frequency')
 plt.title('Distribution of New Confirmed Cases in England')
 plt.grid(True)
 plt.tight_layout()
-plt.savefig('histogram_new_confirmed_cases_england.png')
+plt.savefig('../../reports/images/histogram_new_confirmed_cases_england.pdf')
 plt.show()
 
 # Box Plot of New Deceased Cases for England
@@ -204,16 +208,16 @@ plt.ylabel('New Deceased Cases')
 plt.title('Distribution of New Deceased Cases in England')
 plt.grid(True)
 plt.tight_layout()
-plt.savefig('boxplot_new_deceased_cases_england.png')
+plt.savefig('../../reports/images/boxplot_new_deceased_cases_england.pdf')
 plt.show()
 
 # Heatmap of Correlation Matrix for England
-plt.figure(figsize=(10, 8))
+plt.figure(figsize=(12, 6))
 corr_matrix_england = england_data[['new_confirmed', 'new_deceased', 'hospitalCases']].corr()
 sns.heatmap(corr_matrix_england, annot=True, cmap='coolwarm', linewidths=0.5)
 plt.title('Correlation Matrix for Key Metrics in England')
 plt.tight_layout()
-plt.savefig('heatmap_correlation_matrix_england.png')
+plt.savefig('../../reports/images/heatmap_correlation_matrix_england.pdf')
 plt.show()
 
 # Saving merged data
@@ -312,8 +316,11 @@ pivot_cases_time_region = merged_data.pivot_table(
     index="date", columns="region", values=feature, aggfunc="sum"
 ).fillna(0)
 
-# Format the dates to only show Year-Month for 4 months interval
-pivot_cases_time_region.index = pivot_cases_time_region.index.strftime('%Y-%m')
+
+# Format the dates to only show 
+pivot_cases_time_region.index = pivot_cases_time_region.index.strftime("%Y-%m")
+
+
 # Create the heatmap
 plt.figure(figsize=(10, 8))  # Adjusted for a more compact display
 sns.heatmap(pivot_cases_time_region, cmap="viridis")

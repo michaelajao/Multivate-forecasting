@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import matplotlib.dates as mdates
 from tqdm.notebook import tqdm
 from scipy.integrate import odeint
 from collections import deque
@@ -142,6 +142,7 @@ def load_and_preprocess_data(
         "hospitalCases",
         "covidOccupiedMVBeds",
         "recovered",
+        "new_deceased",
         "active_cases",
     ]
     for col in cols_to_smooth:
@@ -158,8 +159,9 @@ data = load_and_preprocess_data(
     "../../data/hos_data/england_data.csv",
     # areaname="Midlands",
     recovery_period=21,
-    start_date="2020-05-01",
-    end_date="2022-05-31",
+    rolling_window=7,
+    start_date="2020-04-23",
+    end_date="2021-05-31",
 )
 
 
@@ -452,18 +454,21 @@ def pinn_loss(
         + (R_pred[0] - R0) ** 2
         + (D_pred[0] - D0) ** 2
     )
+    
+    # Total loss
+    total_loss = data_fitting_loss + residual_loss + initial_condition_loss
 
     # Weights for the loss terms
-    lambda_data = 1.0
-    lambda_residual = 1.0
-    lambda_initial = 1.0
+    # lambda_data = 1.0
+    # lambda_residual = 1.0
+    # lambda_initial = 1.0
 
-    # Total loss
-    total_loss = (
-        lambda_data * data_fitting_loss
-        + lambda_residual * residual_loss
-        + lambda_initial * initial_condition_loss
-    )
+    # # Total loss
+    # total_loss = (
+    #     lambda_data * data_fitting_loss
+    #     + lambda_residual * residual_loss
+    #     + lambda_initial * initial_condition_loss
+    # )
 
     return total_loss
 
@@ -509,8 +514,8 @@ model = SEIRDNet(
 ).to(device)
 
 # Initialize optimizer and scheduler
-optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-5)
-scheduler = StepLR(optimizer, step_size=5000, gamma=0.9)
+optimizer = optim.Adam(model.parameters(), lr=1e-4)
+scheduler = StepLR(optimizer, step_size=5000, gamma=0.8)
 
 # Initialize early stopping
 earlystopping = EarlyStopping(patience=20, verbose=False)
@@ -581,8 +586,8 @@ def train_loop(
             break
 
         # Print progress every 100 epochs
-        if epoch % 1000 == 0:
-            print(f"Epoch {epoch + 1}, Loss: {loss.item():.6f}")
+        if (epoch + 1) % 1000 == 0:
+            print(f"Epoch {epoch + 1}/{epochs}, Loss: {loss.item():.6f}")
 
     return model, loss_history
 
@@ -617,14 +622,13 @@ dates = data["date"]
 
 # Extract predictions for each compartment
 S_pred = predictions[:, 0]
-E_pred = predictions[:, 1]
-I_pred = predictions[:, 2]
-R_pred = predictions[:, 3]
-D_pred = predictions[:, 4]
+I_pred = predictions[:, 1]
+R_pred = predictions[:, 2]
+D_pred = predictions[:, 3]
 
 # Actual data
 S_actual = data["susceptible"].values
-E_actual = data["exposed"].values
+# E_actual = data["exposed"].values
 I_actual = data["active_cases"].values
 R_actual = data["recovered"].values
 D_actual = data["cumulative_deceased"].values
@@ -632,93 +636,11 @@ D_actual = data["cumulative_deceased"].values
 # Define training index size
 train_index_size = len(tensor_data["train"][0])
 
-# Plot the results
-# fig, ax = plt.subplots(5, 1, figsize=(10, 15), sharex=True)
-
-# # Plot the susceptible compartment
-# ax[0].plot(dates, S_actual, label="True Susceptible", color="blue")
-# ax[0].plot(dates, S_pred, label="Predicted Susceptible", color="red", linestyle="--")
-# # ax[0].scatter(dates[:train_index_size], S_actual[:train_index_size], color="green", label="Train-Val Split")
-# # dotted line for the training-validation split
-# ax[0].axvline(
-#     x=dates[train_index_size],
-#     color="black",
-#     linestyle="--",
-#     linewidth=1,
-#     label="Train-Val Split",
-# )
-# ax[0].set_ylabel("Susceptible")
-# ax[0].legend()
-
-# # Plot the exposed compartment
-# ax[1].plot(dates, E_actual, label="True Exposed", color="blue")
-# ax[1].plot(dates, E_pred, label="Predicted Exposed", color="red", linestyle="--")
-# # ax[1].scatter(dates[:train_index_size], E_actual[:train_index_size], color="green", label="Train-Val Split")
-# ax[1].axvline(
-#     x=dates[train_index_size],
-#     color="black",
-#     linestyle="--",
-#     linewidth=1,
-#     label="Train-Val Split",
-# )
-# ax[1].set_ylabel("Exposed")
-# ax[1].legend()
-
-# # Plot the active cases compartment
-# ax[2].plot(dates, I_actual, label="True Active Cases", color="blue")
-# ax[2].plot(dates, I_pred, label="Predicted Active Cases", color="red", linestyle="--")
-# # ax[2].scatter(dates[:train_index_size], I_actual[:train_index_size], color="green", label="Train-Val Split")
-# ax[2].axvline(
-#     x=dates[train_index_size],
-#     color="black",
-#     linestyle="--",
-#     linewidth=1,
-#     label="Train-Val Split",
-# )
-# ax[2].set_ylabel("Active Cases")
-# ax[2].legend()
-
-# # Plot the recovered compartment
-# ax[3].plot(dates, R_actual, label="True Recovered", color="blue")
-# ax[3].plot(dates, R_pred, label="Predicted Recovered", color="red", linestyle="--")
-# # ax[3].scatter(dates[:train_index_size], R_actual[:train_index_size], color="green", label="Train-Val Split")
-# ax[3].axvline(
-#     x=dates[train_index_size],
-#     color="black",
-#     linestyle="--",
-#     linewidth=1,
-#     label="Train-Val Split",
-# )
-# ax[3].set_ylabel("Recovered")
-# ax[3].legend()
-
-# # Plot the deceased compartment
-# ax[4].plot(dates, D_actual, label="True Deceased", color="blue")
-# ax[4].plot(dates, D_pred, label="Predicted Deceased", color="red", linestyle="--")
-# # ax[4].scatter(dates[:train_index_size], D_actual[:train_index_size], color="green", label="Train-Val Split")
-# ax[4].axvline(
-#     x=dates[train_index_size],
-#     color="black",
-#     linestyle="--",
-#     linewidth=1,
-#     label="Train-Val Split",
-# )
-# ax[4].set_ylabel("Deceased")
-# ax[4].legend()
-
-# plt.xlabel("Date")
-# plt.xticks(rotation=45)
-# plt.tight_layout()
-# plt.savefig(f"../../reports/figures/pinn_{areaname}_results.pdf")
-# plt.show()
-
-import matplotlib.dates as mdates
-
-fig, ax = plt.subplots(5, 1, figsize=(14, 18), sharex=True)
+fig, ax = plt.subplots(4, 1, figsize=(12, 10), sharex=True)
 # Define plot details
 plot_details = [
     ("Susceptible", S_actual, S_pred),
-    ("Exposed", E_actual, E_pred),
+    # ("Exposed", E_actual, E_pred),
     ("Active Cases", I_actual, I_pred),
     ("Recovered", R_actual, R_pred),
     ("Deceased", D_actual, D_pred),
@@ -769,7 +691,7 @@ output = pd.DataFrame(
     {
         "date": dates,
         "susceptible": S_pred,
-        "exposed": E_pred,
+        # "exposed": E_pred,
         "active_cases": I_pred,
         "recovered": R_pred,
         "cumulative_deceased": D_pred,
