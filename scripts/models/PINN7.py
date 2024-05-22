@@ -90,10 +90,23 @@ def check_pytorch():
 
 check_pytorch()
 
+# data = pd.read_csv("../../data/hos_data/england_data.csv")
+# data["date"] = pd.to_datetime(data["date"], format="%Y-%m-%d")
+
+# # plot the covidOccupiedMVBeds data over time to check for any trends
+# plt.figure()
+# plt.plot(data["date"], data["covidOccupiedMVBeds"], label="covidOccupiedMVBeds")
+# plt.xlabel("Date")
+# plt.ylabel("covidOccupiedMVBeds")
+# plt.title("covidOccupiedMVBeds Over Time")
+# plt.xticks(rotation=45)
+# plt.tight_layout()
+# # plt.savefig("../../reports/figures/covidOccupiedMVBeds.pdf")
+# plt.show()
 
 def load_and_preprocess_data(
     filepath,
-    areaname,
+    # areaname,
     recovery_period=16,
     rolling_window=7,
     start_date="2020-04-01",
@@ -101,8 +114,8 @@ def load_and_preprocess_data(
 ):
     """Load and preprocess the data from a CSV file."""
     df = pd.read_csv(filepath)
-    df = df[df["areaName"] == areaname].reset_index(drop=True)
-    df = df[::-1].reset_index(drop=True)  # Reverse dataset if needed
+    # df = df[df["areaName"] == areaname].reset_index(drop=True)
+    # df = df[::-1].reset_index(drop=True)  # Reverse dataset if needed
 
     df["date"] = pd.to_datetime(df["date"])
     df = df[
@@ -120,12 +133,10 @@ def load_and_preprocess_data(
     df["susceptible"] = df["population"] - (
         df["recovered"] + df["cumulative_deceased"] + df["active_cases"]
     )
-    df["exposed"] = 1.1 * df["active_cases"].shift(1).fillna(0)
-    df["exposed"] = df["exposed"].clip(lower=0)
+    
 
     cols_to_smooth = [
         "susceptible",
-        "exposed",
         "cumulative_confirmed",
         "cumulative_deceased",
         "hospitalCases",
@@ -144,14 +155,15 @@ def load_and_preprocess_data(
 
 # Load and preprocess the data
 data = load_and_preprocess_data(
-    "../../data/processed/merged_nhs_covid_data.csv",
-    areaname="Midlands",
+    "../../data/hos_data/england_data.csv",
+    # areaname="Midlands",
     recovery_period=21,
     start_date="2020-05-01",
-    end_date="2021-05-31",
-).drop(columns=["Unnamed: 0"], axis=1)
+    end_date="2022-05-31",
+)
 
-areaname="Midlands"
+
+areaname="England"
 
 # plot suscepitble data over time to check for any trends
 plt.figure()
@@ -183,7 +195,7 @@ class SEIRDNet(nn.Module):
         for _ in range(num_layers - 1):
             layers.extend([nn.Linear(hidden_neurons, hidden_neurons), nn.Tanh()])
         layers.append(
-            nn.Linear(hidden_neurons, 5)
+            nn.Linear(hidden_neurons, 4)
         )  # Adjust the output size to 5 (S, E, I, R, D)
         self.net = nn.Sequential(*layers)
 
@@ -275,14 +287,23 @@ def network_prediction(t, model, device, scaler, N):
     return predictions
 
 
-def SEIRD_model(u, t, beta, sigma, gamma, delta, N):
-    S, E, I, R, D = u
+def SIRD_model(y, t, beta, gamma, delta, N):
+    S, I, R, D = y
     dSdt = -beta * S * I / N
-    dEdt = beta * S * I / N - sigma * E
-    dIdt = sigma * E - (gamma + delta) * I
+    dIdt = beta * S * I / N - (gamma + delta) * I
     dRdt = gamma * I
     dDdt = delta * I
-    return [dSdt, dEdt, dIdt, dRdt, dDdt]
+    return [dSdt, dIdt, dRdt, dDdt]
+
+
+# def SEIRD_model(u, t, beta, sigma, gamma, delta, N):
+#     S, E, I, R, D = u
+#     dSdt = -beta * S * I / N
+#     dEdt = beta * S * I / N - sigma * E
+#     dIdt = sigma * E - (gamma + delta) * I
+#     dRdt = gamma * I
+#     dDdt = delta * I
+#     return [dSdt, dEdt, dIdt, dRdt, dDdt]
 
 
 # Prepare PyTorch tensors from the data
@@ -295,7 +316,7 @@ def prepare_tensors(data, device):
         .requires_grad_(True)
     )
     S = tensor(data["susceptible"].values, dtype=torch.float32).view(-1, 1).to(device)
-    E = tensor(data["exposed"].values, dtype=torch.float32).view(-1, 1).to(device)
+    # E = tensor(data["exposed"].values, dtype=torch.float32).view(-1, 1).to(device)
     I = tensor(data["active_cases"].values, dtype=torch.float32).view(-1, 1).to(device)
     R = tensor(data["recovered"].values, dtype=torch.float32).view(-1, 1).to(device)
     D = (
@@ -303,7 +324,7 @@ def prepare_tensors(data, device):
         .view(-1, 1)
         .to(device)
     )
-    return t, S, E, I, R, D
+    return t, S, I, R, D
 
 
 # Split and scale the data into training and validation sets
@@ -327,14 +348,14 @@ def split_and_scale_data(data, train_size, features, device):
     )
 
     # Prepare tensors for each segment
-    t_train, S_train, E_train, I_train, R_train, D_train = prepare_tensors(
+    t_train, S_train, I_train, R_train, D_train = prepare_tensors(
         scaled_train_data, device
     )
-    t_val, S_val, E_val, I_val, R_val, D_val = prepare_tensors(scaled_val_data, device)
+    t_val, S_val, I_val, R_val, D_val = prepare_tensors(scaled_val_data, device)
 
     tensor_data = {
-        "train": (t_train, S_train, E_train, I_train, R_train, D_train),
-        "val": (t_val, S_val, E_val, I_val, R_val, D_val),
+        "train": (t_train, S_train, I_train, R_train, D_train),
+        "val": (t_val, S_val, I_val, R_val, D_val),
     }
 
     return tensor_data, scaler
@@ -343,14 +364,14 @@ def split_and_scale_data(data, train_size, features, device):
 # Example features and data split
 features = [
     "susceptible",
-    "exposed",
+    # "exposed",
     "active_cases",
     "recovered",
     "cumulative_deceased",
 ]
 
 # Set the training size to 95% of the data
-train_size = int(0.95 * len(data))
+train_size = int(0.80 * len(data))
 
 tensor_data, scaler = split_and_scale_data(data, train_size, features, device)
 
@@ -369,19 +390,19 @@ def pinn_loss(
     train_size=None,
 ):
     """Physics-Informed Neural Network loss function."""
-    S_pred, E_pred, I_pred, R_pred, D_pred = torch.split(model_output, 1, dim=1)
+    S_pred, I_pred, R_pred, D_pred = torch.split(model_output, 1, dim=1)
 
-    S_train, E_train, I_train, R_train, D_train = tensor_data["train"][1:]
-    S_val, E_val, I_val, R_val, D_val = tensor_data["val"][1:]
+    S_train, I_train, R_train, D_train = tensor_data["train"][1:]
+    S_val, I_val, R_val, D_val = tensor_data["val"][1:]
 
     S_total = torch.cat([S_train, S_val])
-    E_total = torch.cat([E_train, E_val])
+    # E_total = torch.cat([E_train, E_val])
     I_total = torch.cat([I_train, I_val])
     R_total = torch.cat([R_train, R_val])
     D_total = torch.cat([D_train, D_val])
 
     s_t = grad(S_pred, t, grad_outputs=torch.ones_like(S_pred), create_graph=True)[0]
-    e_t = grad(E_pred, t, grad_outputs=torch.ones_like(E_pred), create_graph=True)[0]
+    # e_t = grad(E_pred, t, grad_outputs=torch.ones_like(E_pred), create_graph=True)[0]
     i_t = grad(I_pred, t, grad_outputs=torch.ones_like(I_pred), create_graph=True)[0]
     r_t = grad(R_pred, t, grad_outputs=torch.ones_like(R_pred), create_graph=True)[0]
     d_t = grad(D_pred, t, grad_outputs=torch.ones_like(D_pred), create_graph=True)[0]
@@ -394,11 +415,10 @@ def pinn_loss(
         delta = parameters.delta
 
     dSdt = -beta * S_pred * I_pred / N
-    dEdt = beta * S_pred * I_pred / N - sigma * E_pred
-    dIdt = sigma * E_pred - (gamma + delta) * I_pred
+    dIdt = beta * S_pred * I_pred / N - (gamma + delta) * I_pred
     dRdt = gamma * I_pred
     dDdt = delta * I_pred
-
+    
     # Generate a random subset of indices
     if train_size is not None:
         index = torch.randperm(train_size)
@@ -408,7 +428,7 @@ def pinn_loss(
     # Data fitting loss for the random subset of indices
     data_fitting_loss = (
         torch.mean((S_pred[index] - S_total[index]) ** 2)
-        + torch.mean((E_pred[index] - E_total[index]) ** 2)
+        # + torch.mean((E_pred[index] - E_total[index]) ** 2)
         + torch.mean((I_pred[index] - I_total[index]) ** 2)
         + torch.mean((R_pred[index] - R_total[index]) ** 2)
         + torch.mean((D_pred[index] - D_total[index]) ** 2)
@@ -417,17 +437,17 @@ def pinn_loss(
     # Differential equation residuals
     residual_loss = (
         torch.mean((s_t - dSdt) ** 2)
-        + torch.mean((e_t - dEdt) ** 2)
+        # + torch.mean((e_t - dEdt) ** 2)
         + torch.mean((i_t - dIdt) ** 2)
         + torch.mean((r_t - dRdt) ** 2)
         + torch.mean((d_t - dDdt) ** 2)
     )
 
     # Initial condition loss
-    S0, E0, I0, R0, D0 = S_train[0], E_train[0], I_train[0], R_train[0], D_train[0]
+    S0, I0, R0, D0 = S_train[0], I_train[0], R_train[0], D_train[0]
     initial_condition_loss = (
         (S_pred[0] - S0) ** 2
-        + (E_pred[0] - E0) ** 2
+        # + (E_pred[0] - E0) ** 2
         + (I_pred[0] - I0) ** 2
         + (R_pred[0] - R0) ** 2
         + (D_pred[0] - D0) ** 2
@@ -480,10 +500,10 @@ class EarlyStopping:
 N = data["population"].values[0]
 model = SEIRDNet(
     inverse=True,
-    init_beta=0.3,
+    init_beta=0.1,
     init_gamma=0.1,
     init_delta=0.1,
-    num_layers=10,
+    num_layers=5,
     hidden_neurons=32,
     retain_seed=100,
 ).to(device)
@@ -493,10 +513,10 @@ optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-5)
 scheduler = StepLR(optimizer, step_size=5000, gamma=0.9)
 
 # Initialize early stopping
-earlystopping = EarlyStopping(patience=100, verbose=False)
+earlystopping = EarlyStopping(patience=20, verbose=False)
 
 # Set the number of epochs for training
-epochs = 100000
+epochs = 50000
 
 # Full time input for the entire dataset
 t = (
