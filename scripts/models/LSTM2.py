@@ -1,4 +1,8 @@
 import os
+os.chdir("../../")
+
+
+import os
 import shutil
 import numpy as np
 import pandas as pd
@@ -143,7 +147,7 @@ end_date = "2020-12-30"
 merged_data = merged_data[start_date:end_date]
 
 # Split the data into training, validation, and testing sets
-train_end = min_date + pd.Timedelta(days=date_range.days * 0.45)
+train_end = min_date + pd.Timedelta(days=date_range.days * 0.65)
 val_end = train_end + pd.Timedelta(days=date_range.days * 0.15)
 train = merged_data[merged_data.index <= train_end]
 val = merged_data[(merged_data.index > train_end) & (merged_data.index < val_end)]

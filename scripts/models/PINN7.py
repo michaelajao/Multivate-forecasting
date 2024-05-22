@@ -144,14 +144,26 @@ def load_and_preprocess_data(
 
 # Load and preprocess the data
 data = load_and_preprocess_data(
-    "../../data/hos_data/merged_data.csv",
-    areaname="Midlands",
+    "../../data/processed/merged_nhs_covid_data.csv",
+    areaname="London",
     recovery_period=21,
-    start_date="2020-04-01",
-    end_date="2020-08-31",
+    start_date="2020-05-01",
+    end_date="2021-05-31",
 ).drop(columns=["Unnamed: 0"], axis=1)
 
-areaname="Midlands"
+areaname="London"
+
+# plot suscepitble data over time to check for any trends
+plt.figure()
+plt.plot(data["date"], data["recovered"], label="recovered")
+plt.xlabel("Date")
+plt.ylabel("recovered")
+plt.title(f"recovered Over Time in {areaname}")
+plt.xticks(rotation=45)
+plt.tight_layout()
+# plt.savefig(f"../../reports/figures/{areaname}_susceptible.pdf")
+plt.show()
+
 class SEIRDNet(nn.Module):
     """Epidemiological network for predicting SEIRD model outputs."""
 
