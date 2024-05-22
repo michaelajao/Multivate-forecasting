@@ -1,3 +1,24 @@
+import os
+os.chdir("../../")
+
+# Description: This script contains the code for the second experiment in the project, 
+# forecasting COVID-19 MVBeds using various RNN models and hyperparameter tuning with Simulated Annealing.
+
+# Imports for handling data
+import shutil
+import numpy as np
+import pandas as pd
+from pathlib import Path
+from itertools import cycle
+
+# Imports for machine learning
+import torch
+from torch.utils.data import Dataset, DataLoader
+import pytorch_lightning as pl
+from pytorch_lightning.callbacks import EarlyStopping
+
+from sklearn.metrics import mean_absolute_error as mae, mean_squared_error as mse
+
 def highlight_abs_min(s, props=""):
     return np.where(s == np.nanmin(np.abs(s.values)), props, "")
 
