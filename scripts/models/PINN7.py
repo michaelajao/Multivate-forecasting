@@ -161,7 +161,7 @@ data = load_and_preprocess_data(
     recovery_period=21,
     rolling_window=7,
     start_date="2020-04-23",
-    end_date="2021-12-31",
+    end_date="2020-08-31",
 )
 
 
@@ -371,8 +371,9 @@ features = [
     "cumulative_deceased",
 ]
 
-# Set the training size to 95% of the data
-train_size = int(0.90 * len(data))
+# Set the training size to 90% of the data
+# train_size = int(0.90 * len(data))
+train_size = 60
 
 tensor_data, scaler = split_and_scale_data(data, train_size, features, device)
 
@@ -514,13 +515,13 @@ model = SEIRDNet(
 
 # Initialize optimizer and scheduler
 optimizer = optim.Adam(model.parameters(), lr=1e-4)
-scheduler = StepLR(optimizer, step_size=5000, gamma=0.9)
+scheduler = StepLR(optimizer, step_size=10000, gamma=0.1)
 
 # Initialize early stopping
 earlystopping = EarlyStopping(patience=100, verbose=False)
 
 # Set the number of epochs for training
-epochs = 50000
+epochs = 100000
 
 # Full time input for the entire dataset
 t = (
