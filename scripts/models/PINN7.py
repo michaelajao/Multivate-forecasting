@@ -161,7 +161,7 @@ data = load_and_preprocess_data(
     recovery_period=21,
     rolling_window=7,
     start_date="2020-04-23",
-    end_date="2021-05-31",
+    end_date="2021-12-31",
 )
 
 
@@ -699,3 +699,6 @@ output = pd.DataFrame(
 )
 
 output.to_csv(f"../../reports/output/pinn_{areaname}_output.csv", index=False)
+
+# save the model
+torch.save(model.state_dict(), f"../../models/pinn_{areaname}_model.pth")

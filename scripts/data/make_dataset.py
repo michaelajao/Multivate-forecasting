@@ -144,12 +144,20 @@ final_df.loc[:, "epi_week"] = final_df["date"].apply(get_cdc_epiweek)
 final_df = clean_and_adjust_df(final_df)
 
 final_df.head()
+
+# save data as csv
+final_df.to_csv("../../data/raw/csv/covid19_data.csv", index=False)
+
 # Filtering Data
-start_date = datetime(2020, 4, 1)
+start_date = datetime(2020, 4, 8)
 filtered_df = filter_data(final_df, start_date)
+
+filtered_df.to_csv("../../data/raw/csv/covid19_data_from_april_8.csv", index=False)
 
 # Aggregating Weekly Data
 weekly_aggregated_df = aggregate_weekly_data(filtered_df)
+
+weekly_aggregated_df.to_csv('../../data/raw/csv/covid19_weekly_data_by_region_from_april_8.csv', index=False)
 
 # Saving Data
 save_dataframe(final_df, "../../data/raw/pickle/covid19_data.pkl")

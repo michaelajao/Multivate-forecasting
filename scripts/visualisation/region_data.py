@@ -50,128 +50,191 @@ plt.rcParams.update({
 
 # Constants
 data_path = "../../data/hos_data/"
-filtered_data_file = "filtered_data.csv"
-covid19_data_file = "covid19_data_from_april_8.csv"
+# filtered_data_file = "filtered_data.csv"
+# covid19_data_file = "covid19_data_from_april_8.csv"
 date_column = "date"
 
 # Load the initial data
-filtered_data = pd.read_csv(data_path + filtered_data_file)
-covid19_data = pd.read_csv(data_path + covid19_data_file).drop(columns=['Unnamed: 0',])
+nhs_region_data = pd.read_csv('../../data/interim/csv/nhs_region_data.csv', encoding='ISO-8859-1').drop(columns=['Unnamed: 0'])
+covid19_data = pd.read_csv('../../data/raw/csv/covid19_data.csv', encoding='ISO-8859-1')
 
-# Convert date columns to datetime
-filtered_data['date'] = pd.to_datetime(filtered_data['date'])
+# Rename columns for consistency
+nhs_region_data.rename(columns={'areaName': 'region'}, inplace=True)
+
+# Display unique regions in both datasets to verify consistency
+
+# Unique regions in NHS region data
+unique_nhs_regions = nhs_region_data['region'].unique()
+
+# Unique regions in COVID-19 data
+unique_covid_regions = covid19_data['region'].unique()
+
+unique_nhs_regions, unique_covid_regions
+
+
 covid19_data['date'] = pd.to_datetime(covid19_data['date'])
+nhs_region_data['date'] = pd.to_datetime(nhs_region_data['date'])
 
-# Apply region mapping to both datasets
+# Create a mapping dictionary for region names
 region_mapping = {
-    "North East England": "North East and Yorkshire",
-    "Yorkshire and the Humber": "North East and Yorkshire",
-    "East Midlands": "Midlands",
-    "West Midlands": "Midlands",
-    "East of England": "East of England",
-    "London Region": "London",
-    "South East England": "South East",
-    "South West England": "South West",
-    "North West England": "North West",
+    "East of England": ["East of England"],
+    "London": ["London Region"],
+    "Midlands": ["East Midlands", "West Midlands"],
+    "North East and Yorkshire": ["North East England", "Yorkshire and the Humber"],
+    "North West": ["North West England"],
+    "South East": ["South East England"],
+    "South West": ["South West England"]
 }
 
-# Correctly map the regions
-filtered_data['region'] = filtered_data['areaName'].replace(region_mapping)
-covid19_data['region'] = covid19_data['region'].replace(region_mapping)
+# Reverse the mapping for easier merging
+covid_to_nhs_mapping = {covid: nhs for nhs, covids in region_mapping.items() for covid in covids}
 
-# Handle NaN values in the region column
-filtered_data = filtered_data.dropna(subset=['region'])
-covid19_data = covid19_data.dropna(subset=['region'])
+# Map the COVID-19 data regions to NHS regions
+covid19_data['nhs_region'] = covid19_data['region'].map(covid_to_nhs_mapping)
 
-# Filter for common dates
-common_dates = pd.to_datetime(list(set(filtered_data['date']).intersection(set(covid19_data['date']))))
+# Merge datasets on 'date' and 'nhs_region'
+merged_data = pd.merge(nhs_region_data, covid19_data, left_on=['date', 'region'], right_on=['date', 'nhs_region'], how='inner')
 
-# check if the common dates are continuous
-date_range = pd.date_range(start=common_dates.min(), end=common_dates.max())
-missing_dates = date_range.difference(common_dates)
-if not missing_dates.empty:
-    print(f"Missing dates: {missing_dates}")
-    
-# Filter the data for common dates
-filtered_data = filtered_data[filtered_data['date'].isin(common_dates)]
-covid19_data = covid19_data[covid19_data['date'].isin(common_dates)]
+# Display the first few rows of the correctly merged dataset
+merged_data.head()
 
-# Identify missing dates for each region
-def identify_missing_dates(df, date_col, region_col):
-    missing_dates_info = {}
-    regions = df[region_col].unique()
-    for region in regions:
-        region_data = df[df[region_col] == region]
-        date_range = pd.date_range(start=region_data[date_col].min(), end=region_data[date_col].max())
-        missing_dates = date_range.difference(region_data[date_col])
-        if not missing_dates.empty:
-            missing_dates_info[region] = missing_dates
-    return missing_dates_info
-
-missing_dates_info_filtered = identify_missing_dates(filtered_data, 'date', 'region')
-missing_dates_info_covid19 = identify_missing_dates(covid19_data, 'date', 'region')
-
-# Fill missing dates for each region
-def fill_missing_dates(df, date_col, region_col, missing_dates_info):
-    complete_data = []
-    for region, missing_dates in missing_dates_info.items():
-        region_data = df[df[region_col] == region]
-        for date in missing_dates:
-            missing_row = {date_col: date, region_col: region}
-            for col in df.columns:
-                if col not in [date_col, region_col]:
-                    missing_row[col] = 0  # or np.nan if preferred
-            complete_data.append(missing_row)
-    complete_data_df = pd.DataFrame(complete_data)
-    df = pd.concat([df, complete_data_df]).sort_values(by=[region_col, date_col]).reset_index(drop=True)
-    return df
-
-filtered_data_complete = fill_missing_dates(filtered_data, 'date', 'region', missing_dates_info_filtered)
-covid19_data_complete = fill_missing_dates(covid19_data, 'date', 'region', missing_dates_info_covid19)
-
-# Verify date continuity after filling missing dates
-def check_date_continuity(df, date_col, region_col):
-    regions = df[region_col].unique()
-    for region in regions:
-        region_data = df[df[region_col] == region]
-        date_range = pd.date_range(start=region_data[date_col].min(), end=region_data[date_col].max())
-        missing_dates = date_range.difference(region_data[date_col])
-        if not missing_dates.empty:
-            print(f"Missing dates for {region}: {missing_dates}")
-
-check_date_continuity(filtered_data_complete, 'date', 'region')
-check_date_continuity(covid19_data_complete, 'date', 'region')
-
-# Group by date and new region, then sum the values for filtered_data
-filtered_data_grouped = filtered_data_complete.groupby(['date', 'region']).sum(numeric_only=True).reset_index()
-
-# Group by date and new region, then sum the values for covid19_data
-covid19_data_grouped = covid19_data_complete.groupby(['date', 'region']).sum(numeric_only=True).reset_index()
-
-# Merge the datasets on date and region
-merged_data = pd.merge(filtered_data_grouped, covid19_data_grouped, on=['date', 'region'], how='inner')
-
-# Verify the merged data includes all expected regions
-unique_regions_merged_data = merged_data['region'].unique()
-print(f"Unique regions in merged_data: {unique_regions_merged_data}")
-
-# Save the merged data as CSV and pickle
 merged_data.to_csv(os.path.join(data_path, "merged_data.csv"), index=False)
 merged_data.to_pickle(os.path.join(data_path, "merged_data.pkl"))
 
-merged_data["date"] = pd.to_datetime(merged_data["date"])
+england_data = merged_data.groupby('date').agg({
+    'new_confirmed': 'sum',
+    'new_deceased': 'sum',
+    'cumulative_confirmed': 'sum',
+    'cumulative_deceased': 'sum',
+    'hospitalCases': 'sum',
+    'newAdmissions': 'sum',
+    'population': 'sum',
+    'covidOccupiedMVBeds': 'sum',
+    'cumAdmissions': 'sum'
+}).reset_index()
 
-# Create a new dataset called "England data" by aggregating the data from all regions
-england_data = merged_data.groupby('date').sum(numeric_only=True).reset_index()
+# Display the first few rows of the aggregated England data
+england_data.head()
 
-# Add a column to indicate the region as "England"
-england_data['region'] = 'England'
-
-# Save the England data as CSV and pickle
 england_data.to_csv(os.path.join(data_path, "england_data.csv"), index=False)
 england_data.to_pickle(os.path.join(data_path, "england_data.pkl"))
 
-england_data["date"] = pd.to_datetime(england_data["date"])
+# # Convert date columns to datetime
+# filtered_data['date'] = pd.to_datetime(filtered_data['date'])
+# covid19_data['date'] = pd.to_datetime(covid19_data['date'])
+
+# # Apply region mapping to both datasets
+# region_mapping = {
+#     "North East England": "North East and Yorkshire",
+#     "Yorkshire and the Humber": "North East and Yorkshire",
+#     "East Midlands": "Midlands",
+#     "West Midlands": "Midlands",
+#     "East of England": "East of England",
+#     "London Region": "London",
+#     "South East England": "South East",
+#     "South West England": "South West",
+#     "North West England": "North West",
+# }
+
+# # Correctly map the regions
+# filtered_data['region'] = filtered_data['areaName'].replace(region_mapping)
+# covid19_data['region'] = covid19_data['region'].replace(region_mapping)
+
+# # Handle NaN values in the region column
+# filtered_data = filtered_data.dropna(subset=['region'])
+# covid19_data = covid19_data.dropna(subset=['region'])
+
+# # Filter for common dates
+# common_dates = pd.to_datetime(list(set(filtered_data['date']).intersection(set(covid19_data['date']))))
+
+# # check if the common dates are continuous
+# date_range = pd.date_range(start=common_dates.min(), end=common_dates.max())
+# missing_dates = date_range.difference(common_dates)
+# if not missing_dates.empty:
+#     print(f"Missing dates: {missing_dates}")
+    
+# # Filter the data for common dates
+# filtered_data = filtered_data[filtered_data['date'].isin(common_dates)]
+# covid19_data = covid19_data[covid19_data['date'].isin(common_dates)]
+
+# # Identify missing dates for each region
+# def identify_missing_dates(df, date_col, region_col):
+#     missing_dates_info = {}
+#     regions = df[region_col].unique()
+#     for region in regions:
+#         region_data = df[df[region_col] == region]
+#         date_range = pd.date_range(start=region_data[date_col].min(), end=region_data[date_col].max())
+#         missing_dates = date_range.difference(region_data[date_col])
+#         if not missing_dates.empty:
+#             missing_dates_info[region] = missing_dates
+#     return missing_dates_info
+
+# missing_dates_info_filtered = identify_missing_dates(filtered_data, 'date', 'region')
+# missing_dates_info_covid19 = identify_missing_dates(covid19_data, 'date', 'region')
+
+# # Fill missing dates for each region
+# def fill_missing_dates(df, date_col, region_col, missing_dates_info):
+#     complete_data = []
+#     for region, missing_dates in missing_dates_info.items():
+#         region_data = df[df[region_col] == region]
+#         for date in missing_dates:
+#             missing_row = {date_col: date, region_col: region}
+#             for col in df.columns:
+#                 if col not in [date_col, region_col]:
+#                     missing_row[col] = 0  # or np.nan if preferred
+#             complete_data.append(missing_row)
+#     complete_data_df = pd.DataFrame(complete_data)
+#     df = pd.concat([df, complete_data_df]).sort_values(by=[region_col, date_col]).reset_index(drop=True)
+#     return df
+
+# filtered_data_complete = fill_missing_dates(filtered_data, 'date', 'region', missing_dates_info_filtered)
+# covid19_data_complete = fill_missing_dates(covid19_data, 'date', 'region', missing_dates_info_covid19)
+
+# # Verify date continuity after filling missing dates
+# def check_date_continuity(df, date_col, region_col):
+#     regions = df[region_col].unique()
+#     for region in regions:
+#         region_data = df[df[region_col] == region]
+#         date_range = pd.date_range(start=region_data[date_col].min(), end=region_data[date_col].max())
+#         missing_dates = date_range.difference(region_data[date_col])
+#         if not missing_dates.empty:
+#             print(f"Missing dates for {region}: {missing_dates}")
+
+# check_date_continuity(filtered_data_complete, 'date', 'region')
+# check_date_continuity(covid19_data_complete, 'date', 'region')
+
+# # Group by date and new region, then sum the values for filtered_data
+# filtered_data_grouped = filtered_data_complete.groupby(['date', 'region']).sum(numeric_only=True).reset_index()
+
+# # Group by date and new region, then sum the values for covid19_data
+# covid19_data_grouped = covid19_data_complete.groupby(['date', 'region']).sum(numeric_only=True).reset_index()
+
+# # Merge the datasets on date and region
+# merged_data = pd.merge(filtered_data_grouped, covid19_data_grouped, on=['date', 'region'], how='inner')
+
+# # Verify the merged data includes all expected regions
+# unique_regions_merged_data = merged_data['region'].unique()
+# print(f"Unique regions in merged_data: {unique_regions_merged_data}")
+
+# # Save the merged data as CSV and pickle
+# merged_data.to_csv(os.path.join(data_path, "merged_data.csv"), index=False)
+# merged_data.to_pickle(os.path.join(data_path, "merged_data.pkl"))
+
+# merged_data["date"] = pd.to_datetime(merged_data["date"])
+
+# Create a new dataset called "England data" by aggregating the data from all regions
+# Create the england_data by aggregating per date across all regions
+# england_data = merged_data.groupby('date').sum().reset_index()
+
+
+# # Add a column to indicate the region as "England"
+# england_data['region'] = 'England'
+
+# # Save the England data as CSV and pickle
+# england_data.to_csv(os.path.join(data_path, "england_data.csv"), index=False)
+# england_data.to_pickle(os.path.join(data_path, "england_data.pkl"))
+
+# england_data["date"] = pd.to_datetime(england_data["date"])
 
 # Trend Analysis for England
 plt.figure(figsize=(14, 8))
@@ -228,8 +291,8 @@ merged_data["date"] = pd.to_datetime(merged_data["date"])
 
 # 1. Time Series Graph of New Confirmed Cases Over Time for Each NHS Region
 plt.figure(figsize=(12, 6))
-for region in merged_data["region"].unique():
-    region_data = merged_data[merged_data["region"] == region]
+for region in merged_data["nhs_region"].unique():
+    region_data = merged_data[merged_data["nhs_region"] == region]
     plt.plot(region_data["date"], region_data["new_confirmed"], label=region)
 plt.title("New Confirmed COVID-19 Cases Over Time by NHS Region", fontsize=16)
 plt.xlabel("Date", fontsize=14)
@@ -241,8 +304,8 @@ plt.show()
 
 # 2. Time Series Graph of Cumulative Confirmed Cases Over Time for Each NHS Region
 plt.figure(figsize=(12, 6))
-for region in merged_data["region"].unique():
-    region_data = merged_data[merged_data["region"] == region]
+for region in merged_data["nhs_region"].unique():
+    region_data = merged_data[merged_data["nhs_region"] == region]
     plt.plot(region_data["date"], region_data["cumulative_confirmed"], label=region)
 plt.title("Cumulative Confirmed COVID-19 Cases Over Time by NHS Region", fontsize=16)
 plt.xlabel("Date", fontsize=14)
@@ -254,8 +317,8 @@ plt.show()
 
 # 3. Time Series Graph of New Admissions Over Time for Each NHS Region
 plt.figure(figsize=(12, 6))
-for region in merged_data["region"].unique():
-    region_data = merged_data[merged_data["region"] == region]
+for region in merged_data["nhs_region"].unique():
+    region_data = merged_data[merged_data["nhs_region"] == region]
     plt.plot(region_data["date"], region_data["newAdmissions"], label=region)
 plt.title("New Admissions Over Time by NHS Region", fontsize=16)
 plt.xlabel("Date", fontsize=14)
@@ -266,20 +329,20 @@ plt.tight_layout()
 plt.show()
 
 # 4. New Confirmed COVID-19 Cases per 100,000 Population Over Time by NHS Region
-population_data = merged_data[["region", "population"]].drop_duplicates()
-for region in merged_data["region"].unique():
-    region_data = merged_data[merged_data["region"] == region]
-    region_population = population_data[population_data["region"] == region]["population"].values[0]
-    merged_data.loc[merged_data["region"] == region, "new_confirmed_per_100k"] = (
+population_data = merged_data[["nhs_region", "population"]].drop_duplicates()
+for region in merged_data["nhs_region"].unique():
+    region_data = merged_data[merged_data["nhs_region"] == region]
+    region_population = population_data[population_data["nhs_region"] == region]["population"].values[0]
+    merged_data.loc[merged_data["nhs_region"] == region, "new_confirmed_per_100k"] = (
         region_data["new_confirmed"] / region_population
     ) * 100000
-    merged_data.loc[merged_data["region"] == region, "new_deceased_per_100k"] = (
+    merged_data.loc[merged_data["nhs_region"] == region, "new_deceased_per_100k"] = (
         region_data["new_deceased"] / region_population
     ) * 100000
 
 plt.figure(figsize=(12, 6))
-for region in merged_data["region"].unique():
-    region_data = merged_data[merged_data["region"] == region]
+for region in merged_data["nhs_region"].unique():
+    region_data = merged_data[merged_data["nhs_region"] == region]
     plt.plot(region_data["date"], region_data["new_confirmed_per_100k"], label=region)
 
 lockdown_periods = [
@@ -301,7 +364,7 @@ plt.show()
 
 # 5. Scatter Plot: New Confirmed Cases vs. New Admissions
 plt.figure(figsize=(12, 6))
-sns.scatterplot(data=merged_data, x="new_confirmed", y="newAdmissions", hue="region", style="region")
+sns.scatterplot(data=merged_data, x="new_confirmed", y="newAdmissions", hue="nhs_region", style="nhs_region")
 plt.title("New Confirmed Cases vs. New Admissions by NHS Region", fontsize=16)
 plt.xlabel("New Confirmed Cases", fontsize=14)
 plt.ylabel("New Admissions", fontsize=14)
@@ -313,7 +376,7 @@ plt.show()
 # Create a pivot table
 feature = "new_confirmed"
 pivot_cases_time_region = merged_data.pivot_table(
-    index="date", columns="region", values=feature, aggfunc="sum"
+    index="date", columns="nhs_region", values=feature, aggfunc="sum"
 ).fillna(0)
 
 
@@ -336,7 +399,7 @@ plt.show()
 
 
 # 5. Box Plot for Hospital Cases by Region
-sns.boxplot(x="region", y="hospitalCases", data=merged_data)
+sns.boxplot(x="nhs_region", y="hospitalCases", data=merged_data)
 plt.title("Distribution of Hospital Cases by NHS Region")
 plt.xlabel("NHS Region")
 plt.ylabel("Hospital Cases")
@@ -362,20 +425,20 @@ plt.title("Correlation Heat Map of COVID-19 Metrics")
 plt.show()
 
 
-weekly_data = merged_data.groupby(['region', pd.Grouper(key='date', freq='W')]).agg({
-    'covidOccupiedMVBeds': 'mean',  # Average number of ICU beds occupied during the week
+weekly_data = merged_data.groupby(['nhs_region', pd.Grouper(key='date', freq='W')]).agg({
+    'covidOccupiedMVBeds': 'sum',  # Average number of ICU beds occupied during the week
     'newAdmissions': 'sum', # Total new admissions during the week
     'new_confirmed': 'sum', # Total new confirmed cases during the week
     'new_deceased': 'sum', # Total new deceased during the week
-    'hospitalCases': 'mean', # Average number of hospital cases during the wee
+    'hospitalCases': 'sum', # Average number of hospital cases during the wee
 }).reset_index()
 
 
-region = weekly_data['region'].unique()
+region = weekly_data['nhs_region'].unique()
 
 
 for area in region:
-    area_data = weekly_data[weekly_data['region'] == area]
+    area_data = weekly_data[weekly_data['nhs_region'] == area]
     plt.plot(area_data['date'], area_data['covidOccupiedMVBeds'], label=f"{area} - ICU Beds")
     
 for start, end in lockdown_periods:
@@ -395,12 +458,12 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import silhouette_score
 
-cluster_data = merged_data.groupby(['region', 'date']).agg({
-    'new_confirmed': 'mean',
-    'new_deceased': 'mean',
-    'hospitalCases': 'mean',
-    'newAdmissions': 'mean',
-    'covidOccupiedMVBeds': 'mean'
+cluster_data = merged_data.groupby(['nhs_region', 'date']).agg({
+    'new_confirmed': 'sum',
+    'new_deceased': 'sum',
+    'hospitalCases': 'sum',
+    'newAdmissions': 'sum',
+    'covidOccupiedMVBeds': 'sum'
 }).reset_index()
 
 scaler = StandardScaler()
