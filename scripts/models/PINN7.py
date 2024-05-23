@@ -674,8 +674,8 @@ ax[-1].xaxis.set_major_locator(mdates.MonthLocator())
 ax[-1].xaxis.set_major_formatter(mdates.DateFormatter("%b %Y"))
 plt.xticks(rotation=45, ha="right")
 plt.tight_layout(rect=[0, 0, 1, 0.95])  # Adjust layout to accommodate the legend
-plt.subplots_adjust(top=0.9)
-plt.savefig(f"../../reports/figures/pinn_{areaname}_results.pdf")
+plt.subplots_adjust(top=0.7)
+plt.savefig(f"../../reports/figures/{train_size}_pinn_{areaname}_results.pdf")
 plt.show()
 
 # Extract the parameter values
@@ -702,7 +702,7 @@ output = pd.DataFrame(
     }
 )
 
-output.to_csv(f"../../reports/output/pinn_{areaname}_output.csv", index=False)
+output.to_csv(f"../../reports/output/{train_size}_pinn_{areaname}_output.csv", index=False)
 
 # save the model
-torch.save(model.state_dict(), f"../../models/pinn_{areaname}_model.pth")
+torch.save(model.state_dict(), f"../../models/{train_size}_pinn_{areaname}_model.pth")
