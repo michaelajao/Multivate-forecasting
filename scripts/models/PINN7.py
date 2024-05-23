@@ -253,8 +253,7 @@ class SEIRDNet(nn.Module):
                 g = nn.init.calculate_gain("tanh")
                 nn.init.xavier_uniform_(m.weight, gain=g)
                 if m.bias is not None:
-                    m.bias.data.fill_(0.001)
-
+                    m.bias.data.fill_(0.01)
         self.apply(init_weights)
 
 
@@ -373,7 +372,7 @@ features = [
 ]
 
 # Set the training size to 95% of the data
-train_size = int(0.80 * len(data))
+train_size = int(0.90 * len(data))
 
 tensor_data, scaler = split_and_scale_data(data, train_size, features, device)
 
@@ -508,17 +507,17 @@ model = SEIRDNet(
     init_beta=0.1,
     init_gamma=0.1,
     init_delta=0.1,
-    num_layers=5,
+    num_layers=6,
     hidden_neurons=32,
     retain_seed=100,
 ).to(device)
 
 # Initialize optimizer and scheduler
 optimizer = optim.Adam(model.parameters(), lr=1e-4)
-scheduler = StepLR(optimizer, step_size=5000, gamma=0.8)
+scheduler = StepLR(optimizer, step_size=5000, gamma=0.9)
 
 # Initialize early stopping
-earlystopping = EarlyStopping(patience=20, verbose=False)
+earlystopping = EarlyStopping(patience=100, verbose=False)
 
 # Set the number of epochs for training
 epochs = 50000
