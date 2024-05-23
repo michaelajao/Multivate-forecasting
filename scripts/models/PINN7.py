@@ -448,11 +448,11 @@ def pinn_loss(
     # Initial condition loss
     S0, I0, R0, D0 = S_train[0], I_train[0], R_train[0], D_train[0]
     initial_condition_loss = (
-        (S_pred[0] - S0) ** 2
-        # + (E_pred[0] - E0) ** 2
-        + (I_pred[0] - I0) ** 2
-        + (R_pred[0] - R0) ** 2
-        + (D_pred[0] - D0) ** 2
+        torch.mean((S_pred[0] - S0) ** 2)
+        # + torch.mean((E_pred[0] - E0) ** 2)
+        + torch.mean((I_pred[0] - I0) ** 2)
+        + torch.mean((R_pred[0] - R0) ** 2)
+        + torch.mean((D_pred[0] - D0) ** 2)
     )
     
     # Total loss
@@ -607,12 +607,14 @@ model, loss_history = train_loop(
 
 # Plot the loss history
 plt.figure()
+# mse vs epoch
 plt.plot(np.log10(loss_history), label="Training Loss", color="blue")
 plt.xlabel("Epoch")
 plt.ylabel("Log10(Loss)")
 plt.title("Training Loss History")
 plt.legend()
 plt.show()
+
 
 # Generate predictions for the entire dataset
 t_values = np.arange(len(data))
@@ -685,6 +687,8 @@ delta = model.delta.item()
 print(f"Estimated beta: {beta:.4f}")
 print(f"Estimated gamma: {gamma:.4f}")
 print(f"Estimated delta: {delta:.4f}")
+
+
 
 # save the output
 output = pd.DataFrame(
