@@ -73,7 +73,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def load_and_preprocess_data(filepath, areaname, recovery_period=21, rolling_window=7, start_date="2020-04-01", end_date="2020-12-31"):
     df = pd.read_csv(filepath)
-    df = df[df["areaName"] == areaname].reset_index(drop=True)
+    df = df[df["nhs_region"] == areaname].reset_index(drop=True)
     df = df[::-1].reset_index(drop=True)  # Reverse dataset if needed
 
     df["date"] = pd.to_datetime(df["date"])

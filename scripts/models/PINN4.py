@@ -83,7 +83,7 @@ check_pytorch()
 def load_and_preprocess_data(filepath, areaname, recovery_period=16, rolling_window=7, start_date="2020-04-01", end_date="2020-12-31"):
     """Load and preprocess the data from a CSV file."""
     df = pd.read_csv(filepath)
-    df = df[df["areaName"] == areaname].reset_index(drop=True)
+    df = df[df["nhs_region"] == areaname].reset_index(drop=True)
     df = df[::-1].reset_index(drop=True)  # Reverse dataset if needed
 
     df["date"] = pd.to_datetime(df["date"])
@@ -101,43 +101,78 @@ def load_and_preprocess_data(filepath, areaname, recovery_period=16, rolling_win
     return df
 
 # Load and preprocess the data
-data = load_and_preprocess_data("../../data/hos_data/merged_data.csv", areaname="South West", recovery_period=21, rolling_window=7, start_date="2020-04-01", end_date="2020-12-31").drop(columns=["Unnamed: 0"], axis=1)
+data = load_and_preprocess_data("../../data/hos_data/merged_data.csv", areaname="South West", recovery_period=21, rolling_window=7, start_date="2020-04-01", end_date="2020-12-31")
 
 data.head(10)
 
-def SEIRD_model(t, y, beta, gamma, mu, sigma, e, alpha, N):
-    """SEIRD model differential equations."""
-    S, E, I, R, D = y
-    dSdt = -beta * S * (e * E + I) / N
-    dEdt = beta * S * (e * E + I) / N - E / alpha
-    dIdt = E / alpha - (gamma + mu) * I
-    dRdt = gamma * I
-    dDdt = mu * I
-    return [dSdt, dEdt, dIdt, dRdt, dDdt]
+# def SEIRD_model(t, y, beta, gamma, mu, sigma, e, alpha, N):
+#     """SEIRD model differential equations."""
+#     S, E, I, R, D = y
+#     dSdt = -beta * S * (e * E + I) / N
+#     dEdt = beta * S * (e * E + I) / N - E / alpha
+#     dIdt = E / alpha - (gamma + mu) * I
+#     dRdt = gamma * I
+#     dDdt = mu * I
+#     return [dSdt, dEdt, dIdt, dRdt, dDdt]
+
+def SIHCRD_model(t, y, beta, gamma, delta, rho, eta, kappa, mu, xi, N):
+    S, I, H, C, R, D = y
+    dSdt = -(beta * I / N) * S
+    dIdt = (beta * S / N) * I - (gamma + rho + delta) * I
+    dHdt = rho * I - (eta + kappa) * H
+    dCdt = eta * H - (mu + xi) * C
+    dRdt = gamma * I + kappa * H + mu * C
+    dDdt = delta * I + xi * C
+    return [dSdt, dIdt, dHdt, dCdt, dRdt, dDdt]
 
 def prepare_tensors(data, device):
-    """Prepare tensors for training."""
     t = tensor(range(1, len(data) + 1), dtype=torch.float32).view(-1, 1).to(device).requires_grad_(True)
     S = tensor(data["S(t)"].values, dtype=torch.float32).view(-1, 1).to(device)
     I = tensor(data["active_cases"].values, dtype=torch.float32).view(-1, 1).to(device)
     R = tensor(data["recovered"].values, dtype=torch.float32).view(-1, 1).to(device)
     D = tensor(data["new_deceased"].values, dtype=torch.float32).view(-1, 1).to(device)
-    return t, S, I, R, D
+    H = tensor(data["hospitalCases"].values, dtype=torch.float32).view(-1, 1).to(device)
+    C = tensor(data["covidOccupiedMVBeds"].values, dtype=torch.float32).view(-1, 1).to(device)
+    return t, S, I, R, D, H, C
 
-def scale_data(data, features):
-    """Scale the data using MinMaxScaler."""
+# def scale_data(data, features):
+#     """Scale the data using MinMaxScaler."""
+#     scaler = MinMaxScaler()
+#     scaled_data = pd.DataFrame(scaler.fit_transform(data[features]), columns=features)
+#     return scaled_data, scaler  
+
+# # Define features and data split
+# features = ["S(t)", "active_cases", "recovered", "new_deceased"]
+
+# # Scale the data
+# scaled_data, scaler = scale_data(data, features)
+
+# # Prepare tensors
+# t_data, S_data, I_data, R_data, D_data = prepare_tensors(scaled_data, device)
+
+def split_and_scale_data(data, train_size, features, device):
     scaler = MinMaxScaler()
-    scaled_data = pd.DataFrame(scaler.fit_transform(data[features]), columns=features)
-    return scaled_data, scaler  
+    scaler.fit(data[features])
 
-# Define features and data split
-features = ["S(t)", "active_cases", "recovered", "new_deceased"]
+    train_data = data.iloc[:train_size]
+    val_data = data.iloc[train_size:]
 
-# Scale the data
-scaled_data, scaler = scale_data(data, features)
+    scaled_train_data = pd.DataFrame(scaler.transform(train_data[features]), columns=features)
+    scaled_val_data = pd.DataFrame(scaler.transform(val_data[features]), columns=features)
 
-# Prepare tensors
-t_data, S_data, I_data, R_data, D_data = prepare_tensors(scaled_data, device)
+    # Prepare tensors for training and validation
+    t_train, S_train, I_train, R_train, D_train, H_train, C_train = prepare_tensors(scaled_train_data, device)
+    t_val, S_val, I_val, R_val, D_val, H_val, C_val = prepare_tensors(scaled_val_data, device)
+
+    tensor_data = {
+        "train": (t_train, S_train, I_train, R_train, D_train, H_train, C_train),
+        "val": (t_val, S_val, I_val, R_val, D_val, H_val, C_val),
+    }
+
+    return tensor_data, scaler
+
+features = ["S(t)", "active_cases", "hospitalCases", "covidOccupiedMVBeds", "recovered", "new_deceased"]
+train_size = 60  # days
 
 class ModifiedTanh(nn.Module):
     def __init__(self, alpha, epsilon):
@@ -174,7 +209,7 @@ class StateNN(nn.Module):
         layers = [nn.Linear(1, hidden_neurons), nn.Tanh()]
         for _ in range(num_layers - 1):
             layers.append(ResBlock(hidden_neurons, hidden_neurons))
-        layers.append(nn.Linear(hidden_neurons, 5))  # Adjust the output size to 5 (S, E, I, R, D)
+        layers.append(nn.Linear(hidden_neurons, 6)) # Adjust the output size to 6 (S, I, R, D, H, C)
         self.net = nn.Sequential(*layers)
         self.init_weights()
 
@@ -194,7 +229,7 @@ class ParamNN(nn.Module):
         layers = [nn.Linear(1, hidden_neurons), nn.Tanh()]
         for _ in range(num_layers - 1):
             layers.append(ResBlock(hidden_neurons, hidden_neurons))
-        layers.append(nn.Linear(hidden_neurons, 3))  # Adjust the output size to 3 (beta, gamma, mu)
+        layers.append(nn.Linear(hidden_neurons, 8)) # Adjust the output size to 8 (beta, gamma, delta, rho, eta, kappa, mu, xi)
         self.net = nn.Sequential(*layers)
         self.init_weights()
 
@@ -205,29 +240,120 @@ class ParamNN(nn.Module):
                 nn.init.zeros_(m.bias)
 
     def forward(self, t):
-        params = self.net(t)
+        params = torch.sigmoid(self.net(t))
         # Ensure beta, gamma, and mu are in a valid range
         beta = nn.Parameter(torch.sigmoid(params[:, 0]))
         gamma = nn.Parameter(torch.sigmoid(params[:, 1]))
-        mu = nn.Parameter(torch.sigmoid(params[:, 2]))
-        return beta, gamma, mu
+        delta = nn.Parameter(torch.sigmoid(params[:, 2]))
+        rho = nn.Parameter(torch.sigmoid(params[:, 3]))
+        eta = nn.Parameter(torch.sigmoid(params[:, 4]))
+        kappa = nn.Parameter(torch.sigmoid(params[:, 5]))
+        mu = nn.Parameter(torch.sigmoid(params[:, 6]))
+        xi = nn.Parameter(torch.sigmoid(params[:, 7]))
+        return beta, gamma, delta, rho, eta, kappa, mu, xi
+    
 
-def pinn_loss(t, data, state_nn, param_nn, N, sigma, alpha, epsilon):
+def network_prediction(t, model, device, scaler, N):
+    """
+    Generate predictions from the SEIRDNet model.
+
+    Parameters:
+    t (numpy array): Time input.
+    model (SEIRDNet): Trained SEIRDNet model.
+    device (torch.device): Device to run the model on.
+    scaler (MinMaxScaler): Scaler used to normalize the data.
+    N (float): Population size.
+
+    Returns:
+    np.array: Scaled predictions from the model.
+    """
+    # Convert time input to tensor and move to the appropriate device
+    t_tensor = torch.from_numpy(t).float().view(-1, 1).to(device).requires_grad_(True)
+
+    # Disable gradient computation for prediction
+    with torch.no_grad():
+        # Generate predictions from the model
+        predictions = model(t_tensor)
+
+        # Convert predictions to numpy array
+        predictions = predictions.cpu().numpy()
+
+        # Inverse transform the predictions to original scale
+        predictions = scaler.inverse_transform(predictions)
+
+    return predictions
+
+
+# function for parameter estimation
+def parameter_estimation(t, data, model, device, scaler, N):
+    """
+    Estimate parameters beta, gamma, and mu from the SEIRDNet model.
+
+    Parameters:
+    t (numpy array): Time input.
+    data (dict): Dictionary containing the data tensors.
+    model (SEIRDNet): Trained SEIRDNet model.
+    device (torch.device): Device to run the model on.
+    scaler (MinMaxScaler): Scaler used to normalize the data.
+    N (float): Population size.
+
+    Returns:
+    np.array: Estimated parameters beta, gamma, and mu.
+    """
+    # Convert time input to tensor and move to the appropriate device
+    t_tensor = torch.from_numpy(t).float().view(-1, 1).to(device).requires_grad_(True)
+
+    # Disable gradient computation for prediction
+    with torch.no_grad():
+        # Generate predictions from the model
+        predictions = model(t_tensor)
+
+        # Convert predictions to numpy array
+        predictions = predictions.cpu().numpy()
+
+        # Inverse transform the predictions to original scale
+        predictions = scaler.inverse_transform(predictions)
+
+        # Extract the estimated parameters
+        beta = predictions[:, 0]
+        gamma = predictions[:, 1]
+        mu = predictions[:, 2]
+
+    return beta, gamma, mu
+
+
+tensor_data, scaler = split_and_scale_data(data, train_size, features, device)
+
+
+def pinn_loss(t, data, state_nn, param_nn, N, alpha, epsilon, train_size=None):
     """Physics-Informed Neural Network loss function."""
     
     # Predicted states
     states_pred = state_nn(t)
-    S_pred, E_pred, I_pred, R_pred, D_pred = states_pred[:, 0], states_pred[:, 1], states_pred[:, 2], states_pred[:, 3], states_pred[:, 4]
+    S_pred, I_pred, R_pred, D_pred, H_pred, C_pred = states_pred[:, 0], states_pred[:, 1], states_pred[:, 2], states_pred[:, 3], states_pred[:, 4], states_pred[:, 5]
+    
+    S_train, I_train, R_train, D_train, H_train, C_train = data["train"][1:]
+    S_val, I_val, R_val, D_val, H_val, C_val = data["val"][1:]
+    
+    
+    S_total = torch.cat([S_train, S_val])
+    I_total = torch.cat([I_train, I_val])
+    R_total = torch.cat([R_train, R_val])
+    D_total = torch.cat([D_train, D_val])
+    H_total = torch.cat([H_train, H_val])
+    C_total = torch.cat([C_train, C_val])
+    
     
     # Compute gradients
     S_t = grad(S_pred, t, grad_outputs=torch.ones_like(S_pred), create_graph=True)[0]
-    E_t = grad(E_pred, t, grad_outputs=torch.ones_like(E_pred), create_graph=True)[0]   
     I_t = grad(I_pred, t, grad_outputs=torch.ones_like(I_pred), create_graph=True)[0]
     R_t = grad(R_pred, t, grad_outputs=torch.ones_like(R_pred), create_graph=True)[0]
     D_t = grad(D_pred, t, grad_outputs=torch.ones_like(D_pred), create_graph=True)[0]
+    H_t = grad(H_pred, t, grad_outputs=torch.ones_like(H_pred), create_graph=True)[0]
+    C_t = grad(C_pred, t, grad_outputs=torch.ones_like(C_pred), create_graph=True)[0]
     
     # Predicted parameters
-    beta_pred, gamma_pred, mu_pred = param_nn(t)
+    beta_pred, gamma_pred, delta_pred, rho_pred, eta_pred, kappa_pred, mu_pred, xi_pred = param_nn(t)
     
     # SEIRD model residuals
     e_tensor = torch.tensor(epsilon, dtype=torch.float32, device=device, requires_grad=True)
@@ -236,35 +362,26 @@ def pinn_loss(t, data, state_nn, param_nn, N, sigma, alpha, epsilon):
     e = torch.tanh(e_tensor)
     alpha = 2 * torch.tanh(alpha_tensor)
     
-    dSdt, dEdt, dIdt, dRdt, dDdt = SEIRD_model(t, [S_pred, E_pred, I_pred, R_pred, D_pred], beta_pred, gamma_pred, mu_pred, sigma, e, alpha, N)
+    dSdt, dIdt, dHdt, dCdt, dRdt, dDdt = SIHCRD_model(t, [S_pred, I_pred, H_pred, C_pred, R_pred, D_pred], beta_pred, gamma_pred, delta_pred, rho_pred, eta_pred, kappa_pred, mu_pred, xi_pred, N)
+    
+        # Generate a random subset of indices
+    if train_size is not None:
+        index = torch.randperm(train_size)
+    else:
+        index = torch.arange(len(t))
     
     # Compute data loss (MSE_u)
-    # data loss
-    S_data, I_data, R_data, D_data = data
-    data_loss = torch.mean((S_pred - S_data) ** 2) + torch.mean((I_pred - I_data) ** 2) + torch.mean((R_pred - R_data) ** 2) + torch.mean((D_pred - D_data) ** 2)
+    data_loss = torch.mean((S_pred[index] - S_total[index]) ** 2) + torch.mean((I_pred[index] - I_total[index]) ** 2) + torch.mean((R_pred[index] - R_total[index]) ** 2) + torch.mean((D_pred[index] - D_total[index]) ** 2) + torch.mean((H_pred[index] - H_total[index]) ** 2) + torch.mean((C_pred[index] - C_total[index]) ** 2)
     
     # derivatives loss
-    derivatives_loss = torch.mean((S_t - dSdt) ** 2) + torch.mean((I_t - dIdt) ** 2) + torch.mean((R_t - dRdt) ** 2) + torch.mean((D_t - dDdt) ** 2)
+    derivatives_loss = torch.mean((S_t - dSdt) ** 2) + torch.mean((I_t - dIdt) ** 2) + torch.mean((R_t - dRdt) ** 2) + torch.mean((D_t - dDdt) ** 2) + torch.mean((H_t - dHdt) ** 2) + torch.mean((C_t - dCdt) ** 2)
     
     # initial condition loss
-    S0_loss = torch.mean((S_pred[0] - S_data[0]) ** 2)
-    
-    # boundary condition loss
-    t_boundary = t[-1]
-    S_boundary = S_pred[-1]
-    I_boundary = I_pred[-1]
-    R_boundary = R_pred[-1]
-    D_boundary = D_pred[-1]
-    
-    S_boundary_loss = torch.mean((S_boundary - S_data[-1]) ** 2)
-    I_boundary_loss = torch.mean((I_boundary - I_data[-1]) ** 2)
-    R_boundary_loss = torch.mean((R_boundary - R_data[-1]) ** 2)
-    D_boundary_loss = torch.mean((D_boundary - D_data[-1]) ** 2)
-    
-    boundary_loss = S_boundary_loss + I_boundary_loss + R_boundary_loss + D_boundary_loss
+    S0, I0, R0, D0, H0, C0 = S_pred[0], I_pred[0], R_pred[0], D_pred[0], H_pred[0], C_pred[0]
+    initial_condition_loss = torch.mean((S0 - S_total[0]) ** 2) + torch.mean((I0 - I_total[0]) ** 2) + torch.mean((R0 - R_total[0]) ** 2) + torch.mean((D0 - D_total[0]) ** 2) + torch.mean((H0 - H_total[0]) ** 2) + torch.mean((C0 - C_total[0]) ** 2)
     
     # total loss
-    total_loss = data_loss + derivatives_loss + S0_loss + boundary_loss
+    total_loss = data_loss + derivatives_loss + initial_condition_loss
     
     return total_loss
 
@@ -313,100 +430,132 @@ optimizer_param = optim.Adam(param_nn.parameters(), lr=learning_rate)
 # Early stopping criteria
 early_stopping = EarlyStopping(patience=20, verbose=False)
 
-# Training loop
-loss_history = []
-for epoch in tqdm(range(num_epochs)):
-    state_nn.train()
-    param_nn.train()
+# Set the number of epochs for training
+epochs = 100000
+
+# Full time input for the entire dataset
+t = (
+    torch.tensor(np.arange(len(data)), dtype=torch.float32)
+    .view(-1, 1)
+    .to(device)
+    .requires_grad_(True)
+)
+
+# Shuffle the data index
+index = torch.randperm(len(tensor_data["train"][0]))
+
+# Training loop function
+def train_model(epochs, t, data, state_nn, param_nn, optimizer_state, optimizer_param, N, sigma, alpha, epsilon, early_stopping, index):
     
-    optimizer_state.zero_grad()
-    optimizer_param.zero_grad()
+    model_loss = []
+    param_loss = []
     
-    # Prepare time tensor
-    # Prepare time tensor
-    t = t_data
+    for epoch in tqdm(range(epochs)):
+        state_nn.train()
+        param_nn.train()
+        
+        # Zero gradients
+        optimizer_state.zero_grad()
+        optimizer_param.zero_grad()
+        
+        # Shuffle the training index for each epoch
+        index = torch.randperm(len(data["train"][0]))
+        
+        # Get the model predictions
+        loss = pinn_loss(t[index], data, state_nn, param_nn, N, alpha, epsilon, train_size=len(tensor_data["train"][0]))
+        
+        # Backward pass
+        loss.backward()
+        
+        # Optimize
+        optimizer_state.step()
+        optimizer_param.step()
+        
+        model_loss.append(loss.item())
+        param_loss.append(loss.item())
+        
+        
+        if early_stopping(loss.item()):
+            print(f"Early stopping at epoch {epoch}. No improvement in loss for {early_stopping.patience} epochs.")
+            break            
     
-    data_tensors = (S_data, I_data, R_data, D_data)
+
+        # Early stopping
+        if (epoch + 1) % 500 == 0:
+            print(f"Epoch [{epoch + 1}/{epochs}], Loss: {loss.item():.6f}")
+            
+        
+    return model_loss, param_loss, state_nn, param_nn
+
+# Train the model
+model, param, state_nn, param_nn = train_model(epochs, t, tensor_data, state_nn, param_nn, optimizer_state, optimizer_param, N, sigma, alpha, epsilon, early_stopping, index)
     
-    # Compute loss
-    loss = pinn_loss(t, data_tensors, state_nn, param_nn, N, sigma, alpha, epsilon)
-    
-    # Backpropagation
-    loss.backward()
-    
-    optimizer_state.step()
-    optimizer_param.step()
-    
-    loss_history.append(loss.item())
-    
-    if epoch % 500 == 0:
-        print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {loss.item():.6f}")
-    
-    if early_stopping(loss.item()):
-        print(f"Early stopping at epoch {epoch}. No improvement in loss for {early_stopping.patience} epochs.")
-        break
+
 
 # Plot the training loss
 plt.figure(figsize=(10, 5))
-plt.plot(np.log10(loss_history), label='Training Loss')
+plt.plot(np.log10(state_nn), label='Model Loss')
+plt.plot(np.log10(param_nn), label='Parameter Loss')
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.legend()
 plt.show()
 
-# Predict and plot the results
-state_nn.eval()
-param_nn.eval()
-with torch.no_grad():
-    S_pred, E_pred, I_pred, R_pred, D_pred = state_nn(t_data).cpu().numpy().T
-    beta_pred, gamma_pred, mu_pred = param_nn(t_data)
-    beta_pred, gamma_pred, mu_pred = beta_pred.cpu().numpy(), gamma_pred.cpu().numpy(), mu_pred.cpu().numpy()
-    
-    # plot the predictions 
-    fig, ax = plt.subplots(4, 1, figsize=(10, 20), sharex=True)
-    
-    ax[0].plot(S_pred, label='S(t) (Predicted)', color='blue')
-    ax[0].plot(S_data.cpu().numpy(), label='S(t) (Actual)', color='red', linestyle='dashed')
-    ax[0].set_ylabel('S(t)')
-    ax[0].legend()
-    
-    ax[1].plot(I_pred, label='I(t) (Predicted)', color='blue')
-    ax[1].plot(I_data.cpu().numpy(), label='I(t) (Actual)', color='red', linestyle='dashed')
-    ax[1].set_ylabel('I(t)')
-    ax[1].legend()
-    
-    ax[2].plot(R_pred, label='R(t) (Predicted)', color='blue')
-    ax[2].plot(R_data.cpu().numpy(), label='R(t) (Actual)', color='red', linestyle='dashed')
-    ax[2].set_ylabel('R(t)')
-    ax[2].legend()
 
-    ax[3].plot(D_pred, label='D(t) (Predicted)', color='blue')
-    ax[3].plot(D_data.cpu().numpy(), label='D(t) (Actual)', color='red', linestyle='dashed')
-    ax[3].set_ylabel('D(t)')
-    ax[3].legend()
+
+# # Predict and plot the results
+# state_nn.eval()
+# param_nn.eval()
+# with torch.no_grad():
+#     S_pred, E_pred, I_pred, R_pred, D_pred = state_nn(t_data).cpu().numpy().T
+#     beta_pred, gamma_pred, mu_pred = param_nn(t_data)
+#     beta_pred, gamma_pred, mu_pred = beta_pred.cpu().numpy(), gamma_pred.cpu().numpy(), mu_pred.cpu().numpy()
     
-    plt.xlabel('Time (days)')
-    plt.tight_layout()
-    plt.show()
+#     # plot the predictions 
+#     fig, ax = plt.subplots(4, 1, figsize=(10, 20), sharex=True)
     
-    # plot the parameters
-    fig, ax = plt.subplots(3, 1, figsize=(10, 15), sharex=True)
+#     ax[0].plot(S_pred, label='S(t) (Predicted)', color='blue')
+#     ax[0].plot(S_data.cpu().numpy(), label='S(t) (Actual)', color='red', linestyle='dashed')
+#     ax[0].set_ylabel('S(t)')
+#     ax[0].legend()
     
-    ax[0].plot(beta_pred, label='beta(t) (Predicted)', color='blue')
-    ax[0].set_ylabel('beta(t)')
-    ax[0].legend()
+#     ax[1].plot(I_pred, label='I(t) (Predicted)', color='blue')
+#     ax[1].plot(I_data.cpu().numpy(), label='I(t) (Actual)', color='red', linestyle='dashed')
+#     ax[1].set_ylabel('I(t)')
+#     ax[1].legend()
     
-    ax[1].plot(gamma_pred, label='gamma(t) (Predicted)', color='blue')
-    ax[1].set_ylabel('gamma(t)')
-    ax[1].legend()
+#     ax[2].plot(R_pred, label='R(t) (Predicted)', color='blue')
+#     ax[2].plot(R_data.cpu().numpy(), label='R(t) (Actual)', color='red', linestyle='dashed')
+#     ax[2].set_ylabel('R(t)')
+#     ax[2].legend()
+
+#     ax[3].plot(D_pred, label='D(t) (Predicted)', color='blue')
+#     ax[3].plot(D_data.cpu().numpy(), label='D(t) (Actual)', color='red', linestyle='dashed')
+#     ax[3].set_ylabel('D(t)')
+#     ax[3].legend()
     
-    ax[2].plot(mu_pred, label='mu(t) (Predicted)', color='blue')
-    ax[2].set_ylabel('mu(t)')
-    ax[2].legend()
+#     plt.xlabel('Time (days)')
+#     plt.tight_layout()
+#     plt.show()
     
-    plt.xlabel('Time (days)')
-    plt.tight_layout()
-    plt.show()
+#     # plot the parameters
+#     fig, ax = plt.subplots(3, 1, figsize=(10, 15), sharex=True)
+    
+#     ax[0].plot(beta_pred, label='beta(t) (Predicted)', color='blue')
+#     ax[0].set_ylabel('beta(t)')
+#     ax[0].legend()
+    
+#     ax[1].plot(gamma_pred, label='gamma(t) (Predicted)', color='blue')
+#     ax[1].set_ylabel('gamma(t)')
+#     ax[1].legend()
+    
+#     ax[2].plot(mu_pred, label='mu(t) (Predicted)', color='blue')
+#     ax[2].set_ylabel('mu(t)')
+#     ax[2].legend()
+    
+#     plt.xlabel('Time (days)')
+#     plt.tight_layout()
+#     plt.show()
     
     
 

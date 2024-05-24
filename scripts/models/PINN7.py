@@ -373,7 +373,7 @@ features = [
 
 # Set the training size to 90% of the data
 # train_size = int(0.90 * len(data))
-train_size = 60
+train_size = 100
 
 tensor_data, scaler = split_and_scale_data(data, train_size, features, device)
 
@@ -706,3 +706,125 @@ output.to_csv(f"../../reports/output/{train_size}_pinn_{areaname}_output.csv", i
 
 # save the model
 torch.save(model.state_dict(), f"../../models/{train_size}_pinn_{areaname}_model.pth")
+
+from sklearn.metrics import mean_absolute_error, mean_squared_error
+
+def mean_absolute_scaled_error(y_true, y_pred, benchmark=None):
+    """
+    Calculate the Mean Absolute Scaled Error (MASE).
+
+    Parameters:
+    y_true (array-like): Array of actual values.
+    y_pred (array-like): Array of predicted values.
+    benchmark (array-like): Array of benchmark values for scaling, default is the naive one-step ahead forecast.
+
+    Returns:
+    float: MASE value.
+    """
+    if benchmark is None:
+        # Use naive one-step ahead forecast
+        benchmark = np.roll(y_true, 1)
+        benchmark[0] = y_true[0]  # avoid nan for the first element
+    
+    mae_benchmark = mean_absolute_error(y_true, benchmark)
+    mae_model = mean_absolute_error(y_true, y_pred)
+    
+    return mae_model / mae_benchmark
+
+def forecast_bias(y_true, y_pred):
+    """
+    Calculate the forecast bias.
+
+    Parameters:
+    y_true (array-like): Array of actual values.
+    y_pred (array-like): Array of predicted values.
+
+    Returns:
+    float: Forecast bias value.
+    """
+    return np.mean(y_pred - y_true)
+
+def evaluate_model(model, data, scaler, device, N):
+    """
+    Evaluate the trained model on the dataset and calculate evaluation metrics.
+
+    Parameters:
+    model (SEIRDNet): Trained SEIRDNet model.
+    data (pd.DataFrame): DataFrame containing the dataset.
+    scaler (MinMaxScaler): Scaler used to normalize the data.
+    device (torch.device): Device to run the model on.
+    N (float): Population size.
+
+    Returns:
+    dict: Dictionary containing evaluation metrics.
+    """
+    model.eval()
+    with torch.no_grad():
+        # Generate predictions
+        t_values = np.arange(len(data))
+        predictions = network_prediction(t_values, model, device, scaler, N)
+
+        # Extract actual and predicted values
+        S_pred = predictions[:, 0]
+        I_pred = predictions[:, 1]
+        R_pred = predictions[:, 2]
+        D_pred = predictions[:, 3]
+
+        S_actual = data["susceptible"].values
+        I_actual = data["active_cases"].values
+        R_actual = data["recovered"].values
+        D_actual = data["cumulative_deceased"].values
+
+        # Calculate MAE for each compartment
+        mae_s = mean_absolute_error(S_actual, S_pred)
+        mae_i = mean_absolute_error(I_actual, I_pred)
+        mae_r = mean_absolute_error(R_actual, R_pred)
+        mae_d = mean_absolute_error(D_actual, D_pred)
+
+        # Calculate MSE for each compartment
+        mse_s = mean_squared_error(S_actual, S_pred)
+        mse_i = mean_squared_error(I_actual, I_pred)
+        mse_r = mean_squared_error(R_actual, R_pred)
+        mse_d = mean_squared_error(D_actual, D_pred)
+
+        # Calculate MASE for each compartment
+        mase_s = mean_absolute_scaled_error(S_actual, S_pred)
+        mase_i = mean_absolute_scaled_error(I_actual, I_pred)
+        mase_r = mean_absolute_scaled_error(R_actual, R_pred)
+        mase_d = mean_absolute_scaled_error(D_actual, D_pred)
+
+        # Calculate forecast bias for each compartment
+        bias_s = forecast_bias(S_actual, S_pred)
+        bias_i = forecast_bias(I_actual, I_pred)
+        bias_r = forecast_bias(R_actual, R_pred)
+        bias_d = forecast_bias(D_actual, D_pred)
+
+        # Combine results into a dictionary
+        results = {
+            "MAE_Susceptible": mae_s,
+            "MAE_Infected": mae_i,
+            "MAE_Recovered": mae_r,
+            "MAE_Deceased": mae_d,
+            "MSE_Susceptible": mse_s,
+            "MSE_Infected": mse_i,
+            "MSE_Recovered": mse_r,
+            "MSE_Deceased": mse_d,
+            "MASE_Susceptible": mase_s,
+            "MASE_Infected": mase_i,
+            "MASE_Recovered": mase_r,
+            "MASE_Deceased": mase_d,
+            "Forecast_Bias_Susceptible": bias_s,
+            "Forecast_Bias_Infected": bias_i,
+            "Forecast_Bias_Recovered": bias_r,
+            "Forecast_Bias_Deceased": bias_d,
+        }
+
+        return results
+
+# Example usage:
+results = evaluate_model(model, data, scaler, device, N)
+print(results)
+
+# save the results
+results_df = pd.DataFrame(results, index=[0])
+results_df.to_csv(f"../../reports/results/{train_size}_pinn_{areaname}_results.csv", index=False)
