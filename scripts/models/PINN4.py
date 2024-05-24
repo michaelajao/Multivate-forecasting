@@ -149,67 +149,152 @@ def split_and_scale_data(data, train_size, features, device):
 features = ["S(t)", "active_cases", "hospitalCases", "covidOccupiedMVBeds", "recovered", "new_deceased"]
 train_size = 60  # days
 
-class ResBlock(nn.Module):
-    def __init__(self, in_features, out_features):
-        super(ResBlock, self).__init__()
-        self.fc = nn.Linear(in_features, out_features)
-        self.activation = nn.Tanh()
-        self.init_weights()
-
-    def init_weights(self):
-        nn.init.xavier_uniform_(self.fc.weight)
-        nn.init.zeros_(self.fc.bias)
-
-    def forward(self, x):
-        identity = x.clone()
-        out = self.fc(x)
-        out = self.activation(out)
-        if out.shape == identity.shape:
-            out = out + identity
-        return out
-
 class StateNN(nn.Module):
-    """Epidemiological network for predicting SEIRD model outputs."""
-    def __init__(self, num_layers=4, hidden_neurons=20):
+    def __init__(self, num_layers=2, hidden_neurons=10, output_size=6):
         super(StateNN, self).__init__()
-        layers = [nn.Linear(1, hidden_neurons), nn.Tanh()]
-        for _ in range(num_layers - 1):
-            layers.append(ResBlock(hidden_neurons, hidden_neurons))
-        layers.append(nn.Linear(hidden_neurons, 6)) # Adjust the output size to 6 (S, I, R, D, H, C)
-        self.net = nn.Sequential(*layers)
-        self.init_weights()
+        self.retain_seed = 100
+        torch.manual_seed(self.retain_seed)
 
-    def init_weights(self):
-        for m in self.net:
-            if isinstance(m, nn.Linear):
-                nn.init.xavier_uniform_(m.weight)
-                nn.init.zeros_(m.bias)
+        # Initialize layers array starting with input layer
+        layers = [nn.Linear(1, hidden_neurons), nn.Tanh()]
+
+        # Append hidden layers
+        for _ in range(num_layers - 1):
+            layers.extend([nn.Linear(hidden_neurons, hidden_neurons), nn.Tanh()])
+
+        # Append output layer
+        layers.append(nn.Linear(hidden_neurons, output_size))  # Epidemiological outputs
+
+        # Convert list of layers to nn.Sequential
+        self.net = nn.Sequential(*layers)
+
+        # Initialize weights
+        self.init_xavier()
 
     def forward(self, t):
         return self.net(t)
 
-class ParamNN(nn.Module):
-    """Neural network for predicting time-varying parameters."""
-    def __init__(self, num_layers=4, hidden_neurons=20):
-        super(ParamNN, self).__init__()
-        layers = [nn.Linear(1, hidden_neurons), nn.Tanh()]
-        for _ in range(num_layers - 1):
-            layers.append(ResBlock(hidden_neurons, hidden_neurons))
-        layers.append(nn.Linear(hidden_neurons, 8)) # Adjust the output size to 8 (beta, gamma, delta, rho, eta, kappa, mu, xi)
-        self.net = nn.Sequential(*layers)
-        self.init_weights()
+    def init_xavier(self):
+        def init_weights(layer):
+            if isinstance(layer, nn.Linear):
+                g = nn.init.calculate_gain("tanh")
+                nn.init.xavier_normal_(layer.weight, gain=g)
+                if layer.bias is not None:
+                    layer.bias.data.fill_(0)
+        self.net.apply(init_weights)
 
-    def init_weights(self):
-        for m in self.net:
-            if isinstance(m, nn.Linear):
-                nn.init.xavier_uniform_(m.weight)
-                nn.init.zeros_(m.bias)
+class ParamNN(nn.Module):
+    def __init__(self, num_layers=2, hidden_neurons=10, output_size=8):
+        super(ParamNN, self).__init__()
+        self.retain_seed = 100
+        torch.manual_seed(self.retain_seed)
+
+        # Initialize layers array starting with the input layer
+        layers = [nn.Linear(1, hidden_neurons), nn.Tanh()]
+
+        # Append hidden layers
+        for _ in range(num_layers - 1):
+            layers.extend([nn.Linear(hidden_neurons, hidden_neurons), nn.Tanh()])
+
+        # Append output layer
+        layers.append(nn.Linear(hidden_neurons, output_size))  # Output layer for estimating parameters
+
+        # Convert list of layers to nn.Sequential
+        self.net = nn.Sequential(*layers)
+
+        # Initialize weights
+        self.init_xavier()
+
+    def init_xavier(self):
+        def init_weights(layer):
+            if isinstance(layer, nn.Linear):
+                g = nn.init.calculate_gain("tanh")
+                nn.init.xavier_normal_(layer.weight, gain=g)
+                if layer.bias is not None:
+                    layer.bias.data.fill_(0)
+        self.net.apply(init_weights)
 
     def forward(self, t):
         params = self.net(t)
-        # Ensure parameters are in a valid range
-        params = torch.sigmoid(params)
-        return params[:, 0], params[:, 1], params[:, 2], params[:, 3], params[:, 4], params[:, 5], params[:, 6], params[:, 7]
+        # Beta (β) is a positive value between 0.1 and 1 using the sigmoid function
+        beta = torch.sigmoid(params[:, 0]) * 0.9 + 0.1
+        # Gamma (γ) is a positive value between 0.01 and 0.1 using the sigmoid function
+        gamma = torch.sigmoid(params[:, 1]) * 0.1 + 0.01
+        # Delta (δ) is a positive value between 0.001 and 0.01 using the sigmoid function
+        delta = torch.sigmoid(params[:, 2]) * 0.01 + 0.001
+        # Rho (ρ) is a positive value between 0.001 and 0.05 using the sigmoid function
+        rho = torch.sigmoid(params[:, 3]) * 0.05 + 0.001
+        # Eta (η) is a positive value between 0.001 and 0.05 using the sigmoid function
+        eta = torch.sigmoid(params[:, 4]) * 0.05 + 0.001
+        # Kappa (κ) is a positive value between 0.001 and 0.05 using the sigmoid function
+        kappa = torch.sigmoid(params[:, 5]) * 0.05 + 0.001
+        # Mu (μ) is a positive value between 0.001 and 0.05 using the sigmoid function
+        mu = torch.sigmoid(params[:, 6]) * 0.05 + 0.001
+        # Xi (ξ) is a positive value between 0.001 and 0.01 using the sigmoid function
+        xi = torch.sigmoid(params[:, 7]) * 0.01 + 0.001
+        return torch.stack([beta, gamma, delta, rho, eta, kappa, mu, xi], dim=1)
+
+# class ResBlock(nn.Module):
+#     def __init__(self, in_features, out_features):
+#         super(ResBlock, self).__init__()
+#         self.fc = nn.Linear(in_features, out_features)
+#         self.activation = nn.Tanh()
+#         self.init_weights()
+
+#     def init_weights(self):
+#         nn.init.xavier_uniform_(self.fc.weight)
+#         nn.init.zeros_(self.fc.bias)
+
+#     def forward(self, x):
+#         identity = x.clone()
+#         out = self.fc(x)
+#         out = self.activation(out)
+#         if out.shape == identity.shape:
+#             out = out + identity
+#         return out
+
+# class StateNN(nn.Module):
+#     """Epidemiological network for predicting SEIRD model outputs."""
+#     def __init__(self, num_layers=4, hidden_neurons=20):
+#         super(StateNN, self).__init__()
+#         layers = [nn.Linear(1, hidden_neurons), nn.Tanh()]
+#         for _ in range(num_layers - 1):
+#             layers.append(ResBlock(hidden_neurons, hidden_neurons))
+#         layers.append(nn.Linear(hidden_neurons, 6)) # Adjust the output size to 6 (S, I, R, D, H, C)
+#         self.net = nn.Sequential(*layers)
+#         self.init_weights()
+
+#     def init_weights(self):
+#         for m in self.net:
+#             if isinstance(m, nn.Linear):
+#                 nn.init.xavier_uniform_(m.weight)
+#                 nn.init.zeros_(m.bias)
+
+#     def forward(self, t):
+#         return self.net(t)
+
+# class ParamNN(nn.Module):
+#     """Neural network for predicting time-varying parameters."""
+#     def __init__(self, num_layers=4, hidden_neurons=20):
+#         super(ParamNN, self).__init__()
+#         layers = [nn.Linear(1, hidden_neurons), nn.Tanh()]
+#         for _ in range(num_layers - 1):
+#             layers.append(ResBlock(hidden_neurons, hidden_neurons))
+#         layers.append(nn.Linear(hidden_neurons, 8)) # Adjust the output size to 8 (beta, gamma, delta, rho, eta, kappa, mu, xi)
+#         self.net = nn.Sequential(*layers)
+#         self.init_weights()
+
+#     def init_weights(self):
+#         for m in self.net:
+#             if isinstance(m, nn.Linear):
+#                 nn.init.xavier_uniform_(m.weight)
+#                 nn.init.zeros_(m.bias)
+
+#     def forward(self, t):
+#         params = self.net(t)
+#         # Ensure parameters are in a valid range
+#         params = torch.sigmoid(params)
+#         return params[:, 0], params[:, 1], params[:, 2], params[:, 3], params[:, 4], params[:, 5], params[:, 6], params[:, 7]
 
 def network_prediction(t, model, device, scaler, N):
     """Generate predictions from the SEIRDNet model."""
@@ -352,7 +437,7 @@ loss_history, state_nn, param_nn = train_model(epochs, t, tensor_data, state_nn,
 
 # Plot the training loss
 plt.figure(figsize=(10, 5))
-plt.plot(loss_history, label="Training Loss")
+plt.plot(np.log10(loss_history), label="Training Loss")
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.legend()
@@ -370,11 +455,11 @@ def generate_predictions(t, state_nn, param_nn, device, scaler):
 
         # Generate parameter predictions
         params_pred = param_nn(t)
-        beta_pred, gamma_pred, delta_pred, rho_pred, eta_pred, kappa_pred, mu_pred, xi_pred = params_pred[:, 0], params_pred[:, 1], params_pred[:, 2], params_pred[:, 3], params_pred[:, 4], params_pred[:, 5], params_pred[:, 6], params_pred[:, 7]
+        beta_pred, gamma_pred, delta_pred, rho_pred, eta_pred, kappa_pred, mu_pred, xi_pred = params_pred
 
         # Convert predictions to numpy arrays
         states_pred = states_pred.cpu().numpy()
-        params_pred = params_pred.cpu().numpy()
+        params_pred = torch.stack([beta_pred, gamma_pred, delta_pred, rho_pred, eta_pred, kappa_pred, mu_pred, xi_pred], dim=1).cpu().numpy()
 
         # Inverse transform the state predictions to original scale
         states_pred = scaler.inverse_transform(states_pred)
@@ -402,40 +487,43 @@ kappa_pred = params_pred[:, 5]
 mu_pred = params_pred[:, 6]
 xi_pred = params_pred[:, 7]
 
+# Detach the tensor from the computation graph and convert to numpy array
+t_numpy = t.detach().cpu().numpy()
+
 # Plot predictions of the state variables over time
 plt.figure(figsize=(14, 8))
 plt.subplot(2, 3, 1)
-plt.plot(t.cpu().numpy(), S_pred, label='Predicted S(t)')
+plt.plot(t_numpy, S_pred, label='Predicted S(t)')
 plt.xlabel('Time')
 plt.ylabel('Susceptible')
 plt.legend()
 
 plt.subplot(2, 3, 2)
-plt.plot(t.cpu().numpy(), I_pred, label='Predicted I(t)')
+plt.plot(t_numpy, I_pred, label='Predicted I(t)')
 plt.xlabel('Time')
 plt.ylabel('Infected')
 plt.legend()
 
 plt.subplot(2, 3, 3)
-plt.plot(t.cpu().numpy(), R_pred, label='Predicted R(t)')
+plt.plot(t_numpy, R_pred, label='Predicted R(t)')
 plt.xlabel('Time')
 plt.ylabel('Recovered')
 plt.legend()
 
 plt.subplot(2, 3, 4)
-plt.plot(t.cpu().numpy(), D_pred, label='Predicted D(t)')
+plt.plot(t_numpy, D_pred, label='Predicted D(t)')
 plt.xlabel('Time')
 plt.ylabel('Deceased')
 plt.legend()
 
 plt.subplot(2, 3, 5)
-plt.plot(t.cpu().numpy(), H_pred, label='Predicted H(t)')
+plt.plot(t_numpy, H_pred, label='Predicted H(t)')
 plt.xlabel('Time')
 plt.ylabel('Hospitalized')
 plt.legend()
 
 plt.subplot(2, 3, 6)
-plt.plot(t.cpu().numpy(), C_pred, label='Predicted C(t)')
+plt.plot(t_numpy, C_pred, label='Predicted C(t)')
 plt.xlabel('Time')
 plt.ylabel('Critical')
 plt.legend()
@@ -446,55 +534,56 @@ plt.show()
 # Plot time-varying parameters over time
 plt.figure(figsize=(14, 8))
 plt.subplot(2, 4, 1)
-plt.plot(t.cpu().numpy(), beta_pred, label='Predicted beta(t)')
+plt.plot(t_numpy, beta_pred, label='Predicted beta(t)')
 plt.xlabel('Time')
 plt.ylabel('Beta')
 plt.legend()
 
 plt.subplot(2, 4, 2)
-plt.plot(t.cpu().numpy(), gamma_pred, label='Predicted gamma(t)')
+plt.plot(t_numpy, gamma_pred, label='Predicted gamma(t)')
 plt.xlabel('Time')
 plt.ylabel('Gamma')
 plt.legend()
 
 plt.subplot(2, 4, 3)
-plt.plot(t.cpu().numpy(), delta_pred, label='Predicted delta(t)')
+plt.plot(t_numpy, delta_pred, label='Predicted delta(t)')
 plt.xlabel('Time')
 plt.ylabel('Delta')
 plt.legend()
 
 plt.subplot(2, 4, 4)
-plt.plot(t.cpu().numpy(), rho_pred, label='Predicted rho(t)')
+plt.plot(t_numpy, rho_pred, label='Predicted rho(t)')
 plt.xlabel('Time')
 plt.ylabel('Rho')
 plt.legend()
 
 plt.subplot(2, 4, 5)
-plt.plot(t.cpu().numpy(), eta_pred, label='Predicted eta(t)')
+plt.plot(t_numpy, eta_pred, label='Predicted eta(t)')
 plt.xlabel('Time')
 plt.ylabel('Eta')
 plt.legend()
 
 plt.subplot(2, 4, 6)
-plt.plot(t.cpu().numpy(), kappa_pred, label='Predicted kappa(t)')
+plt.plot(t_numpy, kappa_pred, label='Predicted kappa(t)')
 plt.xlabel('Time')
 plt.ylabel('Kappa')
 plt.legend()
 
 plt.subplot(2, 4, 7)
-plt.plot(t.cpu().numpy(), mu_pred, label='Predicted mu(t)')
+plt.plot(t_numpy, mu_pred, label='Predicted mu(t)')
 plt.xlabel('Time')
 plt.ylabel('Mu')
 plt.legend()
 
 plt.subplot(2, 4, 8)
-plt.plot(t.cpu().numpy(), xi_pred, label='Predicted xi(t)')
+plt.plot(t_numpy, xi_pred, label='Predicted xi(t)')
 plt.xlabel('Time')
 plt.ylabel('Xi')
 plt.legend()
 
 plt.tight_layout()
 plt.show()
+
 
 
 
