@@ -568,7 +568,7 @@ def train_loop(
             model_output,
             t,
             N,
-            train_size=len(tensor_data["train"][0]),
+            train_size=len(index),
         )
 
         # Backpropagation

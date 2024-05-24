@@ -413,7 +413,6 @@ class EarlyStopping:
 
 # Hyperparameters
 learning_rate = 1e-4
-num_epochs = 50000
 sigma = 1/5
 N = data["population"].values[0]
 alpha = 0.5
@@ -447,8 +446,7 @@ index = torch.randperm(len(tensor_data["train"][0]))
 # Training loop function
 def train_model(epochs, t, data, state_nn, param_nn, optimizer_state, optimizer_param, N, sigma, alpha, epsilon, early_stopping, index):
     
-    model_loss = []
-    param_loss = []
+    loss_history = []
     
     for epoch in tqdm(range(epochs)):
         state_nn.train()
@@ -462,7 +460,7 @@ def train_model(epochs, t, data, state_nn, param_nn, optimizer_state, optimizer_
         index = torch.randperm(len(data["train"][0]))
         
         # Get the model predictions
-        loss = pinn_loss(t[index], data, state_nn, param_nn, N, alpha, epsilon, train_size=len(tensor_data["train"][0]))
+        loss = pinn_loss(t, data, state_nn, param_nn, N, alpha, epsilon, train_size=len(index))
         
         # Backward pass
         loss.backward()
@@ -471,8 +469,9 @@ def train_model(epochs, t, data, state_nn, param_nn, optimizer_state, optimizer_
         optimizer_state.step()
         optimizer_param.step()
         
-        model_loss.append(loss.item())
-        param_loss.append(loss.item())
+        loss_history.append(loss.item())
+        
+        
         
         
         if early_stopping(loss.item()):
@@ -485,17 +484,16 @@ def train_model(epochs, t, data, state_nn, param_nn, optimizer_state, optimizer_
             print(f"Epoch [{epoch + 1}/{epochs}], Loss: {loss.item():.6f}")
             
         
-    return model_loss, param_loss, state_nn, param_nn
+    return loss_history, state_nn, param_nn
 
 # Train the model
-model, param, state_nn, param_nn = train_model(epochs, t, tensor_data, state_nn, param_nn, optimizer_state, optimizer_param, N, sigma, alpha, epsilon, early_stopping, index)
+loss_history, state_nn, param_nn = train_model(epochs, t, tensor_data, state_nn, param_nn, optimizer_state, optimizer_param, N, sigma, alpha, epsilon, early_stopping, index)
     
 
 
 # Plot the training loss
 plt.figure(figsize=(10, 5))
-plt.plot(np.log10(state_nn), label='Model Loss')
-plt.plot(np.log10(param_nn), label='Parameter Loss')
+plt.plot(loss_history, label="Training Loss")
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.legend()
@@ -503,6 +501,20 @@ plt.show()
 
 # Generate predictions for the entire dataset
 t_values = np.arange(len(data))
+
+model_predictions = network_prediction(t_values, state_nn, device, scaler, N)
+beta_pred, gamma_pred, delta_pred, rho_pred, eta_pred, kappa_pred, mu_pred, xi_pred = parameter_estimation(t_values, tensor_data, param_nn, device, scaler, N)
+
+dates = data["date"]
+
+# Plot the predictions
+fig, ax = plt.subplots(6, 1, figsize=(10, 20), sharex=True)
+
+ax[0].plot(dates, model_predictions[:, 0], label='S(t) (Predicted)', color='blue')
+ax[0].plot(dates, data["S(t)"], label='S(t) (Actual)', color='red', linestyle='dashed')
+ax[0].set_ylabel('S(t)')
+ax[0].legend()
+
 
 
 
