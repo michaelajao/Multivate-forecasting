@@ -326,10 +326,10 @@ optimizer_state = optim.Adam(state_nn.parameters(), lr=learning_rate)
 optimizer_param = optim.Adam(param_nn.parameters(), lr=learning_rate)
 
 # Early stopping criteria
-early_stopping = EarlyStopping(patience=20, verbose=False)
+early_stopping = EarlyStopping(patience=10, verbose=False)
 
 # Set the number of epochs for training
-epochs = 100000
+epochs = 50000
 
 # Full time input for the entire dataset
 t = (
