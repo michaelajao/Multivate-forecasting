@@ -501,6 +501,9 @@ plt.ylabel('Loss')
 plt.legend()
 plt.show()
 
+# Generate predictions for the entire dataset
+t_values = np.arange(len(data))
+
 
 
 # # Predict and plot the results
