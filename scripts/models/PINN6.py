@@ -98,7 +98,7 @@ def prepare_tensors(data, device):
     return t, I, R, D
 
 # Load and preprocess the data
-data = load_and_preprocess_data("../../data/hos_data/merged_data.csv", areaname="South West", recovery_period=21, rolling_window=7, start_date="2020-04-01", end_date="2020-12-31").drop(columns=["Unnamed: 0"], axis=1)
+data = load_and_preprocess_data("../../data/hos_data/merged_data.csv", areaname="South West", recovery_period=21, rolling_window=7, start_date="2020-04-01", end_date="2020-08-31")
 
 # Normalize the data using StandardScaler
 scaler = StandardScaler()
@@ -159,6 +159,8 @@ class SEIRNet(nn.Module):
 
 def seird_loss(model, model_output, SIRD_tensor, t_tensor, N, sigma=1/5, beta=None, gamma=None, delta=None):
     S_pred, E_pred, I_pred, R_pred, D_pred = model_output[:, 0], model_output[:, 1], model_output[:, 2], model_output[:, 3], model_output[:, 4]
+    
+    N = torch.tensor(N/N, dtype=torch.float32).to(device)
     S_pred = N - I_pred - R_pred - D_pred - E_pred
 
     I_data, R_data, D_data = SIRD_tensor[:, 0], SIRD_tensor[:, 1], SIRD_tensor[:, 2]

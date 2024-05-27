@@ -87,6 +87,18 @@ def load_and_preprocess_data(filepath, areaname, recovery_period=21, rolling_win
     cols_to_smooth = ["S(t)", "cumulative_confirmed", "cumulative_deceased", "hospitalCases", "covidOccupiedMVBeds", "recovered", "active_cases", "new_deceased", "new_confirmed"]
     for col in cols_to_smooth:
         df[col] = df[col].rolling(window=rolling_window, min_periods=1).mean().fillna(0)
+        
+    # normalize the data with the population
+    df["cumulative_confirmed"] = df["cumulative_confirmed"] / df["population"]
+    df["cumulative_deceased"] = df["cumulative_deceased"] / df["population"]
+    df["hospitalCases"] = df["hospitalCases"] / df["population"]
+    df["covidOccupiedMVBeds"] = df["covidOccupiedMVBeds"] / df["population"]
+    df["recovered"] = df["recovered"] / df["population"]
+    df["active_cases"] = df["active_cases"] / df["population"]
+    df["new_deceased"] = df["new_deceased"] / df["population"]
+    df["new_confirmed"] = df["new_confirmed"] / df["population"]
+    df["population"] = df["population"] / df["population"]
+    df["S(t)"] = df["S(t)"] / df["population"]
 
     return df
 
@@ -99,6 +111,16 @@ def prepare_tensors(data, device):
 
 # Load and preprocess the data
 data = load_and_preprocess_data("../../data/hos_data/merged_data.csv", areaname="South West", recovery_period=21, rolling_window=7, start_date="2020-04-01", end_date="2020-12-31")
+
+# plot S(t)
+plt.plot(data["date"], data["active_cases"])
+plt.title("S(t) over time")
+plt.xlabel("Date")
+plt.ylabel("S(t)")
+plt.xticks(rotation=45)
+plt.tight_layout()
+# plt.savefig("../../reports/figures/S(t)_over_time.pdf")
+plt.show()
 
 # Normalize the data using MinMaxScaler
 scaler = MinMaxScaler()
@@ -154,7 +176,7 @@ class SEIRNet(nn.Module):
                 g = nn.init.calculate_gain("tanh")
                 nn.init.xavier_uniform_(m.weight, gain=g)
                 if m.bias is not None:
-                    m.bias.data.fill_(0)
+                    m.bias.data.fill_(0.01)
         self.apply(init_weights)
 
 def seird_loss(model, model_output, SIRD_tensor, t_tensor, N, sigma=1/5, beta=None, gamma=None, delta=None):
