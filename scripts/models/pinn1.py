@@ -153,7 +153,7 @@ region_name = get_region_name_from_filepath(path)
 df = load_and_preprocess_data(f"../../data/region_daily_data/{region_name}.csv")
 
 start_date = "2020-04-01"
-end_date = "2020-05-31"
+end_date = "2022-05-31"
 mask = (df["date"] >= start_date) & (df["date"] <= end_date)
 training_data = df.loc[mask]
 
