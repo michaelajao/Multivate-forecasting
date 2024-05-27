@@ -122,11 +122,12 @@ def load_and_preprocess_data(
         (df["date"] >= pd.to_datetime(start_date))
         & (df["date"] <= pd.to_datetime(end_date))
     ]
-
-    df["recovered"] = df["cumulative_confirmed"].shift(recovery_period) - df[
-        "cumulative_deceased"
-    ].shift(recovery_period)
-    df["recovered"] = df["recovered"].fillna(0).clip(lower=0)
+    # R(t) = C(t − T ) − D(t − T ), where T is the average time to recovery
+    df["recovered"] = (
+        df["cumulative_confirmed"].shift(recovery_period)
+        - df["cumulative_deceased"].shift(recovery_period)
+    )
+    # df["recovered"] = df["recovered"].fillna(0)
     df["active_cases"] = (
         df["cumulative_confirmed"] - df["recovered"] - df["cumulative_deceased"]
     )
@@ -161,10 +162,11 @@ data = load_and_preprocess_data(
     # areaname="Midlands",
     recovery_period=21,
     rolling_window=7,
-    start_date="2020-04-23",
+    start_date="2020-05-01",
     end_date="2020-12-31",
 )
 
+data["recovered"]
 
 areaname="England"
 
