@@ -30,7 +30,7 @@ plt.rcParams.update(
         # "font.family": "serif",
         # "font.serif": ["Times New Roman"],
         "font.size": 14,
-        "figure.figsize": [10, 6],
+        "figure.figsize": [8, 6],
         "text.usetex": False,  # Enable LaTeX for text rendering for a professional look
         "figure.facecolor": "white",
         "figure.autolayout": True,
@@ -303,7 +303,8 @@ def plot_results(t, I_data, R_data, D_data, model, title, N):
     
     
 
-    fig, axs = plt.subplots(1, 5, figsize=(30, 6))
+    # fig, axs = plt.subplots(1, 5, figsize=(30, 6))
+    fig, axs = plt.subplots(5, 1, figsize=(10, 20))
 
 
     # Plotting S (Susceptible)
@@ -353,7 +354,6 @@ def plot_loss(losses, title):
     
     
 def plot_loss2(losses, title):
-    plt.figure(figsize=(10, 6)) 
     plt.plot(np.arange(1, len(losses) + 1), losses, label='Loss', color='black')
     plt.yscale('log')
     plt.title(f"{title} loss")
