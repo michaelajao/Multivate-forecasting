@@ -27,8 +27,11 @@ if torch.cuda.is_available():
 plt.style.use("seaborn-v0_8-poster")
 plt.rcParams.update(
     {
-        "font.size": 20,
-        "figure.figsize": [10, 5],
+        # "font.family": "serif",
+        # "font.serif": ["Times New Roman"],
+        "font.size": 14,
+        "figure.figsize": [10, 6],
+        "text.usetex": False,  # Enable LaTeX for text rendering for a professional look
         "figure.facecolor": "white",
         "figure.autolayout": True,
         "figure.dpi": 600,
@@ -37,7 +40,7 @@ plt.rcParams.update(
         "savefig.bbox": "tight",
         "axes.labelweight": "bold",
         "axes.titleweight": "bold",
-        "axes.labelsize": 14,
+        "axes.labelsize": 12,
         "axes.titlesize": 18,
         "axes.facecolor": "white",
         "axes.grid": True,
@@ -48,15 +51,15 @@ plt.rcParams.update(
         "axes.formatter.useoffset": False,
         "axes.xmargin": 0,
         "axes.ymargin": 0,
-        "legend.fontsize": 14,
+        "legend.fontsize": 12,
         "legend.frameon": False,
         "legend.loc": "best",
         "lines.linewidth": 2,
         "lines.markersize": 8,
-        "xtick.labelsize": 14,
+        "xtick.labelsize": 12,
         "xtick.direction": "in",
         "xtick.top": False,
-        "ytick.labelsize": 14,
+        "ytick.labelsize": 12,
         "ytick.direction": "in",
         "ytick.right": False,
         "grid.color": "grey",
@@ -66,6 +69,7 @@ plt.rcParams.update(
         "figure.subplot.wspace": 0.4,
         "figure.subplot.hspace": 0.4,
         "image.cmap": "viridis",
+        "text.latex.preamble": r"\usepackage{amsmath}",  # Latex preamble for math expressions
     }
 )
 
@@ -139,9 +143,9 @@ class SEIRNet(nn.Module):
         self.net = nn.Sequential(*layers)
 
         if inverse:
-            self._beta = nn.Variable(torch.tensor(init_beta, dtype=torch.float32).to(device), requires_grad=True)
-            self._gamma = nn.Variable(torch.tensor(init_gamma, dtype=torch.float32).to(device), requires_grad=True)
-            self._delta = nn.Variable(torch.tensor(init_delta, dtype=torch.float32).to(device), requires_grad=True)
+            self._beta = nn.Parameter(torch.tensor(init_beta, dtype=torch.float32).to(device), requires_grad=True)
+            self._gamma = nn.Parameter(torch.tensor(init_gamma, dtype=torch.float32).to(device), requires_grad=True)
+            self._delta = nn.Parameter(torch.tensor(init_delta, dtype=torch.float32).to(device), requires_grad=True)
         else:
             self._beta = None
             self._gamma = None
@@ -197,7 +201,9 @@ def network_prediction(model, t, N, device):
 
 def seird_loss(model, model_output, SIRD_tensor, t_tensor, N, sigma=1/5, beta=None, gamma=None, delta=None):
     S_pred, E_pred, I_pred, R_pred, D_pred = model_output[:, 0], model_output[:, 1], model_output[:, 2], model_output[:, 3], model_output[:, 4]
-    S_pred = N - I_pred - R_pred - D_pred - E_pred
+    
+    N = N/N
+    # S_data = N - I_pred - R_pred - D_pred - E_pred
     
     I_data, R_data, D_data = SIRD_tensor[:, 0], SIRD_tensor[:, 1], SIRD_tensor[:, 2]
     S_data = N - I_data - R_data - D_data
@@ -278,7 +284,7 @@ def train(model, t_tensor, SIRD_tensor, epochs=1000, lr=0.001, N=None, sigma=1/5
         
         losses.append(loss.item())
         scheduler.step()
-        if epoch % 1000 == 0:
+        if (epoch + 1) % 1000 == 0:
             print(f"Epoch {epoch + 1}/{epochs}, Loss: {loss.item():.6f}")
 
         early_stopping(loss, model)
@@ -344,6 +350,17 @@ def plot_loss(losses, title):
     plt.xlabel("Epoch")
     plt.ylabel("Log10 Loss")
     plt.show()
+    
+    
+def plot_loss2(losses, title):
+    plt.figure(figsize=(10, 6)) 
+    plt.plot(np.arange(1, len(losses) + 1), losses, label='Loss', color='black')
+    plt.yscale('log')
+    plt.title(f"{title} loss")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss (log scale)")
+    plt.legend()
+    plt.show()
 
 model_forward = SEIRNet(num_layers=6, hidden_neurons=32)
 model_forward.to(device)
@@ -351,6 +368,7 @@ losses = train(model_forward, t_data, SIRD_tensor, epochs=50000, lr=0.0001, N=N,
 
 plot_results(t_data, I_data, R_data, D_data, model_forward, "Forward Model Results", N)
 plot_loss(losses, "Forward Model Loss")
+plot_loss2(losses, "Forward Model Loss")
 
 model_inverse = SEIRNet(inverse=True, init_beta=0.1, init_gamma=0.01, init_delta=0.01, num_layers=6, hidden_neurons=32)
 model_inverse.to(device)
@@ -358,6 +376,7 @@ losses = train(model_inverse, t_data, SIRD_tensor, epochs=50000, lr=0.0001, N=N,
 
 plot_results(t_data, I_data, R_data, D_data, model_inverse, "Inverse Model Results", N)
 plot_loss(losses, "Inverse Model Loss")
+plot_loss2(losses, "Inverse Model Loss")
 
 def extract_parameters(model):
     try:
@@ -372,20 +391,36 @@ def extract_parameters(model):
 beta_predicted, gamma_predicted, delta_predicted = extract_parameters(model_inverse)
 
 def solve_seird_ode(beta, gamma, delta, N, I0, R0, D0, E0, t):
-    S0 = N - I0 - R0 - D0 - E0
-    sigma = 1/5
-    def seird_model(t, y):
-        S, I, R, D, E = y
+    """
+    Solve the SEIRD ODE system using the given parameters.
+    
+    Parameters:
+    - beta: Transmission rate
+    - gamma: Recovery rate
+    - delta: Death rate
+    - N: Total population
+    - I0: Initial number of infected individuals
+    - R0: Initial number of recovered individuals
+    - D0: Initial number of deceased individuals
+    - E0: Initial number of exposed individuals
+    - t: Time points
+    
+    Returns:
+    - Solution of the ODE system
+    """
+    def seird_ode(t, y):
+        S, E, I, R, D = y
         dSdt = -(beta * S * I) / N
-        dEdt = (beta * S * I) / N - sigma * E
-        dIdt = sigma * E - gamma * I - delta * I
+        dEdt = (beta * S * I) / N - (1/5) * E
+        dIdt = (1/5) * E - gamma * I - delta * I
         dRdt = gamma * I
         dDdt = delta * I
         return [dSdt, dEdt, dIdt, dRdt, dDdt]
 
-    y0 = [S0, I0, R0, D0, E0]
-    sol = solve_ivp(seird_model, [t[0], t[-1]], y0, t_eval=t, vectorized=True)
+    y0 = [N - I0 - R0 - D0 - E0, E0, I0, R0, D0]
+    sol = solve_ivp(seird_ode, (t[0], t[-1]), y0, t_eval=t, method='LSODA')
     return sol.y
+
 
 # Get the final conditions and parameters from the inverse model
 I0 = I_data[-1].item()
@@ -393,8 +428,10 @@ R0 = R_data[-1].item()
 D0 = D_data[-1].item()
 E0 = (beta_predicted * I0) / (1/5)  # Initial guess for E0
 
-t_np = t_data.cpu().detach().numpy().flatten()
-sol = solve_seird_ode(beta_predicted, gamma_predicted, delta_predicted, N, I0, R0, D0, E0, t_np[:len(sol[0])])  # Adjust length
+t_np = np.linspace(0, len(training_data), len(training_data))
+sol = solve_seird_ode(beta_predicted, gamma_predicted, delta_predicted, N, I0, R0, D0, E0, t_np)
+
+
 
 # Plot the ODE solution
 def plot_ode_solution(t, sol, title):
