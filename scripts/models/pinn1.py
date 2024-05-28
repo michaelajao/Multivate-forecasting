@@ -31,163 +31,238 @@ torch.manual_seed(42)
 #     }
 # )
 
-plt.rcParams.update({
-    "font.size": 20,
-    "figure.figsize": [10, 5],
-    "figure.facecolor": "white",
-    "figure.autolayout": True,
-    "figure.dpi": 600,
-    "savefig.dpi": 600,
-    "savefig.format": "pdf",
-    "savefig.bbox": "tight",
-    "axes.labelweight": "bold",
-    "axes.titleweight": "bold",
-    "axes.labelsize": 14,
-    "axes.titlesize": 18,
-    "axes.facecolor": "white",
-    "axes.grid": True,
-    "axes.spines.top": False,
-    "axes.spines.right": False,
-    "axes.formatter.limits": (0, 5),
-    "axes.formatter.use_mathtext": True,
-    "axes.formatter.useoffset": False,
-    "axes.xmargin": 0,
-    "axes.ymargin": 0,
-    "legend.fontsize": 14,
-    "legend.frameon": False,
-    "legend.loc": "best",
-    "lines.linewidth": 2,
-    "lines.markersize": 8,
-    "xtick.labelsize": 14,
-    "xtick.direction": "in",
-    "xtick.top": False,
-    "ytick.labelsize": 14,
-    "ytick.direction": "in",
-    "ytick.right": False,
-    "grid.color": "grey",
-    "grid.linestyle": "--",
-    "grid.linewidth": 0.5,
-    "errorbar.capsize": 4,
-    "figure.subplot.wspace": 0.4,
-    "figure.subplot.hspace": 0.4,
-    "image.cmap": "viridis",
-})
+plt.rcParams.update(
+    {
+        "font.size": 20,
+        "figure.figsize": [10, 5],
+        "figure.facecolor": "white",
+        "figure.autolayout": True,
+        "figure.dpi": 600,
+        "savefig.dpi": 600,
+        "savefig.format": "pdf",
+        "savefig.bbox": "tight",
+        "axes.labelweight": "bold",
+        "axes.titleweight": "bold",
+        "axes.labelsize": 14,
+        "axes.titlesize": 18,
+        "axes.facecolor": "white",
+        "axes.grid": True,
+        "axes.spines.top": False,
+        "axes.spines.right": False,
+        "axes.formatter.limits": (0, 5),
+        "axes.formatter.use_mathtext": True,
+        "axes.formatter.useoffset": False,
+        "axes.xmargin": 0,
+        "axes.ymargin": 0,
+        "legend.fontsize": 14,
+        "legend.frameon": False,
+        "legend.loc": "best",
+        "lines.linewidth": 2,
+        "lines.markersize": 8,
+        "xtick.labelsize": 14,
+        "xtick.direction": "in",
+        "xtick.top": False,
+        "ytick.labelsize": 14,
+        "ytick.direction": "in",
+        "ytick.right": False,
+        "grid.color": "grey",
+        "grid.linestyle": "--",
+        "grid.linewidth": 0.5,
+        "errorbar.capsize": 4,
+        "figure.subplot.wspace": 0.4,
+        "figure.subplot.hspace": 0.4,
+        "image.cmap": "viridis",
+    }
+)
 
 # Device configuration
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+
+data = pd.read_csv("../../data/hos_data/merged_data.csv")
 
 
-def load_and_preprocess_data(filepath):
-    try:
-        # Load data from a CSV file
-        df = pd.read_csv(filepath)
+def load_and_preprocess_data(
+    filepath,
+    areaname,
+    recovery_period=16,
+    rolling_window=7,
+    start_date="2020-04-01",
+    end_date="2020-07-31",
+):
+    """Load and preprocess the data from a CSV file."""
+    df = pd.read_csv(filepath)
+    df = df[df["nhs_region"] == areaname].reset_index(drop=True)
+    df = df[::-1].reset_index(drop=True)  # Reverse dataset if needed
 
-        # Ensure the 'date', 'cumulative_confirmed', and 'cumulative_deceased' columns exist
-        required_columns = [
-            "date",
-            "cumulative_confirmed",
-            "cumulative_deceased",
-            "population",
-            "new_confirmed",
-            "new_deceased",
-        ]
-        if not all(column in df.columns for column in required_columns):
-            raise ValueError("Missing required columns in the dataset")
+    df["date"] = pd.to_datetime(df["date"])
+    df = df[
+        (df["date"] >= pd.to_datetime(start_date))
+        & (df["date"] <= pd.to_datetime(end_date))
+    ]
 
-        # Convert 'date' column to datetime format
-        df["date"] = pd.to_datetime(df["date"])
+    df["recovered"] = df["cumulative_confirmed"].shift(recovery_period) - df[
+        "cumulative_deceased"
+    ].shift(recovery_period)
+    df["recovered"] = df["recovered"].fillna(0).clip(lower=0)
+    df["active_cases"] = (
+        df["cumulative_confirmed"] - df["recovered"] - df["cumulative_deceased"]
+    )
+    df["susceptible"] = (
+        df["population"]
+        - df["recovered"]
+        - df["cumulative_deceased"]
+        - df["cumulative_confirmed"]
+    )
 
-        # Calculate the number of days since the start of the dataset
-        df["days_since_start"] = (df["date"] - df["date"].min()).dt.days
+    cols_to_smooth = [
+        "cumulative_confirmed",
+        "cumulative_deceased",
+        "hospitalCases",
+        "covidOccupiedMVBeds",
+        "recovered",
+        "active_cases",
+        "new_deceased",
+        "new_confirmed",
+        "susceptible",
+    ]
 
-        # Smooth the 'cumulative_confirmed' and 'cumulative_deceased' with a 7-day rolling average
-        for col in [
-            "new_confirmed",
-            "new_deceased",
-            "cumulative_confirmed",
-            "cumulative_deceased",
-        ]:
-            df[col] = (
-                df[col].rolling(window=7, min_periods=1).mean().fillna(0).astype(int)
-            )
+    for col in cols_to_smooth:
+        df[col] = df[col].clip(lower=0)
 
-        # Calculate recovered cases assuming a fixed recovery period
-        recovery_period = 21
-        df["recovered"] = df["cumulative_confirmed"].shift(recovery_period) - df[
-            "cumulative_deceased"
-        ].shift(recovery_period)
+    for col in cols_to_smooth:
+        df[col] = df[col].rolling(window=rolling_window, min_periods=1).mean().fillna(0)
 
-        # Calculate the number of active cases
-        df["active_cases"] = (
-            df["cumulative_confirmed"] - df["recovered"] - df["cumulative_deceased"]
-        )
-
-        # Calculate the susceptible population (S(t))
-        df["S(t)"] = (
-            df["population"]
-            - df["active_cases"]
-            - df["recovered"]
-            - df["cumulative_deceased"]
-        )
-
-        # Fill any remaining missing values with 0
-        df.fillna(0, inplace=True)
-
-        return df
-    except FileNotFoundError:
-        print("File not found. Please check the filepath and try again.")
-    except pd.errors.EmptyDataError:
-        print("No data found. Please check the file content.")
-    except ValueError as e:
-        print(e)
+    return df
 
 
-def get_region_name_from_filepath(filepath):
+# Load and preprocess the data
+data = load_and_preprocess_data(
+    "../../data/hos_data/merged_data.csv",
+    areaname="South West",
+    recovery_period=21,
+    start_date="2020-04-01",
+    end_date="2020-08-31",
+)
 
-    base = os.path.basename(filepath)
-    return os.path.splitext(base)[0]
+region_name = "South West"
+
+# def load_and_preprocess_data(filepath, areaname="Yorkshire and the Humber"):
+#     try:
+#         # Load data from a CSV file
+#         df = pd.read_csv(filepath)
+#         df = df[::-1].reset_index(drop=True)  # Reverse dataset if needed
+
+#         df = df[df["nhs_region"] == areaname].reset_index(drop=True)
+#         # Ensure the 'date', 'cumulative_confirmed', and 'cumulative_deceased' columns exist
+#         required_columns = [
+#             "date",
+#             "cumulative_confirmed",
+#             "cumulative_deceased",
+#             "population",
+#             "new_confirmed",
+#             "new_deceased",
+#         ]
+#         if not all(column in df.columns for column in required_columns):
+#             raise ValueError("Missing required columns in the dataset")
+
+#         # Convert 'date' column to datetime format
+#         df["date"] = pd.to_datetime(df["date"])
+
+#         # Calculate the number of days since the start of the dataset
+#         df["days_since_start"] = (df["date"] - df["date"].min()).dt.days
+
+#         # Calculate recovered cases assuming a fixed recovery period
+#         recovery_period = 21
+#         df["recovered"] = df["cumulative_confirmed"].shift(recovery_period) - df[
+#             "cumulative_deceased"
+#         ].shift(recovery_period)
+
+#         # Calculate the number of active cases
+#         df["active_cases"] = (
+#             df["cumulative_confirmed"] - df["recovered"] - df["cumulative_deceased"]
+#         )
+
+#         # Calculate the susceptible population (S(t))
+#         df["S(t)"] = (
+#             df["population"]
+#             - df["recovered"]
+#             - df["active_cases"]
+#             - df["cumulative_deceased"]
+#         )
+
+#         # Smooth the 'cumulative_confirmed' and 'cumulative_deceased' with a 7-day rolling average
+#         for col in [
+#             "new_confirmed",
+#             "new_deceased",
+#             "cumulative_confirmed",
+#             "cumulative_deceased",
+#             "recovered",
+#             "active_cases",
+#             "S(t)",
+#         ]:
+#             df[col] = (
+#                 df[col].rolling(window=7, min_periods=1).mean().fillna(0).astype(int)
+#             )
+
+#         # Fill any remaining missing values with 0
+#         df.fillna(0, inplace=True)
+
+#     except FileNotFoundError:
+#         print("File not found. Please check the filepath and try again.")
+#     except pd.errors.EmptyDataError:
+#         print("No data found. Please check the file content.")
+#     except ValueError as e:
+#         print(e)
+
+#         return df
 
 
-path = "../../data/region_daily_data/Yorkshire and the Humber.csv"
-region_name = get_region_name_from_filepath(path)
-df = load_and_preprocess_data(f"../../data/region_daily_data/{region_name}.csv")
+# def get_region_name_from_filepath(filepath):
 
-start_date = "2020-04-01"
-end_date = "2022-05-31"
-mask = (df["date"] >= start_date) & (df["date"] <= end_date)
-training_data = df.loc[mask]
+#     base = os.path.basename(filepath)
+#     return os.path.splitext(base)[0]
+
+
+# path = "../../data/region_daily_data/Yorkshire and the Humber.csv"
+# region_name = get_region_name_from_filepath(path)
+# df = load_and_preprocess_data(f"../../data/region_daily_data/{region_name}.csv")
+
+# start_date = "2020-04-01"
+# end_date = "2020-08-31"
+# mask = (df["date"] >= start_date) & (df["date"] <= end_date)
+# data = data.loc[mask]
 
 transformer = MinMaxScaler()
 
 # Select the columns to scale
-columns_to_scale = ["S(t)", "active_cases", "recovered"]
+columns_to_scale = ["susceptible", "active_cases", "recovered"]
 
 # Fit the scaler to the training data
-transformer.fit(training_data[columns_to_scale])
+transformer.fit(data[columns_to_scale])
 
 # Transform the training data
-training_data[columns_to_scale] = transformer.transform(training_data[columns_to_scale])
+data[columns_to_scale] = transformer.transform(data[columns_to_scale])
 
 
 # Convert columns to tensors
 S_data = (
-    torch.tensor(training_data["S(t)"].values, dtype=torch.float32)
+    torch.tensor(data["susceptible"].values, dtype=torch.float32)
     .view(-1, 1)
     .to(device)
 )
 t_data = (
-    torch.tensor(range(len(training_data)), dtype=torch.float32)
+    torch.tensor(range(len(data)), dtype=torch.float32)
     .view(-1, 1)
     .requires_grad_(True)
     .to(device)
 )
 I_data = (
-    torch.tensor(training_data["active_cases"].values, dtype=torch.float32)
+    torch.tensor(data["active_cases"].values, dtype=torch.float32)
     .view(-1, 1)
     .to(device)
 )
 R_data = (
-    torch.tensor(training_data["recovered"].values, dtype=torch.float32)
+    torch.tensor(data["recovered"].values, dtype=torch.float32)
     .view(-1, 1)
     .to(device)
 )
@@ -307,14 +382,15 @@ def train_PINN(model, t_data, SIR_tensor, num_epochs=5000, lr=0.01):
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, "min", patience=500, factor=0.5, min_lr=1e-2, verbose=True
     )
-    early_stopping = EarlyStopping(patience=200)
+    early_stopping = EarlyStopping(patience=100)
     history = []
 
     for epoch in range(num_epochs):
         model.train()
         optimizer.zero_grad()
         predictions = model(t_data)
-        loss = sir_loss(predictions, SIR_tensor, t_data, df["population"].iloc[0])
+        N =data["population"].iloc[0] / data["population"].iloc[0]
+        loss = sir_loss(predictions, SIR_tensor, t_data, N)
         # reg_loss = model.regularization()  # Un-comment and compute regularization loss
         # total_loss = loss + reg_loss  # Combine primary loss and regularization loss
         loss.backward()
@@ -362,8 +438,7 @@ plt.grid(True, which="both", ls=":")
 plt.plot(np.arange(1, len(history) + 1), np.log10(history), label="Train Loss")
 plt.xlabel("Epoch")
 plt.ylabel("Log10(Loss)")
-plt.title(f"Training History {region_name}")
-plt.savefig(f"../../reports/images/Training_History_{region_name}.pdf")
+plt.title("Training History")
 plt.legend()
 plt.show()
 
@@ -445,11 +520,11 @@ full_actual_data = np.zeros((len(S_actual), transformer.n_features_in_))
 
 # Fill in the placeholders with the predicted and actual data
 # The order of columns in 'columns_to_scale' is ['recovered', 'active_cases', 'S(t)']
-full_predicted_data[:, columns_to_scale.index("S(t)")] = S_pred
+full_predicted_data[:, columns_to_scale.index("susceptible")] = S_pred
 full_predicted_data[:, columns_to_scale.index("active_cases")] = I_pred
 full_predicted_data[:, columns_to_scale.index("recovered")] = R_pred
 
-full_actual_data[:, columns_to_scale.index("S(t)")] = S_actual
+full_actual_data[:, columns_to_scale.index("susceptible")] = S_actual
 full_actual_data[:, columns_to_scale.index("active_cases")] = I_actual
 full_actual_data[:, columns_to_scale.index("recovered")] = R_actual
 
@@ -458,11 +533,11 @@ inverse_predicted_data = transformer.inverse_transform(full_predicted_data)
 inverse_actual_data = transformer.inverse_transform(full_actual_data)
 
 # Separate the inversely transformed S, I, R values for predicted and actual data
-S_pred_transformed = inverse_predicted_data[:, columns_to_scale.index("S(t)")]
+S_pred_transformed = inverse_predicted_data[:, columns_to_scale.index("susceptible")]
 I_pred_transformed = inverse_predicted_data[:, columns_to_scale.index("active_cases")]
 R_pred_transformed = inverse_predicted_data[:, columns_to_scale.index("recovered")]
 
-S_actual_transformed = inverse_actual_data[:, columns_to_scale.index("S(t)")]
+S_actual_transformed = inverse_actual_data[:, columns_to_scale.index("susceptible")]
 I_actual_transformed = inverse_actual_data[:, columns_to_scale.index("active_cases")]
 R_actual_transformed = inverse_actual_data[:, columns_to_scale.index("recovered")]
 

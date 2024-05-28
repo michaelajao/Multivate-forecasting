@@ -486,7 +486,7 @@ model_optimizer = optim.Adam(model.parameters(), lr=1e-4)
 param_optimizer = optim.Adam(param_net.parameters(), lr=1e-4)
 
 # Learning rate scheduler
-scheduler = StepLR(model_optimizer, step_size=2000, gamma=0.7)
+scheduler = StepLR(model_optimizer, step_size=5000, gamma=0.7)
 
 # Early stopping criteria
 early_stopping = EarlyStopping(patience=100, verbose=False)
