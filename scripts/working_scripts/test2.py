@@ -110,67 +110,69 @@ check_pytorch()
 #     df["susceptible"] = df["population"] - (df["recovered"] + df["cumulative_deceased"] + df["active_cases"])
     
 #     return df
-
+file_path = "../../data/hos_data/england_data.csv"
 def load_and_preprocess_data(
     filepath,
-    # areaname,
-    recovery_period=16,
     rolling_window=7,
     start_date="2020-04-01",
     end_date="2020-05-31",
+    recovery_window=14
 ):
     """Load and preprocess the data from a CSV file."""
     df = pd.read_csv(filepath)
-    # df = df[df["areaName"] == areaname].reset_index(drop=True)
-    # df = df[::-1].reset_index(drop=True)  # Reverse dataset if needed
-
     df["date"] = pd.to_datetime(df["date"])
     df = df[
         (df["date"] >= pd.to_datetime(start_date))
         & (df["date"] <= pd.to_datetime(end_date))
     ]
-    # R(t) = C(t − T ) − D(t − T ), where T is the average time to recovery
-    df["recovered"] = (
-        df["cumulative_confirmed"].shift(recovery_period)
-        - df["cumulative_deceased"].shift(recovery_period)
-    )
-    # df["recovered"] = df["recovered"].fillna(0)
-    df["active_cases"] = (
-        df["cumulative_confirmed"] - df["recovered"] - df["cumulative_deceased"]
-    )
-    df["susceptible"] = df["population"] - (
-        df["recovered"] + df["cumulative_deceased"] + df["active_cases"]
-    )
     
+    # Estimate recovery rates using a moving window
+    df["recovered"] = df["new_confirmed"].shift(recovery_window) - df["new_deceased"].shift(recovery_window)
+    df["recovered"] = df["recovered"].fillna(0).clip(lower=0)
 
+    # Calculate cumulative recovered cases
+    df["cumulative_recovered"] = df["recovered"].cumsum().fillna(0)
+
+    # Calculate active cases
+    df["active_cases"] = (
+        df["cumulative_confirmed"] - df["cumulative_recovered"] - df["cumulative_deceased"]
+    ).clip(lower=0)
+
+    # Calculate susceptible cases
+    df["susceptible"] = df["population"] - (
+        df["cumulative_recovered"] + df["cumulative_deceased"] + df["active_cases"]
+    ).clip(lower=0)
+
+    # Smooth the columns
     cols_to_smooth = [
-        "susceptible",
-        "new_confirmed"
+        "new_confirmed",
         "cumulative_confirmed",
         "cumulative_deceased",
         "hospitalCases",
         "covidOccupiedMVBeds",
-        "recovered",
         "new_deceased",
         "active_cases",
+        "susceptible",
+        "cumulative_recovered",
+        "recovered"
     ]
     for col in cols_to_smooth:
         if col in df.columns:
-            df[col] = (
-                df[col].rolling(window=rolling_window, min_periods=1).mean().fillna(0)
-            )
+            df[col] = df[col].rolling(window=rolling_window, min_periods=1).mean().fillna(0)
 
     return df
 
+# Process the data using the updated preprocessing function
+data = load_and_preprocess_data(file_path, rolling_window=7, start_date="2020-05-01", end_date="2020-08-31", recovery_window=21)
 # Load and preprocess the data
-data = load_and_preprocess_data("../../data/hos_data/england_data.csv", recovery_period=21, rolling_window=7, start_date="2020-05-01", end_date="2020-08-31")
+# data = load_and_preprocess_data("../../data/hos_data/england_data.csv", recovery_period=21, rolling_window=7, start_date="2020-05-01", end_date="2020-08-31")
 
 
 areaname = "England"
 
 # Plot susceptible data over time to check for any trends
 plt.figure()
-plt.plot(data["date"], data["recovered"], label="recovered")
+plt.plot(data["date"], data["cumulative_recovered"], label="cumulative_recovered")
 plt.xlabel("Date")
 plt.ylabel("recovered")
 plt.title(f"Recovered Over Time in {areaname}")
@@ -247,8 +249,8 @@ def SIRD_model(y, t, beta, gamma, delta, N):
 def prepare_tensors(data, device):
     t = tensor(np.arange(1, len(data) + 1), dtype=torch.float32).view(-1, 1).to(device).requires_grad_(True)
     S = tensor(data["susceptible"].values, dtype=torch.float32).view(-1, 1).to(device)
-    I = tensor(data["active_cases"].values, dtype=torch.float32).view(-1, 1).to(device)
-    R = tensor(data["recovered"].values, dtype=torch.float32).view(-1, 1).to(device)
+    I = tensor(data["cumulative_confirmed"].values, dtype=torch.float32).view(-1, 1).to(device)
+    R = tensor(data["cumulative_recovered"].values, dtype=torch.float32).view(-1, 1).to(device)
     D = tensor(data["cumulative_deceased"].values, dtype=torch.float32).view(-1, 1).to(device)
     return t, S, I, R, D
 
@@ -271,7 +273,7 @@ def split_and_scale_data(data, train_size, features, device):
     return tensor_data, N
 
 # Example features and data split
-features = ["susceptible", "active_cases", "recovered", "cumulative_deceased"]
+features = ["susceptible", "cumulative_confirmed", "cumulative_recovered", "cumulative_deceased"]
 train_size = 60
 
 tensor_data, N = split_and_scale_data(data, train_size, features, device)
@@ -435,9 +437,10 @@ D_pred = predictions[:, 3]
 
 # Actual data
 S_actual = data["susceptible"].values * N
-I_actual = data["active_cases"].values * N
-R_actual = data["recovered"].values * N
+I_actual = data["cumulative_confirmed"].values * N
+R_actual = data["cumulative_recovered"].values * N
 D_actual = data["cumulative_deceased"].values * N
+
 
 # Define training index size
 train_index_size = len(tensor_data["train"][0])
@@ -458,9 +461,9 @@ def plot_predictions_vs_actual(dates, actual, predicted, title, ylabel, train_in
     plt.show()
 
 plot_predictions_vs_actual(dates, S_actual, S_pred, "Susceptible Over Time", "Susceptible", train_index_size)
-plot_predictions_vs_actual(dates, I_actual, I_pred, "Active Cases Over Time", "Active Cases", train_index_size)
-plot_predictions_vs_actual(dates, R_actual, R_pred, "Recovered Over Time", "Recovered", train_index_size)
-plot_predictions_vs_actual(dates, D_actual, D_pred, "Deceased Over Time", "Deceased", train_index_size)
+plot_predictions_vs_actual(dates, I_actual, I_pred, "Active Cases Over Time", "cumulative_confirmed", train_index_size)
+plot_predictions_vs_actual(dates, R_actual, R_pred, "Recovered Over Time", "cumulative_recovered", train_index_size)
+plot_predictions_vs_actual(dates, D_actual, D_pred, "Deceased Over Time", "cumulative_deceased", train_index_size)
 
 # Extract the parameter values
 beta = model.beta.item()
@@ -476,8 +479,8 @@ print(f"Estimated delta: {delta:.4f}")
 output = pd.DataFrame({
     "date": dates,
     "susceptible": S_pred,
-    "active_cases": I_pred,
-    "recovered": R_pred,
+    "cumulative_confirmed": I_pred,
+    "cumulative_recovered": R_pred,
     "cumulative_deceased": D_pred,
 })
 output.to_csv(f"../../reports/output/{train_size}_pinn_{areaname}_output.csv", index=False)
@@ -510,8 +513,8 @@ def evaluate_model(model, data, device, N):
         D_pred = predictions[:, 3]
 
         S_actual = data["susceptible"].values * N
-        I_actual = data["active_cases"].values * N
-        R_actual = data["recovered"].values * N
+        I_actual = data["cumulative_confirmed"].values * N
+        R_actual = data["cumulative_recovered"].values * N
         D_actual = data["cumulative_deceased"].values * N
 
         mae_s = mean_absolute_error(S_actual, S_pred)
