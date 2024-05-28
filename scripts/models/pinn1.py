@@ -312,7 +312,7 @@ class NeuralNet(nn.Module):
             if isinstance(m, nn.Linear):
                 g = nn.init.calculate_gain("tanh")
                 nn.init.xavier_uniform_(m.weight, gain=g)
-                m.bias.data.fill_(0)
+                m.bias.data.fill_(0.01)
 
         self.apply(init_weights)
 
@@ -375,7 +375,7 @@ def sir_loss(model_output, SIR_tensor, t, N, beta=0.25, gamma=0.15):
 
 
 def train_PINN(model, t_data, SIR_tensor, num_epochs=5000, lr=0.01):
-    optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=1e-5)
+    optimizer = optim.Adam(model.parameters(), lr=lr)
     # scheduler = torch.optim.lr_scheduler.StepLR(
     #     optimizer, step_size=10000, gamma=0.1
     # )  # Adjust as needed
