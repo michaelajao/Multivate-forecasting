@@ -87,30 +87,79 @@ def check_pytorch():
 check_pytorch()
 
 # Function to load and preprocess data
-def load_and_preprocess_data(filepath, recovery_period=16, rolling_window=7, start_date="2020-04-01", end_date="2020-05-31"):
+# def load_and_preprocess_data(filepath, recovery_period=16, rolling_window=7, start_date="2020-04-01", end_date="2020-05-31"):
+#     df = pd.read_csv(filepath)
+#     df["date"] = pd.to_datetime(df["date"])
+#     df = df[(df["date"] >= pd.to_datetime(start_date)) & (df["date"] <= pd.to_datetime(end_date))]
+    
+#     # Smooth the columns
+#     cols_to_smooth = ["susceptible", "new_confirmed", "cumulative_confirmed", "cumulative_deceased", "hospitalCases", "covidOccupiedMVBeds", "recovered", "new_deceased", "active_cases"]
+#     for col in cols_to_smooth:
+#         if col in df.columns:
+#             df[col] = df[col].rolling(window=rolling_window, min_periods=1).mean().fillna(0)
+    
+#     # Calculate initial recovered cases based on a given recovery rate or an initial period
+#     df["recovered"] = df["cumulative_confirmed"].shift(recovery_period) - df["cumulative_deceased"].shift(recovery_period)
+#     df["recovered"] = df["recovered"].fillna(0).clip(lower=0)
+    
+#     # Forward fill the initial recovered value to fill the gap created by shifting
+#     # df["recovered"].fillna(method='ffill', inplace=True)
+    
+#     # Calculate other columns
+#     df["active_cases"] = df["cumulative_confirmed"] - df["recovered"] - df["cumulative_deceased"]
+#     df["susceptible"] = df["population"] - (df["recovered"] + df["cumulative_deceased"] + df["active_cases"])
+    
+#     return df
+
+def load_and_preprocess_data(
+    filepath,
+    # areaname,
+    recovery_period=16,
+    rolling_window=7,
+    start_date="2020-04-01",
+    end_date="2020-05-31",
+):
+    """Load and preprocess the data from a CSV file."""
     df = pd.read_csv(filepath)
+    # df = df[df["areaName"] == areaname].reset_index(drop=True)
+    # df = df[::-1].reset_index(drop=True)  # Reverse dataset if needed
+
     df["date"] = pd.to_datetime(df["date"])
-    df = df[(df["date"] >= pd.to_datetime(start_date)) & (df["date"] <= pd.to_datetime(end_date))]
-    
-    # Smooth the columns
-    cols_to_smooth = ["susceptible", "new_confirmed", "cumulative_confirmed", "cumulative_deceased", "hospitalCases", "covidOccupiedMVBeds", "recovered", "new_deceased", "active_cases"]
-    for col in cols_to_smooth:
-        if col in df.columns:
-            df[col] = df[col].rolling(window=rolling_window, min_periods=1).mean().fillna(0)
-    
-    # Calculate initial recovered cases based on a given recovery rate or an initial period
-    df["recovered"] = df["cumulative_confirmed"].shift(recovery_period) - df["cumulative_deceased"].shift(recovery_period)
-    df["recovered"] = df["recovered"].fillna(0).clip(lower=0)
-    
-    # Forward fill the initial recovered value to fill the gap created by shifting
-    # df["recovered"].fillna(method='ffill', inplace=True)
-    
-    # Calculate other columns
-    df["active_cases"] = df["cumulative_confirmed"] - df["recovered"] - df["cumulative_deceased"]
-    df["susceptible"] = df["population"] - (df["recovered"] + df["cumulative_deceased"] + df["active_cases"])
+    df = df[
+        (df["date"] >= pd.to_datetime(start_date))
+        & (df["date"] <= pd.to_datetime(end_date))
+    ]
+    # R(t) = C(t − T ) − D(t − T ), where T is the average time to recovery
+    df["recovered"] = (
+        df["cumulative_confirmed"].shift(recovery_period)
+        - df["cumulative_deceased"].shift(recovery_period)
+    )
+    # df["recovered"] = df["recovered"].fillna(0)
+    df["active_cases"] = (
+        df["cumulative_confirmed"] - df["recovered"] - df["cumulative_deceased"]
+    )
+    df["susceptible"] = df["population"] - (
+        df["recovered"] + df["cumulative_deceased"] + df["active_cases"]
+    )
     
 
-    
+    cols_to_smooth = [
+        "susceptible",
+        "new_confirmed"
+        "cumulative_confirmed",
+        "cumulative_deceased",
+        "hospitalCases",
+        "covidOccupiedMVBeds",
+        "recovered",
+        "new_deceased",
+        "active_cases",
+    ]
+    for col in cols_to_smooth:
+        if col in df.columns:
+            df[col] = (
+                df[col].rolling(window=rolling_window, min_periods=1).mean().fillna(0)
+            )
+
     return df
 
 # Load and preprocess the data
@@ -152,7 +201,7 @@ class SEIRDNet(nn.Module):
         self.init_xavier()
 
     def forward(self, t):
-        return self.net(t)
+        return torch.sigmoid(self.net(t))
 
     @property
     def beta(self):

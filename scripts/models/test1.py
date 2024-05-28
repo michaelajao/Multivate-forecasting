@@ -69,7 +69,7 @@ plt.rcParams.update(
         "figure.subplot.wspace": 0.4,
         "figure.subplot.hspace": 0.4,
         "image.cmap": "viridis",
-        "text.latex.preamble": r"\usepackage{amsmath}",  # Latex preamble for math expressions
+        # "text.latex.preamble": r"\usepackage{amsmath}",  # Latex preamble for math expressions
     }
 )
 
