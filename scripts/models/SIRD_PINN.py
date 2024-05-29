@@ -99,7 +99,7 @@ def load_and_preprocess_data(
 ):
     """Load and preprocess the data from a CSV file."""
     df = pd.read_csv(filepath)
-    df = df[df["areaName"] == areaname].reset_index(drop=True)
+    df = df[df["nhs_region"] == areaname].reset_index(drop=True)
     df = df[::-1].reset_index(drop=True)  # Reverse dataset if needed
 
     df["date"] = pd.to_datetime(df["date"])
@@ -144,7 +144,7 @@ data = load_and_preprocess_data(
     recovery_period=21,
     start_date="2020-04-01",
     end_date="2020-12-31",
-).drop(columns=["Unnamed: 0"], axis=1)
+)
 
 
 class SIRDNet(nn.Module):
