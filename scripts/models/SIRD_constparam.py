@@ -407,7 +407,7 @@ def train_loop(model, optimizer, scheduler, earlystopping, epochs, tensor_data, 
             print("Early stopping")
             break
 
-        if (epoch + 1) % 1000 == 0:
+        if (epoch + 1) % 1000 == 0 or epoch == 0:
             print(f"Epoch {epoch + 1}/{epochs}, Loss: {loss.item():.6f}")
 
     return model, loss_history
