@@ -131,7 +131,7 @@ data = load_and_preprocess_data(
     recovery_period=21,
     rolling_window=7,
     start_date="2020-05-01",
-    end_date="2020-12-31",
+    end_date="2020-08-31",
 )
 
 areaname = "England"
@@ -202,7 +202,7 @@ class SEIRDNet(nn.Module):
                 g = nn.init.calculate_gain("tanh")
                 nn.init.xavier_uniform_(m.weight, gain=g)
                 if m.bias is not None:
-                    m.bias.data.fill_(0)
+                    m.bias.data.fill_(0.01)
         self.apply(init_weights)
 
 
@@ -262,7 +262,7 @@ def split_and_scale_data(data, train_size, features, device):
 features = ["susceptible", "active_cases", "recovered", "cumulative_deceased"]
 
 # Set the training size to 90% of the data
-train_size = 200
+train_size = 60
 
 tensor_data, scaler = split_and_scale_data(data, train_size, features, device)
 
