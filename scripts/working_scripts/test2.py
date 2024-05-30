@@ -224,7 +224,7 @@ class SEIRDNet(nn.Module):
                 g = nn.init.calculate_gain("tanh")
                 nn.init.xavier_uniform_(m.weight, gain=g)
                 if m.bias is not None:
-                    m.bias.data.fill_(0.01)
+                    m.bias.data.fill_(0.001)
         self.apply(init_weights)
 
 # Function for network prediction
