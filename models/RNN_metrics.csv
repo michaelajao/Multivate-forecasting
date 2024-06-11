@@ -1,0 +1,2 @@
+Algorithm,MAE,MSE,MASE,Forecast Bias
+RNN,1.6175,2.8425,7.0797,-1.62
