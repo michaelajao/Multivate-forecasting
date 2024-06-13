@@ -102,7 +102,7 @@ def load_and_preprocess_data(filepath, areaname, recovery_period=16, rolling_win
     return df
 
 # Load and preprocess the data
-data = load_and_preprocess_data("../../data/hos_data/merged_data.csv", areaname="South West", recovery_period=21, start_date="2020-04-01").drop(columns=["Unnamed: 0"], axis=1)
+data = load_and_preprocess_data("../../data/processed/merged_nhs_covid_data.csv", areaname="South West", recovery_period=21, start_date="2020-04-01")
 
 
 class EpiNet(nn.Module):
@@ -375,40 +375,9 @@ plt.title("Training Loss over Epochs (Log Scale)")
 plt.legend()
 plt.show()
 
+# plot the model output and the actual data
 
+def plot_model_output(data, model, beta_net, scaler, device, N, features, title="Model Output"):
+    
+    
 
-# initial_conditions for the SIHCRD model based on the data
-S0 = data["S(t)"].values[0]
-I0 = data["active_cases"].values[0]
-H0 = data["hospitalCases"].values[0]    
-C0 = data["covidOccupiedMVBeds"].values[0]  
-R0 = data["recovered"].values[0]
-D0 = data["new_deceased"].values[0]
-
-# simulation time points
-t = np.linspace(0, train_size, train_size+1)[:-1]
-
-u0 = [S0, I0, H0, C0, R0, D0]  # initial conditions vector
-
-# Extract the parameters from the trained model
-params = beta_net(tensor(t).to(device)).detach().cpu().numpy()
-
-beta = params[:, 0]
-gamma = params[:, 1]
-delta = params[:, 2]
-rho = params[:, 3]
-eta = params[:, 4]
-kappa = params[:, 5]
-mu = params[:, 6]
-xi = params[:, 7]
-
-
-# plot the beta parameter
-plt.figure(figsize=(16, 9))
-plt.plot(t, beta, label="Beta (β)")
-plt.xlabel("Time (days)")
-plt.ylabel("Value")
-plt.title("Beta (β) Parameter")
-plt.tight_layout()
-plt.legend()
-plt.show()
